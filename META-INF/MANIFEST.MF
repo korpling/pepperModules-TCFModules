@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1390391060994
+Build-Jdk: 1.7.0_25
+Built-By: klotzmaz
+Bundle-Description: This module will allow converting from TCF to Salt a
+ nd the other way around
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-ManifestVersion: 2
+Bundle-Name: pepperModules-TCFModules
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: de.hu_berlin.german.korpling.saltnpepper.pepperModu
+ les-TCFModules;singleton:=true
+Bundle-Vendor: Humboldt Univerity of Berlin, INRIA
+Bundle-Version: 1.1.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Export-Package: de.hu_berlin.german.korpling.saltnpepper.pepperModules.s
+ ampleModules;uses:="de.hu_berlin.german.korpling.saltnpepper.pepper.pep
+ perExceptions,de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.
+ sCorpusStructure,de.hu_berlin.german.korpling.saltnpepper.pepper.pepper
+ Modules,org.eclipse.emf.common.util,de.hu_berlin.german.korpling.saltnp
+ epper.salt.saltCore,de.hu_berlin.german.korpling.saltnpepper.pepper.pep
+ perModules.impl";version="1.1.0.SNAPSHOT"
+Import-Package: de.hu_berlin.german.korpling.saltnpepper.pepper.pepperEx
+ ceptions;version="[1.1,2)",de.hu_berlin.german.korpling.saltnpepper.pep
+ per.pepperModules;version="[1.1,2)",de.hu_berlin.german.korpling.saltnp
+ epper.pepper.pepperModules.impl;version="[1.1,2)",de.hu_berlin.german.k
+ orpling.saltnpepper.salt.saltCommon.sCorpusStructure,de.hu_berlin.germa
+ n.korpling.saltnpepper.salt.saltCore,org.eclipse.emf.common.util
+META-INF: /home/klotzmaz/Documents/SNP/workspace/pepperModules-TCFModule
+ s/META-INF
+OSGI-INF: OSGI-INF
+Service-Component: OSGI-INF/service-component/*.xml
+Tool: Bnd-1.50.0

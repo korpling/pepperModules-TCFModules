@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1390395580903
-Build-Jdk: 1.7.0_25
+Bnd-LastModified: 1391180465465
+Build-Jdk: 1.7.0_51
 Built-By: klotzmaz
 Bundle-Description: This module will allow converting from TCF to Salt a
  nd the other way around
@@ -14,13 +14,18 @@ Bundle-Vendor: Humboldt Univerity of Berlin, INRIA
 Bundle-Version: 1.1.0.SNAPSHOT
 Created-By: Apache Maven Bundle Plugin
 Export-Package: de.hu_berlin.german.korpling.saltnpepper.pepperModules.T
- CFModules;version="1.1.0.SNAPSHOT",de.hu_berlin.german.korpling.saltnpe
- pper.pepperModules.sampleModules;uses:="de.hu_berlin.german.korpling.sa
- ltnpepper.pepper.pepperExceptions,de.hu_berlin.german.korpling.saltnpep
- per.salt.saltCommon.sCorpusStructure,de.hu_berlin.german.korpling.saltn
- pepper.pepper.pepperModules,org.eclipse.emf.common.util,de.hu_berlin.ge
- rman.korpling.saltnpepper.salt.saltCore,de.hu_berlin.german.korpling.sa
- ltnpepper.pepper.pepperModules.impl";version="1.1.0.SNAPSHOT"
+ CFModules;uses:="de.hu_berlin.german.korpling.saltnpepper.pepper.pepper
+ Exceptions,de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCo
+ rpusStructure,de.hu_berlin.german.korpling.saltnpepper.pepper.pepperMod
+ ules,org.eclipse.emf.common.util,de.hu_berlin.german.korpling.saltnpepp
+ er.salt.saltCore,de.hu_berlin.german.korpling.saltnpepper.pepper.pepper
+ Modules.impl";version="1.1.0.SNAPSHOT",de.hu_berlin.german.korpling.sal
+ tnpepper.pepperModules.sampleModules;uses:="de.hu_berlin.german.korplin
+ g.saltnpepper.pepper.pepperExceptions,de.hu_berlin.german.korpling.salt
+ npepper.salt.saltCommon.sCorpusStructure,de.hu_berlin.german.korpling.s
+ altnpepper.pepper.pepperModules,org.eclipse.emf.common.util,de.hu_berli
+ n.german.korpling.saltnpepper.salt.saltCore,de.hu_berlin.german.korplin
+ g.saltnpepper.pepper.pepperModules.impl";version="1.1.0.SNAPSHOT"
 Import-Package: de.hu_berlin.german.korpling.saltnpepper.pepper.pepperEx
  ceptions;version="[1.1,2)",de.hu_berlin.german.korpling.saltnpepper.pep
  per.pepperModules;version="[1.1,2)",de.hu_berlin.german.korpling.saltnp

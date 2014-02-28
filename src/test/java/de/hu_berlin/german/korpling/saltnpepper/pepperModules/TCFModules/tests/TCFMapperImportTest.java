@@ -467,13 +467,14 @@ public class TCFMapperImportTest {
 		/* compare template salt model to imported salt model */	
 		
 		SToken tok;
+		String posQName = SaltSemanticsPackage.eNS_PREFIX+"::"+SALT_SEMANTIC_NAMES.POS.toString();
 		for(int i=0; i<fixGraph.getSTokens().size(); i++){			
 			tok = fixGraph.getSTokens().get(i);
-			assertNotEquals(tok.getSAnnotation(TCFMapperImport.LEVEL_POS), null);
-			assertNotEquals(tok.getSAnnotation(TCFMapperImport.LEVEL_POS).getValue(), null);
-			assertNotEquals(tok.getSAnnotation(TCFMapperImport.LEVEL_POS).getValue(), "");
+			assertNotEquals(tok.getSAnnotation(posQName), null);
+			assertNotEquals(tok.getSAnnotation(posQName).getValue(), null);
+			assertNotEquals(tok.getSAnnotation(posQName).getValue(), "");
 			/* compare assuming the tokens are stored in their linear order (always true) */			
-			assertEquals(tok.getSAnnotation(TCFMapperImport.LEVEL_POS).getValue(), docGraph.getSTokens().get(i).getSAnnotation(SaltSemanticsPackage.eNS_PREFIX+"::"+SALT_SEMANTIC_NAMES.POS.toString()).getValue());			
+			assertEquals(tok.getSAnnotation(posQName).getValue(), docGraph.getSTokens().get(i).getSAnnotation(posQName).getValue());			
 		}		
 	}
 	
@@ -771,12 +772,13 @@ public class TCFMapperImportTest {
 		/* compare template salt model to imported salt model */	
 		SDocumentGraph fixGraph = getFixture().getSDocument().getSDocumentGraph();
 		SToken tok;
+		String lemmaQName = SaltSemanticsPackage.eNS_PREFIX+"::"+SALT_SEMANTIC_NAMES.LEMMA.toString();
 		for(int i=0; i<fixGraph.getSTokens().size(); i++){
 			tok = fixGraph.getSTokens().get(i);
-			assertNotEquals(tok.getSAnnotation(TCFMapperImport.LEVEL_LEMMA), null);
+			assertNotEquals(tok.getSAnnotation(lemmaQName), null);
 			
 			/* compare with the (always true) assumption that the tokens are stored in their linear order */			
-			assertEquals(tok.getSAnnotation(TCFMapperImport.LEVEL_LEMMA), docGraph.getSTokens().get(i).getSAnnotation(TCFMapperImport.LEVEL_LEMMA));			
+			assertEquals(tok.getSAnnotation(lemmaQName), docGraph.getSTokens().get(i).getSAnnotation(lemmaQName));			
 		}
 	}
 	

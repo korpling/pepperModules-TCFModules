@@ -65,8 +65,22 @@
     <url>https://github.com/MartinKl/pepperModules-TCFModules</url>
   </scm>
  
-  <dependencies>
-    <!-- TODO /10/ ... put here all the dependencies you need, which are not already included in the parent project...-->
+  <dependencies> 
+    <dependency>
+    	<groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
+    <artifactId>salt-saltCommon</artifactId>
+    <version>1.1.8-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+    	<groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
+    <artifactId>salt-saltSample</artifactId>
+    <version>1.1.8-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+	<groupId>junit</groupId>
+	<artifactId>junit</artifactId>
+	<version>4.11</version>
+</dependency>
   </dependencies>
   <build>
     <plugins>

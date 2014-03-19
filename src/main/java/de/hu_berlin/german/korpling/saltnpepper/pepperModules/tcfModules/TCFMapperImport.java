@@ -66,6 +66,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 		private String currentAnnoID;
 		private String currentAnnoKey;
 		private SNode currentSNode;
+		private boolean shrinkTokenAnnotation;
 		
 		public TCFReader(){
 			super();
@@ -76,7 +77,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			currentAnnoID = null;
 			currentAnnoKey = null;
 			p = 0;
-			((TCFImporterProperties)getProperties()).isShrinkTokenAnnotation(); /* TODO */
+			shrinkTokenAnnotation = ((TCFImporterProperties)getProperties()).isShrinkTokenAnnotation(); /* TODO */
 		}
 		
 		@Override

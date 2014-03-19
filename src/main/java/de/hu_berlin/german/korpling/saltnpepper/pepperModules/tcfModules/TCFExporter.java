@@ -15,7 +15,7 @@
  *
  *
  */
-package de.hu_berlin.german.korpling.saltnpepper.pepperModules.TCFModules;
+package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;

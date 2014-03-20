@@ -1,8 +1,0 @@
-<container xmlns="http://www.osgi.org/xmlns/scr/v1.1.0">
-  <component name="TCFExporterComponent" factory="PepperExporterComponentFactory">
-    <implementation class="de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFExporter"/>
-    <service>
-      <provide interface="de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperExporter"/>
-    </service>
-  </component>
-</container>

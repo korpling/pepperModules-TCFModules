@@ -65,14 +65,11 @@ public class TCFImporter extends PepperImporterImpl implements PepperImporter
 	public TCFImporter()
 	{
 		super();
-		//TODO change the name of the module, for example use the format name and the ending Importer (FORMATImporter)
 		this.setName("TCFImporter");
-		//TODO change the version of your module, we recommend to synchronize this value with the maven version in your pom.xml
-		this.setVersion("1.1.0");
-		//TODO change "sample" with format name and 1.0 with format version to support
-		this.addSupportedFormat("TCF", "1.0", null);
-		//TODO change the endings in endings of files you want to import, see also predefined endings beginning with 'ENDING_' 
-		this.getSDocumentEndings().add("xml");
+		this.setVersion("0.0.1");
+		this.addSupportedFormat("TCF", "0.4", null);
+		this.setProperties(new TCFImporterProperties());
+		this.getSDocumentEndings().add(ENDING_XML);
 		this.getSDocumentEndings().add(PepperImporter.ENDING_LEAF_FOLDER); //CHECK: does this always work? If not, p.17 (2) and (3) propose solutions 
 	}
 	
@@ -89,9 +86,7 @@ public class TCFImporter extends PepperImporterImpl implements PepperImporter
 	 * @param sElementId {@link SElementId} of the {@link SCorpus} or {@link SDocument} to be processed. 
 	 * @return {@link PepperMapper} object to do the mapping task for object connected to given {@link SElementId}
 	 */
-	public PepperMapper createPepperMapper(SElementId sElementId)
-	{		
-		//TODO create an object of a class derived from PepperMapper and return it, if necessary, make some more initializations		
+	public PepperMapper createPepperMapper(SElementId sElementId){		
 		return(new TCFMapperImport());
 	}
 	
@@ -128,21 +123,5 @@ public class TCFImporter extends PepperImporterImpl implements PepperImporter
 	{
 		//TODO make some initializations if necessary
 		return(super.isReadyToStart());
-	}
-	
-	/**
-	 * <strong>OVERRIDE THIS METHOD FOR CUSTOMIZATION</strong>
-	 * 
-	 * This method is called by the pepper framework to import the corpus-structure. In case that you are creating an importer, 
-	 * check if the default behavior of the corpus-structure import mechanism fits for your need. If the default behaviour does not 
-	 * fullfill your needs, or you don't know the default, we recommend, to take a look into the
-	 * 'Developer's Guide for Pepper modules', you will find on <a href="https://korpling.german.hu-berlin.de/saltnpepper/">https://korpling.german.hu-berlin.de/saltnpepper/</a>. 
-	 * @param corpusGraph the CorpusGraph object, which has to be fullfilled.
-	 */
-	@Override
-	public void importCorpusStructure(SCorpusGraph sCorpusGraph) throws PepperModuleException
-	{
-		//TODO remove the following line of code for adoption
-		super.importCorpusStructure(sCorpusGraph);
 	}
 }

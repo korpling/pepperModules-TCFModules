@@ -58,7 +58,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 	}
 	
 	private class TCFReader extends DefaultHandler2 implements TCFDictionary {
-		private STextualDS currentSTDs;
+		private STextualDS currentSTDS;
 		private int p;
 		private Stack<String> path;	
 		private Stack<String> idPath;
@@ -111,7 +111,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				syntaxLayer.setSName(LAYER_CONSTITUENTS);
 				syntaxLayer.createSAnnotation(null, ATT_TAGSET, attributes.getValue(ATT_TAGSET));
 				sLayers.put(LAYER_CONSTITUENTS, syntaxLayer);
-				getSDocument().getSDocumentGraph().addLayer(syntaxLayer);
+				getSDocument().getSDocumentGraph().addSLayer(syntaxLayer);
 			}
 			else if (TAG_GENERALINFO.equals(localName)){
 			}
@@ -177,7 +177,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				currentTokenID = null;
 				SLayer depLayer = SaltFactory.eINSTANCE.createSLayer();
 				depLayer.setSName(LAYER_DEPENDENCIES);
-				getSDocument().getSDocumentGraph().addLayer(depLayer);
+				getSDocument().getSDocumentGraph().addSLayer(depLayer);
 				/* TODO the same has to be done in SaltSample, still undone */
 				/* TODO the same has to be done for POS both in SaltSample(CHECK) and here */
 				/* TODO CHECK does this layer actually make any sense? */
@@ -218,7 +218,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_TC_TEXT.equals(localName)){
 				STextualDS primaryText = SaltFactory.eINSTANCE.createSTextualDS();
-				currentSTDs = primaryText;
+				currentSTDS = primaryText;
 				getSDocument().getSDocumentGraph().addSNode(primaryText);
 				/* reset pointer */
 				p = 0;
@@ -260,6 +260,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				SLayer posLayer = SaltFactory.eINSTANCE.createSLayer();
 				posLayer.setSName(LAYER_POS);
 				sLayers.put(LAYER_POS, posLayer);
+				getSDocument().getSDocumentGraph().addSLayer(posLayer);
 			}
 			else if (TAG_RESOURCES.equals(localName)){
 			}
@@ -303,17 +304,17 @@ public class TCFMapperImport extends PepperMapperImpl{
 				txt.append(ch[i]);
 			}
 			if(TAG_TC_TEXT.equals(path.peek())){				
-				currentSTDs.setSText(txt.toString());
+				currentSTDS.setSText(txt.toString());
 			}
 			else if(TAG_TC_TOKEN.equals(path.peek())){
 				/* build token */				
-				String primaryData = currentSTDs.getSText();
+				String primaryData = currentSTDS.getSText();
 				String tok = txt.toString();
 				while(!primaryData.substring(p).startsWith(tok)){
 					p++;
 				}
 				
-				sNodes.put(currentTokenID, getSDocument().getSDocumentGraph().createSToken(currentSTDs, p, p+tok.length()));
+				sNodes.put(currentTokenID, getSDocument().getSDocumentGraph().createSToken(currentSTDS, p, p+tok.length()));
 			}
 			else if(TAG_TC_TAG.equals(path.peek())){
 				/* build annotation – only use in POS */

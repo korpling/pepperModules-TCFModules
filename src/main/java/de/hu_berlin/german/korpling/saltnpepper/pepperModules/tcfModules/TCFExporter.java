@@ -20,13 +20,10 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
 
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperExceptions.PepperModuleException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperExceptions.PepperModuleNotReadyException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperExporter;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperMapper;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperModule;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperModuleProperties;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.impl.PepperExporterImpl;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperExporter;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModule;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModuleProperties;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;

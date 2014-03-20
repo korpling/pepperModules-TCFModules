@@ -451,6 +451,123 @@ public class TCFMapperImportTest {
 			assertEquals(tok.getSAnnotation(posQName).getValue(), docGraph.getSTokens().get(i).getSAnnotation(posQName).getValue());			
 		}		
 	}
+
+	/**
+	 * This method tests if a valid TCF-XML-structure containing pos-tagged tokens
+	 * is converted to salt correctly by {@link TCFMapperImport}. In this test case
+	 * a single annotation over a sequence of tokens is used. {@link TCFMapperImport} is
+	 * supposed to build a {@link SSpan} over a token sequence that is POS annotated
+	 * while single tokens annotations are directly stored at the {@link SToken} object as
+	 * {@link SPOSAnnotation}.
+	 * @throws XMLStreamException 
+	 * @throws FileNotFoundException 
+	 */
+	@Test
+	public void testTokensPosShrinked() throws XMLStreamException, FileNotFoundException{
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory o= XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);		
+		
+		xmlWriter.writeStartDocument();
+			xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+			xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+			xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+			xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+			xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+			xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+			xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+			xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
+				xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeCharacters(EXAMPLE_TEXT);
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+							xmlWriter.writeCharacters("I");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+							xmlWriter.writeCharacters("love");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+							xmlWriter.writeCharacters("New");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+							xmlWriter.writeCharacters("York");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+							xmlWriter.writeCharacters(".");
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.TAG_TC_POSTAGS);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TAGSET, "penn treebank");
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_TAG);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt1");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t1");
+						xmlWriter.writeCharacters("PP");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_TAG);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt2");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t2");
+						xmlWriter.writeCharacters("VBZ");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_TAG);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt3");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3 t4");
+						xmlWriter.writeCharacters("NE");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_TAG);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt4");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t5");
+						xmlWriter.writeCharacters(".");
+						xmlWriter.writeEndElement();						
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();
+			xmlWriter.writeEndElement();
+		xmlWriter.writeEndDocument();
+				
+		/* generating salt sample */
+		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
+		SDocumentGraph docGraph = doc.getSDocumentGraph();
+		docGraph.createSTextualDS("I love New York.");
+		
+		/**
+		 * TODO SLayer <-- maybe put tagset information in there
+		 */
+		
+		/* setting variables */		
+		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_TOKENS_POS);
+		tmpOut.getParentFile().mkdirs();
+		PrintWriter p = new PrintWriter(tmpOut);		
+		p.println(outStream.toString());
+		p.close();
+		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		
+		/* start mapper */
+		System.out.println(tmpOut);		
+		this.getFixture().mapSDocument();
+	}
+	
+	/**
+	 * This method tests if a valid TCF-XML-structure containing pos-tagged tokens
+	 * is converted to salt correctly by {@link TCFMapperImport}. In this test case
+	 * a single annotation over a sequence of tokens is used. {@link TCFMapperImport} is
+	 * supposed to build a {@link SSpan} both over a token sequence and a single token.
+	 * The {@link SPOSAnnotation} has to be added to the {@link SSpan} object.
+	 * @throws XMLStreamException 
+	 * @throws FileNotFoundException
+	 */
+	@Test
+	public void testTokensPosNotShrinked(){
+		
+	}
 	
 	/**
 	 * This method tests if a valid TCF-XML-structure containing a sentence

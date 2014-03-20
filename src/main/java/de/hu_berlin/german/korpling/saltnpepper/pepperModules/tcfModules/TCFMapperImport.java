@@ -10,6 +10,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
 
+import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -41,7 +43,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 	public static final String ANNO_NAME_CONSTITUENT = "const";
 	
 	@Override
-	public MAPPING_RESULT mapSDocument() {
+	public DOCUMENT_STATUS mapSDocument() {
 		sNodes = new BasicEMap<String, SNode>();
 		labels = new BasicEMap<String, Label>();
 		sLayers = new BasicEMap<String, SLayer>();
@@ -52,7 +54,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 		getSDocument().setSDocumentGraph(docGraph);
 		TCFReader reader = new TCFReader();
 		this.readXMLResource(reader, getResourceURI());
-		return(MAPPING_RESULT.FINISHED);
+		return(DOCUMENT_STATUS.COMPLETED);
 	}
 	
 	private class TCFReader extends DefaultHandler2 implements TCFDictionary {

@@ -24,6 +24,9 @@ import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperExporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModule;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModuleProperties;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleNotReadyException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperExporterImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -60,7 +63,7 @@ public class TCFExporter extends PepperExporterImpl implements PepperExporter
 		{
 			super();
 			//TODO change the name of the module, for example use the format name and the ending Exporter (FORMATExporter)
-			this.name= "TCFExporter";
+			this.setName("TCFExporter");
 			//TODO change the version of your module, we recommend to synchronize this value with the maven version in your pom.xml
 			this.setVersion("1.1.0");
 			//TODO change "sample" with format name and 1.0 with format version to support

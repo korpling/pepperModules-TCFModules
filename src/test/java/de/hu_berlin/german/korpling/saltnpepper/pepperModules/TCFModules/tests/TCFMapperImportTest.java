@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1541,12 +1543,14 @@ public class TCFMapperImportTest {
 	}
 	
 	/**This method tests if a valid TCF-XML-structure containing morphology
-	 * annotations is converted to salt correctly by {@link TCFMapperImport} 
+	 * annotations is converted to salt correctly by {@link TCFMapperImport}. The Mapper
+	 * is supposed to build a span for both morphology annotations on single and on multiple
+	 * {@link SToken} objects. 
 	 * @throws XMLStreamException 
 	 * @throws FileNotFoundException 
 	 */
 	@Test
-	public void testMorphology() throws XMLStreamException, FileNotFoundException{
+	public void testMorphologyNotShrinked() throws XMLStreamException, FileNotFoundException{
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		XMLOutputFactory o= XMLOutputFactory.newFactory();
 		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
@@ -1725,7 +1729,7 @@ public class TCFMapperImportTest {
 							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
 							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "adjective");
 							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
-								xmlWriter.writeCharacters("more complicated");/* TODO CHECK */
+								xmlWriter.writeCharacters("complicated");/* we do not consider the linguistic discussion on that */
 							xmlWriter.writeEndElement();
 						xmlWriter.writeEndElement();
 					xmlWriter.writeEndElement();
@@ -1785,7 +1789,7 @@ public class TCFMapperImportTest {
 					xmlWriter.writeEndElement();
 					/* appears */
 					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
-					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t7");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t8");
 						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
 								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
@@ -1820,7 +1824,7 @@ public class TCFMapperImportTest {
 					xmlWriter.writeEndElement();
 					/* to be */
 					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
-					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t8 t9");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t9 t10");
 						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
 								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
@@ -1837,13 +1841,13 @@ public class TCFMapperImportTest {
 							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
 							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "verb");
 							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
-								xmlWriter.writeCharacters("to be");
+								xmlWriter.writeCharacters("be");
 							xmlWriter.writeEndElement();
 						xmlWriter.writeEndElement();
 					xmlWriter.writeEndElement();
 					/* ? */
 					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
-					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t10");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t11");
 						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
 								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
@@ -1860,7 +1864,7 @@ public class TCFMapperImportTest {
 							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
 							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "punctuation");
 							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
-								xmlWriter.writeCharacters("?");
+								xmlWriter.writeCharacters(".");
 							xmlWriter.writeEndElement();
 						xmlWriter.writeEndElement();
 					xmlWriter.writeEndElement();
@@ -1878,8 +1882,8 @@ public class TCFMapperImportTest {
 		/* TODO add to salt sample (Florian okay)*/
 		SDocumentGraph docGraph = doc.getSDocumentGraph();
 		EList<SToken> docTokens = docGraph.getSortedSTokenByText();
-		SLayer docMorph = SaltFactory.eINSTANCE.createSLayer();
-		docMorph.setSName(TCFMapperImport.LAYER_TCF_MORPHOLOGY);		
+		SLayer docMorphLayer = SaltFactory.eINSTANCE.createSLayer();
+		docMorphLayer.setSName(TCFMapperImport.LAYER_TCF_MORPHOLOGY);		
 
 		SSpan sSpan = docGraph.createSSpan(docTokens.get(0));//Is
 		sSpan.createSAnnotation(null, "cat", "verb");
@@ -1893,14 +1897,14 @@ public class TCFMapperImportTest {
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
 		//the character sequence between <segment>...</segment> will be represented in the same namespace and with key=TAG(=namespace)
 		//I'm not sure I like that
-		docMorph.getSNodes().add(sSpan);
+		docMorphLayer.getSNodes().add(sSpan);
 		
 		sSpan = docGraph.createSSpan(docTokens.get(1));//this
 		sSpan.createSAnnotation(null, "cat", "determiner");
 		sSpan.createSAnnotation(null, "number", "singular");
 		sSpan.createSAnnotation(null, "definiteness", "true");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
-		docMorph.getSNodes().add(sSpan);
+		docMorphLayer.getSNodes().add(sSpan);
 		
 		sSpan = docGraph.createSSpan(docTokens.get(2));//example
 		docTokens.get(2).createSAnnotation(null, "cat", "noun");
@@ -1908,27 +1912,27 @@ public class TCFMapperImportTest {
 		docTokens.get(2).createSAnnotation(null, "gender", "neuter");
 		docTokens.get(2).createSAnnotation(null, "case", "nominative");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
-		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
-		docMorph.getSNodes().add(sSpan);
+		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "example");
+		docMorphLayer.getSNodes().add(sSpan);
 		
-		EList<SToken> spanList = new BasicEList<SToken>();
-		spanList.add(docTokens.get(3));
-		spanList.add(docTokens.get(4));
+		EList<SToken> spanTokens = new BasicEList<SToken>();
+		spanTokens.add(docTokens.get(3));
+		spanTokens.add(docTokens.get(4));
 		
-		sSpan = docGraph.createSSpan(spanList);//more complicated		
+		sSpan = docGraph.createSSpan(spanTokens);//more complicated		
 		sSpan.createSAnnotation(null, "cat", "adjective");
 		sSpan.createSAnnotation(null, "comparative", "true");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
-		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
-		docMorph.getSNodes().add(sSpan);
+		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "complicated");
+		docMorphLayer.getSNodes().add(sSpan);
 		
-		spanList.clear();
+		spanTokens.clear();
 		
 		sSpan = docGraph.createSSpan(docTokens.get(5));//than
 		sSpan.createSAnnotation(null, "cat", "conjunction");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
-		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
-		docMorph.getSNodes().add(sSpan);		
+		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "than");
+		docMorphLayer.getSNodes().add(sSpan);		
 		
 		sSpan = docGraph.createSSpan(docTokens.get(6));//it
 		sSpan.createSAnnotation(null, "cat", "personal pronoun");
@@ -1937,8 +1941,8 @@ public class TCFMapperImportTest {
 		sSpan.createSAnnotation(null, "gender", "neuter");
 		sSpan.createSAnnotation(null, "case", "nominative");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
-		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
-		docMorph.getSNodes().add(sSpan);
+		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "it");
+		docMorphLayer.getSNodes().add(sSpan);
 		
 		sSpan = docGraph.createSSpan(docTokens.get(7));//appears
 		sSpan.createSAnnotation(null, "cat", "verb");
@@ -1947,26 +1951,26 @@ public class TCFMapperImportTest {
 		sSpan.createSAnnotation(null, "tense", "present");
 		sSpan.createSAnnotation(null, "indicative", "true");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
-		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
-		docMorph.getSNodes().add(sSpan);
+		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "appear");
+		docMorphLayer.getSNodes().add(sSpan);
 		
-		spanList.add(docTokens.get(8));
-		spanList.add(docTokens.get(9));
+		spanTokens.add(docTokens.get(8));
+		spanTokens.add(docTokens.get(9));
 		
-		sSpan = docGraph.createSSpan(spanList);//to be
+		sSpan = docGraph.createSSpan(spanTokens);//to be
 		sSpan.createSAnnotation(null, "cat", "verb");
 		sSpan.createSAnnotation(null, "infinitive", "true");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
-		docMorph.getSNodes().add(sSpan);
+		docMorphLayer.getSNodes().add(sSpan);
 		
-		spanList.clear();
+		spanTokens.clear();
 		
 		sSpan = docGraph.createSSpan(docTokens.get(10));//?
 		sSpan.createSAnnotation(null, "cat", "punctuation");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
-		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "?");
-		docMorph.getSNodes().add(sSpan);
+		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, ".");
+		docMorphLayer.getSNodes().add(sSpan);
 		
 		/* setting variables */		
 		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_MORPHOLOGY);
@@ -1975,6 +1979,7 @@ public class TCFMapperImportTest {
 		p.println(outStream.toString());
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
 		
 		/* start mapper */
 		System.out.println(tmpOut);		
@@ -1982,34 +1987,37 @@ public class TCFMapperImportTest {
 		
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
-		SLayer fixMorph = fixGraph.getSLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY).get(0);
-		EList<SNode> docSpans = docMorph.getSNodes();
-		EList<SNode> fixSpans = docMorph.getSNodes();		
+		assertNotNull(fixGraph.getSLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY));
+		EList<SNode> docMorph = docMorphLayer.getSNodes();
+		EList<SNode> fixMorph = fixGraph.getSLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY).get(0).getSNodes();		
+		EList<SNode> docSpans = docMorphLayer.getSNodes();
+		EList<SNode> fixSpans = docMorphLayer.getSNodes();		
 		
 		assertNotNull(fixMorph);
-		assertNotEquals(fixMorph.getNodes().size(), 0);
-		assertEquals(docSpans.size(), fixSpans.size());	
-		
-		/*TEST*/System.out.println("[MORPHOLOGY]Number of included nodes in sample layer: "+docMorph.getNodes().size());
-		/*TEST*/System.out.println("[MORPHOLOGY]Number of included nodes in fixture layer: "+fixMorph.getNodes().size());
-		
-		SSpan docSpan = null;
-		SSpan fixSpan = null;
-		/*
-		 * this test assumes the spans to be in their linear order
-		 */
-		for(int i=0; i<docSpans.size(); i++){
-			docSpan = (SSpan)docSpans.get(i);
-			fixSpan = (SSpan)fixSpans.get(i);
-			assertEquals(docSpan.getSAnnotations().size(), fixSpan.getSAnnotations().size());
-			for(int j=0; j<docSpan.getSAnnotations().size(); j++){
-				try{
-					assertEquals(docSpan.getSAnnotations().get(j).getSValue(), fixSpan.getSAnnotation(docSpan.getSAnnotations().get(j).getQName()).getSValue());
-				}
-				catch(NullPointerException e){
-					fail("Annotation does not exist for span: "+fixSpan.toString());					
-				}
+		assertNotEquals(fixMorph.size(), 0);
+		assertEquals(docSpans.size(), fixSpans.size());
+		assertNotEquals(fixSpans.size(), fixGraph.getSTokens().size());
+		assertEquals(fixSpans.size(), fixMorph.size());
+				
+		SNode docNode = null;
+		SNode fixNode = null;		
+		for(int i=0; i<docMorph.size(); i++){			
+			docNode = docMorph.get(i);
+			fixNode = fixMorph.get(i);
+			/*TEST*/System.out.println("[doc]Token(s):\t"+docGraph.getSText(docNode));
+			/*TEST*/System.out.println("[fix]Token(s):\t"+fixGraph.getSText(fixNode));
+			/* both of type SSpan? */
+			assertEquals(docNode.getClass(), fixNode.getClass());
+			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
+			for(SAnnotation sAnno : docNode.getSAnnotations()){
+				String qName = sAnno.getQName();
+				/* compare annotations */
+				/*TEST*/System.out.println("[doc]"+qName+"="+sAnno.getValueString());
+				/*TEST*/System.out.println("[fix]"+qName+"="+fixNode.getSAnnotation(qName).getValue());
+				assertNotNull(fixNode.getSAnnotation(qName));				
+				assertEquals(sAnno.getValue(), fixNode.getSAnnotation(qName).getValue());
 			}
+			/*TODO Segment*/
 		}
 		
 	}

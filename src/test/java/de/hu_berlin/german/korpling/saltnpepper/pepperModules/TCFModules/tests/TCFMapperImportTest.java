@@ -1056,6 +1056,253 @@ public class TCFMapperImportTest {
 	}
 	
 	/**
+	 * This method tests if a valid TCF-XML-structure containing lemmas
+	 * and tokens is converted to salt correctly by {@link TCFMapperImport}.
+	 * The mapper is supposed to map annotations as {@link SLemmaAnnotation} objects
+	 * directly on the {@link SToken} objects for single token annotations and on
+	 * an {@link SSpan} object in case of multiple token annotation.  
+	 * @throws XMLStreamException 
+	 * @throws FileNotFoundException 
+	 */
+	@Test
+	public void testTokensLemmaShrinked() throws XMLStreamException, FileNotFoundException{
+		System.out.println("=======================================");
+		System.out.println("TESTING LEMMA WITH SHRINKED ANNOTATIONS");
+		System.out.println("=======================================");
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory o= XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);		
+		
+		xmlWriter.writeStartDocument();
+			xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+			xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+			xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+			xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+			xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+			xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+			xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+			xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
+				xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeCharacters(EXAMPLE_TEXT_SHRINK);
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+							xmlWriter.writeCharacters("I");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+							xmlWriter.writeCharacters("love");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+							xmlWriter.writeCharacters("New");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+							xmlWriter.writeCharacters("York");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+							xmlWriter.writeCharacters(".");
+						xmlWriter.writeEndElement();						
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.TAG_TC_LEMMAS);
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_LEMMA);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt1");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t1");
+						xmlWriter.writeCharacters("I");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_LEMMA);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt2");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t2");
+						xmlWriter.writeCharacters("love");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_LEMMA);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt3");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3 t4");
+						xmlWriter.writeCharacters("New York");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_LEMMA);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt4");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t5");
+						xmlWriter.writeCharacters(".");
+						xmlWriter.writeEndElement();						
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();
+			xmlWriter.writeEndElement();
+		xmlWriter.writeEndDocument();
+		
+		/* generating salt sample */
+		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());		
+		SDocumentGraph docGraph = doc.getSDocumentGraph();
+		docGraph.createSTextualDS(EXAMPLE_TEXT_SHRINK);
+		docGraph.tokenize();
+		/*TODO add lemma layer in salt sample*/
+		SLayer docLemmaLayer = SaltFactory.eINSTANCE.createSLayer();
+		docLemmaLayer.setSName(TCFMapperImport.LAYER_LEMMA);
+		EList<SNode> docLemma = docLemmaLayer.getSNodes();
+		EList<SToken> docTokens = docGraph.getSTokens();
+		
+		SNode sNode = docTokens.get(0);
+		SAnnotation sAnno = SaltFactory.eINSTANCE.createSLemmaAnnotation();
+		sAnno.setValue("I");
+		sNode.addSAnnotation(sAnno);
+		docLemma.add(sNode);
+		
+		sNode = docTokens.get(1);
+		sAnno = SaltFactory.eINSTANCE.createSLemmaAnnotation();
+		sAnno.setValue("love");
+		sNode.addSAnnotation(sAnno);
+		docLemma.add(sNode);
+		
+		sNode = docGraph.createSSpan(docTokens.get(2));
+		docGraph.addSNode(sNode, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
+		sAnno = SaltFactory.eINSTANCE.createSLemmaAnnotation();
+		sAnno.setValue("New York");
+		sNode.addSAnnotation(sAnno);
+		docLemma.add(sNode);
+		
+		sNode = docTokens.get(4);
+		sAnno = SaltFactory.eINSTANCE.createSLemmaAnnotation();
+		sAnno.setValue(".");
+		sNode.addSAnnotation(sAnno);
+		docLemma.add(sNode);		
+		
+		/* setting variables */		
+		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_TOKENS_LEMMA);
+		tmpOut.getParentFile().mkdirs();
+		PrintWriter p = new PrintWriter(tmpOut);		
+		p.println(outStream.toString());
+		p.close();
+		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		
+		/* start mapper */
+		System.out.println(tmpOut);		
+		this.getFixture().mapSDocument();
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
+		
+		/* comparing fixture to template */
+		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
+		assertNotNull(fixGraph.getSLayerByName(TCFMapperImport.LAYER_LEMMA).get(0));
+		EList<SNode> fixLemma = fixGraph.getSLayerByName(TCFMapperImport.LAYER_LEMMA).get(0).getSNodes();
+		String lemmaQName = SaltSemanticsPackage.eNS_PREFIX+"::"+SALT_SEMANTIC_NAMES.LEMMA.toString();
+		
+		assertFalse(fixLemma.isEmpty());
+		assertEquals(docLemma.size(), fixLemma.size());
+		SNode docNode = null;
+		SNode fixNode = null;
+		for(int i=0; i<docLemma.size(); i++){
+			docNode = docLemma.get(i);
+			fixNode = fixLemma.get(i);
+			/* both of the same class? */
+			assertEquals(docNode.getClass(), fixNode.getClass());
+			/* both overlap the same SText? */
+			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
+			/* lemma annotation exists for fixture? */
+			assertNotNull(fixNode.getSAnnotation(lemmaQName));
+			/* annotations are equal? */
+			assertEquals(docNode.getSAnnotation(lemmaQName), fixNode.getSAnnotation(lemmaQName));
+		}
+	}
+	
+	public void testTokensLemmaNotShrinked() throws XMLStreamException, FileNotFoundException{
+		System.out.println("===========================================");
+		System.out.println("TESTING LEMMA WITH ANNOTATIONS NOT SHRINKED");
+		System.out.println("===========================================");
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory o= XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);		
+		
+		xmlWriter.writeStartDocument();
+			xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+			xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+			xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+			xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+			xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+			xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+			xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+			xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
+				xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeCharacters(EXAMPLE_TEXT_SHRINK);
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+							xmlWriter.writeCharacters("I");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+							xmlWriter.writeCharacters("love");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+							xmlWriter.writeCharacters("New");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+							xmlWriter.writeCharacters("York");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+							xmlWriter.writeCharacters(".");
+						xmlWriter.writeEndElement();						
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.TAG_TC_LEMMAS);
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_LEMMA);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt1");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t1");
+						xmlWriter.writeCharacters("I");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_LEMMA);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt2");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t2");
+						xmlWriter.writeCharacters("love");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_LEMMA);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt3");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3 t4");
+						xmlWriter.writeCharacters("New York");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.TAG_TC_LEMMA);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt4");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t5");
+						xmlWriter.writeCharacters(".");
+						xmlWriter.writeEndElement();						
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();
+			xmlWriter.writeEndElement();
+		xmlWriter.writeEndDocument();
+		
+		/* generating salt sample */
+		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());		
+		SaltSample.createTokens2(doc);
+		SDocumentGraph docGraph = doc.getSDocumentGraph();
+		docGraph.createSTextualDS(EXAMPLE_TEXT_SHRINK);
+		
+		/* setting variables */		
+		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_TOKENS_LEMMA);
+		tmpOut.getParentFile().mkdirs();
+		PrintWriter p = new PrintWriter(tmpOut);		
+		p.println(outStream.toString());
+		p.close();
+		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		
+		/* start mapper */
+		System.out.println(tmpOut);		
+		this.getFixture().mapSDocument();
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
+	}
+	
+	/**
 	 * This method tests if a valid TCF-XML-structure containing dependency
 	 * annotations (no multi-governing) is converted to salt correctly by {@link TCFMapperImport} 
 	 * @throws XMLStreamException 

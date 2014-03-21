@@ -1853,6 +1853,163 @@ public class TCFMapperImportTest {
 		}
 	}
 	
+	
+	/**This method tests if a valid TCF-XML-structure containing constituent
+	 * annotations is converted to salt correctly by {@link TCFMapperImport}.  
+	 * @throws XMLStreamException 
+	 * @throws FileNotFoundException 
+	 */
+	@Test
+	public void testConstituentParsingShrinked() throws FileNotFoundException, XMLStreamException{
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory o= XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
+		
+		xmlWriter.writeStartDocument();
+		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+			xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+			xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+			xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+			xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+			xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+			xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+			xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
+				xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeCharacters(EXAMPLE_TEXT_SHRINK);
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+							xmlWriter.writeCharacters("I");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+							xmlWriter.writeCharacters("love");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+							xmlWriter.writeCharacters("New");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+							xmlWriter.writeCharacters("York");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+							xmlWriter.writeCharacters(".");
+						xmlWriter.writeEndElement();						
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.TAG_TC_PARSING);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TAGSET, "unknown");
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_PARSE, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//root node
+							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "ROOT");
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c1");
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//S
+								xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "S");
+								xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c2");
+									xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//NP
+									xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "NP");
+									xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c3");
+										xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//"I"
+										xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, ".");
+										xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c4");
+										xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t1");
+										xmlWriter.writeEndElement();//End of "I"
+									xmlWriter.writeEndElement();//End of NP
+									xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//"love"
+									xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, ".");
+									xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c5");
+									xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t2");
+									xmlWriter.writeEndElement();//End of "love"
+									xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//NP
+									xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "NP");
+									xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c6");
+										xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//"New York"
+										xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, ".");
+										xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c7");
+										xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3 t4");
+										xmlWriter.writeEndElement();//End of "New York"
+									xmlWriter.writeEndElement();//End of NP
+								xmlWriter.writeEndElement();//End of S
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//"."
+								xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, ".");
+								xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c8");
+								xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t5");
+								xmlWriter.writeEndElement();//End of "."
+							xmlWriter.writeEndElement();//End of root node
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();//End of TextCorpus
+			xmlWriter.writeEndElement();
+		xmlWriter.writeEndDocument();
+		
+		/* generating salt sample */
+		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
+		SDocumentGraph docGraph = doc.getSDocumentGraph();
+		docGraph.createSTextualDS(EXAMPLE_TEXT_SHRINK);
+		docGraph.tokenize();
+		
+		SStructure root = SaltFactory.eINSTANCE.createSStructure();//ROOT
+		root.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "ROOT");
+		SStructure s = SaltFactory.eINSTANCE.createSStructure();//S
+		s.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "S");
+		SStructure np1 = SaltFactory.eINSTANCE.createSStructure();//NP(1)
+		np1.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "NP");
+		SStructure np2 = SaltFactory.eINSTANCE.createSStructure();//NP(2)
+		np2.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "NP");
+		SSpan newYork = docGraph.createSSpan(docGraph.getSTokens().get(2));
+		docGraph.addSNode(newYork, docGraph.getSTokens().get(3), STYPE_NAME.SSPANNING_RELATION);
+		
+		docGraph.addSNode(root);
+		docGraph.addSNode(root, s, STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(s, np1, STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(np1, docGraph.getSTokens().get(0), STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(s, docGraph.getSTokens().get(1), STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(s, np2, STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(np2, newYork, STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(root, docGraph.getSTokens().get(4), STYPE_NAME.SDOMINANCE_RELATION);
+		
+		/* setting variables */		
+		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_CONSTITUENT_PARSING);
+		tmpOut.getParentFile().mkdirs();
+		PrintWriter p = new PrintWriter(tmpOut);		
+		p.println(outStream.toString());
+		p.close();
+		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		
+		/* start mapper */
+		System.out.println(tmpOut);		
+		this.getFixture().mapSDocument();
+				
+		/* -- compare template salt model to imported salt model -- */
+		
+		SDocumentGraph fixGraph = getFixture().getSDocument().getSDocumentGraph();
+		
+		assertNotEquals(fixGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).size(), 0);	
+		
+		SLayer docSynLayer = docGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0);		
+		SLayer fixSynLayer = fixGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0);
+		
+		assertEquals(docSynLayer.getAllIncludedNodes().size(), fixSynLayer.getAllIncludedNodes().size());
+				
+		EList<SNode> docNodes = docGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getSNodes();
+		EList<SNode> fixNodes = fixGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getSNodes();
+		for(int i=0; i<docNodes.size(); i++){			
+//			System.out.println(i+"\tdoc="+docNodes.get(i).getSElementId().toString().replace("de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.impl.SElementIdImpl@", "")+"\t"+docNodes.get(i).getSAnnotation(TCFMapperImport.ANNO_NAME_CONSTITUENT).getValueString());
+//			System.out.println("\t"+docGraph.getSText(docNodes.get(i)));
+//			System.out.println(i+"\tfix="+fixNodes.get(i).getSElementId().toString().replace("de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.impl.SElementIdImpl@", "")+"\t"+fixNodes.get(i).getSAnnotation(TCFDictionary.ATT_CAT).getValueString());
+//			System.out.println("\t"+fixGraph.getSText(fixNodes.get(i)));
+			assertEquals(docNodes.get(i).getSElementId(), fixNodes.get(i).getSElementId());
+			assertEquals(docGraph.getSText(docNodes.get(i)), fixGraph.getSText(fixNodes.get(i)));
+			assertEquals(docNodes.get(i).getSAnnotation(TCFMapperImport.ANNO_NAME_CONSTITUENT).getValue(), fixNodes.get(i).getSAnnotation(TCFDictionary.ATT_CAT).getValue());
+		}
+	}
+	
 	/**This method tests if a valid TCF-XML-structure containing morphology
 	 * annotations is converted to salt correctly by {@link TCFMapperImport}. The Mapper
 	 * is supposed to build a span for both morphology annotations on single and on multiple

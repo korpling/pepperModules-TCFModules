@@ -1180,11 +1180,11 @@ public class TCFMapperImportTest {
 		p.println(outStream.toString());
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
 		
 		/* start mapper */
-		System.out.println(tmpOut);		
-		this.getFixture().mapSDocument();
-		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
+		System.out.println(tmpOut);			
+		this.getFixture().mapSDocument();		
 		
 		/* comparing fixture to template */
 		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
@@ -1210,6 +1210,16 @@ public class TCFMapperImportTest {
 		}
 	}
 	
+	/**
+	 * This method tests if a valid TCF-XML-structure containing lemmas
+	 * and tokens is converted to salt correctly by {@link TCFMapperImport}.
+	 * The mapper is supposed to map annotations as {@link SLemmaAnnotation} objects
+	 * directly as annotations on {@link SSpan} objects for single token annotations
+	 * and in case of multiple token annotation.  
+	 * @throws XMLStreamException 
+	 * @throws FileNotFoundException 
+	 */
+	@Test
 	public void testTokensLemmaNotShrinked() throws XMLStreamException, FileNotFoundException{
 		System.out.println("===========================================");
 		System.out.println("TESTING LEMMA WITH ANNOTATIONS NOT SHRINKED");
@@ -1284,9 +1294,38 @@ public class TCFMapperImportTest {
 		/* generating salt sample */
 		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
 		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());		
-		SaltSample.createTokens2(doc);
 		SDocumentGraph docGraph = doc.getSDocumentGraph();
 		docGraph.createSTextualDS(EXAMPLE_TEXT_SHRINK);
+		docGraph.tokenize();
+		EList<SToken> docTokens = docGraph.getSTokens();
+		SLayer docLemmaLayer = SaltFactory.eINSTANCE.createSLayer();
+		docLemmaLayer.setSName(TCFMapperImport.LAYER_LEMMA);
+		EList<SNode> docLemma = docLemmaLayer.getSNodes();
+		
+		SSpan sSpan = docGraph.createSSpan(docTokens.get(0));
+		SAnnotation sAnno = SaltFactory.eINSTANCE.createSLemmaAnnotation();
+		sAnno.setValue("I");
+		sSpan.addSAnnotation(sAnno);
+		docLemma.add(sSpan);
+		
+		sSpan = docGraph.createSSpan(docTokens.get(1));
+		sAnno = SaltFactory.eINSTANCE.createSLemmaAnnotation();
+		sAnno.setValue("love");
+		sSpan.addSAnnotation(sAnno);
+		docLemma.add(sSpan);
+		
+		sSpan = docGraph.createSSpan(docTokens.get(2));
+		docGraph.addSNode(sSpan, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
+		sAnno = SaltFactory.eINSTANCE.createSLemmaAnnotation();
+		sAnno.setValue("New York");
+		sSpan.addSAnnotation(sAnno);
+		docLemma.add(sSpan);
+		
+		sSpan = docGraph.createSSpan(docTokens.get(4));
+		sAnno = SaltFactory.eINSTANCE.createSLemmaAnnotation();
+		sAnno.setValue(".");
+		sSpan.addSAnnotation(sAnno);
+		docLemma.add(sSpan);		
 		
 		/* setting variables */		
 		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_TOKENS_LEMMA);
@@ -1295,11 +1334,36 @@ public class TCFMapperImportTest {
 		p.println(outStream.toString());
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
 		
 		/* start mapper */
-		System.out.println(tmpOut);		
-		this.getFixture().mapSDocument();
-		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
+		System.out.println(tmpOut);			
+		this.getFixture().mapSDocument();		
+		
+		/* comparing fixture to template */
+		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
+		assertNotNull(fixGraph.getSLayerByName(TCFMapperImport.LAYER_LEMMA).get(0));
+		EList<SNode> fixLemma = fixGraph.getSLayerByName(TCFMapperImport.LAYER_LEMMA).get(0).getSNodes();
+		String lemmaQName = SaltSemanticsPackage.eNS_PREFIX+"::"+SALT_SEMANTIC_NAMES.LEMMA.toString();
+		
+		assertFalse(fixLemma.isEmpty());
+		assertEquals(docLemma.size(), fixLemma.size());
+		SNode docNode = null;
+		SNode fixNode = null;
+		for(int i=0; i<docLemma.size(); i++){
+			docNode = docLemma.get(i);
+			/*TEST*/System.out.println("[doc]Node \""+docGraph.getSText(docNode)+"\" is instance of "+docNode.getClass().getSimpleName());
+			fixNode = fixLemma.get(i);
+			/*TEST*/System.out.println("[fix]Node \""+fixGraph.getSText(fixNode)+"\" is instance of "+fixNode.getClass().getSimpleName());
+			/* instance of class Span? */
+			assertTrue(fixNode instanceof SSpan);
+			/* both overlap the same SText? */
+			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
+			/* lemma annotation exists for fixture? */
+			assertNotNull(fixNode.getSAnnotation(lemmaQName));
+			/* annotations are equal? */
+			assertEquals(docNode.getSAnnotation(lemmaQName), fixNode.getSAnnotation(lemmaQName));
+		}
 	}
 	
 	/**

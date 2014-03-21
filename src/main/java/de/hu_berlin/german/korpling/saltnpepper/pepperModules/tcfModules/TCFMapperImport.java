@@ -226,7 +226,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 					sNodes.put(currentNodeID, sNode);
 				}
 				else{
-					sNode = shrinkTokenAnnotations ? (SToken)sNodes.get(currentNodeID) : getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(currentNodeID));
+					sNode = shrinkTokenAnnotations ? (SToken)sNodes.get(currentNodeID) : getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(currentNodeID));					
 				}				
 				sLayers.get(LAYER_LEMMA).getSNodes().add(sNode);
 				currentSNode = sNode;

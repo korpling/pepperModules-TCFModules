@@ -1551,6 +1551,9 @@ public class TCFMapperImportTest {
 	 */
 	@Test
 	public void testMorphologyNotShrinked() throws XMLStreamException, FileNotFoundException{
+		System.out.println("================================================");
+		System.out.println("TESTING MORPHOLOGY WITH ANNOTATIONS NOT SHRINKED");
+		System.out.println("================================================");
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		XMLOutputFactory o= XMLOutputFactory.newFactory();
 		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
@@ -1883,7 +1886,8 @@ public class TCFMapperImportTest {
 		SDocumentGraph docGraph = doc.getSDocumentGraph();
 		EList<SToken> docTokens = docGraph.getSortedSTokenByText();
 		SLayer docMorphLayer = SaltFactory.eINSTANCE.createSLayer();
-		docMorphLayer.setSName(TCFMapperImport.LAYER_TCF_MORPHOLOGY);		
+		docMorphLayer.setSName(TCFMapperImport.LAYER_TCF_MORPHOLOGY);
+		EList<SNode> docMorph = docMorphLayer.getSNodes();
 
 		SSpan sSpan = docGraph.createSSpan(docTokens.get(0));//Is
 		sSpan.createSAnnotation(null, "cat", "verb");
@@ -1897,23 +1901,23 @@ public class TCFMapperImportTest {
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
 		//the character sequence between <segment>...</segment> will be represented in the same namespace and with key=TAG(=namespace)
 		//I'm not sure I like that
-		docMorphLayer.getSNodes().add(sSpan);
+		docMorph.add(sSpan);
 		
 		sSpan = docGraph.createSSpan(docTokens.get(1));//this
 		sSpan.createSAnnotation(null, "cat", "determiner");
 		sSpan.createSAnnotation(null, "number", "singular");
 		sSpan.createSAnnotation(null, "definiteness", "true");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
-		docMorphLayer.getSNodes().add(sSpan);
+		docMorph.add(sSpan);
 		
 		sSpan = docGraph.createSSpan(docTokens.get(2));//example
-		docTokens.get(2).createSAnnotation(null, "cat", "noun");
-		docTokens.get(2).createSAnnotation(null, "number", "singular");
-		docTokens.get(2).createSAnnotation(null, "gender", "neuter");
-		docTokens.get(2).createSAnnotation(null, "case", "nominative");
+		sSpan.createSAnnotation(null, "cat", "noun");
+		sSpan.createSAnnotation(null, "number", "singular");
+		sSpan.createSAnnotation(null, "gender", "neuter");
+		sSpan.createSAnnotation(null, "case", "nominative");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "example");
-		docMorphLayer.getSNodes().add(sSpan);
+		docMorph.add(sSpan);
 		
 		EList<SToken> spanTokens = new BasicEList<SToken>();
 		spanTokens.add(docTokens.get(3));
@@ -1924,7 +1928,7 @@ public class TCFMapperImportTest {
 		sSpan.createSAnnotation(null, "comparative", "true");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "complicated");
-		docMorphLayer.getSNodes().add(sSpan);
+		docMorph.add(sSpan);
 		
 		spanTokens.clear();
 		
@@ -1932,7 +1936,7 @@ public class TCFMapperImportTest {
 		sSpan.createSAnnotation(null, "cat", "conjunction");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "than");
-		docMorphLayer.getSNodes().add(sSpan);		
+		docMorph.add(sSpan);		
 		
 		sSpan = docGraph.createSSpan(docTokens.get(6));//it
 		sSpan.createSAnnotation(null, "cat", "personal pronoun");
@@ -1942,7 +1946,7 @@ public class TCFMapperImportTest {
 		sSpan.createSAnnotation(null, "case", "nominative");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "it");
-		docMorphLayer.getSNodes().add(sSpan);
+		docMorph.add(sSpan);
 		
 		sSpan = docGraph.createSSpan(docTokens.get(7));//appears
 		sSpan.createSAnnotation(null, "cat", "verb");
@@ -1952,7 +1956,7 @@ public class TCFMapperImportTest {
 		sSpan.createSAnnotation(null, "indicative", "true");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "appear");
-		docMorphLayer.getSNodes().add(sSpan);
+		docMorph.add(sSpan);
 		
 		spanTokens.add(docTokens.get(8));
 		spanTokens.add(docTokens.get(9));
@@ -1962,7 +1966,7 @@ public class TCFMapperImportTest {
 		sSpan.createSAnnotation(null, "infinitive", "true");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
-		docMorphLayer.getSNodes().add(sSpan);
+		docMorph.add(sSpan);
 		
 		spanTokens.clear();
 		
@@ -1970,7 +1974,7 @@ public class TCFMapperImportTest {
 		sSpan.createSAnnotation(null, "cat", "punctuation");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, ".");
-		docMorphLayer.getSNodes().add(sSpan);
+		docMorph.add(sSpan);
 		
 		/* setting variables */		
 		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_MORPHOLOGY);
@@ -1988,26 +1992,506 @@ public class TCFMapperImportTest {
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
 		assertNotNull(fixGraph.getSLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY));
-		EList<SNode> docMorph = docMorphLayer.getSNodes();
-		EList<SNode> fixMorph = fixGraph.getSLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY).get(0).getSNodes();		
-		EList<SNode> docSpans = docMorphLayer.getSNodes();
-		EList<SNode> fixSpans = docMorphLayer.getSNodes();		
+		EList<SNode> fixMorph = fixGraph.getSLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY).get(0).getSNodes();	
 		
 		assertNotNull(fixMorph);
 		assertNotEquals(fixMorph.size(), 0);
-		assertEquals(docSpans.size(), fixSpans.size());
-		assertNotEquals(fixSpans.size(), fixGraph.getSTokens().size());
-		assertEquals(fixSpans.size(), fixMorph.size());
+		assertEquals(docMorph.size(), fixMorph.size());
+		assertNotEquals(fixMorph.size(), fixGraph.getSTokens().size());
 				
 		SNode docNode = null;
 		SNode fixNode = null;		
 		for(int i=0; i<docMorph.size(); i++){			
 			docNode = docMorph.get(i);
 			fixNode = fixMorph.get(i);
-			/*TEST*/System.out.println("[doc]Token(s):\t"+docGraph.getSText(docNode));
-			/*TEST*/System.out.println("[fix]Token(s):\t"+fixGraph.getSText(fixNode));
-			/* both of type SSpan? */
+			/*TEST*/System.out.println("[doc]Node(s):\t\""+docGraph.getSText(docNode)+"\" instance of "+docNode.getClass().getSimpleName());
+			/*TEST*/System.out.println("[fix]Node(s):\t\""+fixGraph.getSText(fixNode)+"\" instance of "+fixNode.getClass().getSimpleName());
+			/* fixNode of type SSpan? */
+			assertTrue(fixNode instanceof SSpan);
+			/* both overlap the same SText? */
+			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
+			for(SAnnotation sAnno : docNode.getSAnnotations()){
+				String qName = sAnno.getQName();
+				/* compare annotations */
+				/*TEST*/System.out.println("[doc]"+qName+"="+sAnno.getValueString());
+				/*TEST*/System.out.println("[fix]"+qName+"="+fixNode.getSAnnotation(qName).getValue());
+				assertNotNull(fixNode.getSAnnotation(qName));				
+				assertEquals(sAnno.getValue(), fixNode.getSAnnotation(qName).getValue());
+			}
+			/*TODO Segment as annotation of the annotation? Not implemented yet! (See issue #4) */
+		}
+		
+	}
+	
+	/**This method tests if a valid TCF-XML-structure containing morphology
+	 * annotations is converted to salt correctly by {@link TCFMapperImport}. The Mapper
+	 * is supposed to build a span only for morphology annotations on multiple
+	 * {@link SToken} objects. In case of single tokens the {@link SAnnotation} is build
+	 * directly on the {@link SToken} object.
+	 * @throws XMLStreamException 
+	 * @throws FileNotFoundException 
+	 */
+	@Test
+	public void testMorphologyShrinked() throws XMLStreamException, FileNotFoundException{
+		System.out.println("============================================");
+		System.out.println("TESTING MORPHOLOGY WITH SHRINKED ANNOTATIONS");
+		System.out.println("============================================");
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory o= XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
+		
+		xmlWriter.writeStartDocument();
+		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
+			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+			xmlWriter.writeEndElement();
+			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeCharacters(EXAMPLE_TEXT);
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+						xmlWriter.writeCharacters("Is");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+						xmlWriter.writeCharacters("this");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+						xmlWriter.writeCharacters("example");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+						xmlWriter.writeCharacters("more");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+						xmlWriter.writeCharacters("complicated");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
+						xmlWriter.writeCharacters("than");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
+						xmlWriter.writeCharacters("it");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
+						xmlWriter.writeCharacters("appears");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
+						xmlWriter.writeCharacters("to");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
+						xmlWriter.writeCharacters("be");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
+						xmlWriter.writeCharacters("?");
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_MORPHOLOGY, TCFDictionary.NS_VALUE_TC);					
+					/* Is */
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t1");
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "cat");
+								xmlWriter.writeCharacters("verb");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "person");
+								xmlWriter.writeCharacters("3");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "number");
+								xmlWriter.writeCharacters("singular");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "tense");
+								xmlWriter.writeCharacters("present");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "indicative");
+								xmlWriter.writeCharacters("true");
+								xmlWriter.writeEndElement();
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENTATION, TCFDictionary.NS_VALUE_TC);						
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "verb");
+							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
+								xmlWriter.writeCharacters("be");
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+					/* this */
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t2");
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "cat");
+								xmlWriter.writeCharacters("determiner");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "number");
+								xmlWriter.writeCharacters("singular");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "definiteness");
+								xmlWriter.writeCharacters("true");
+								xmlWriter.writeEndElement();
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENTATION, TCFDictionary.NS_VALUE_TC);						
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "determiner");
+							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
+								xmlWriter.writeCharacters("this");
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+					/* example */
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3");
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "cat");
+								xmlWriter.writeCharacters("noun");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "number");
+								xmlWriter.writeCharacters("singular");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "gender");
+								xmlWriter.writeCharacters("neuter");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "case");
+								xmlWriter.writeCharacters("nominative");
+								xmlWriter.writeEndElement();
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENTATION, TCFDictionary.NS_VALUE_TC);						
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "noun");
+							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
+								xmlWriter.writeCharacters("example");
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+					/* more complicated */
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t4 t5");
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "cat");
+								xmlWriter.writeCharacters("adjective");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "comparative");
+								xmlWriter.writeCharacters("true");
+								xmlWriter.writeEndElement();
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENTATION, TCFDictionary.NS_VALUE_TC);						
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "adjective");
+							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
+								xmlWriter.writeCharacters("complicated");/* we do not consider the linguistic discussion on that */
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+					/* than */
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t6");
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "cat");
+								xmlWriter.writeCharacters("conjunction");
+								xmlWriter.writeEndElement();
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENTATION, TCFDictionary.NS_VALUE_TC);						
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "conjunction");
+							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
+								xmlWriter.writeCharacters("than");
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+					/* it */
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t7");
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "cat");
+								xmlWriter.writeCharacters("personal pronoun");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "person");
+								xmlWriter.writeCharacters("3");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "number");
+								xmlWriter.writeCharacters("singular");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "gender");
+								xmlWriter.writeCharacters("neuter");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "case");
+								xmlWriter.writeCharacters("nominative");
+								xmlWriter.writeEndElement();
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENTATION, TCFDictionary.NS_VALUE_TC);						
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "personal pronoun");
+							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
+								xmlWriter.writeCharacters("it");
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+					/* appears */
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t8");
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "cat");
+								xmlWriter.writeCharacters("verb");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "person");
+								xmlWriter.writeCharacters("3");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "number");
+								xmlWriter.writeCharacters("singular");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "tense");
+								xmlWriter.writeCharacters("present");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "indicative");
+								xmlWriter.writeCharacters("true");
+								xmlWriter.writeEndElement();
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENTATION, TCFDictionary.NS_VALUE_TC);						
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "verb");
+							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
+								xmlWriter.writeCharacters("appear");
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+					/* to be */
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t9 t10");
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "cat");
+								xmlWriter.writeCharacters("verb");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "infinitive");
+								xmlWriter.writeCharacters("true");
+								xmlWriter.writeEndElement();
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENTATION, TCFDictionary.NS_VALUE_TC);						
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "verb");
+							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
+								xmlWriter.writeCharacters("be");
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+					/* ? */
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ANALYSIS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t11");
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_FS, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "cat");
+								xmlWriter.writeCharacters("punctuation");
+								xmlWriter.writeEndElement();
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_F, TCFDictionary.NS_VALUE_TC);
+								xmlWriter.writeAttribute(TCFDictionary.ATT_NAME, "punctuation");
+								xmlWriter.writeCharacters("question");
+								xmlWriter.writeEndElement();
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENTATION, TCFDictionary.NS_VALUE_TC);						
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "punctuation");
+							xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "stem");
+								xmlWriter.writeCharacters(".");
+							xmlWriter.writeEndElement();
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();
+			xmlWriter.writeEndElement();
+		xmlWriter.writeEndDocument();
+		
+		/* generating salt sample */
+		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
+		SaltSample.createPrimaryData(doc);
+		SaltSample.createTokens2(doc);
+		
+		/* adding morphological annotation manually to salt sample */
+		/* TODO add to salt sample (Florian okay)*/
+		SDocumentGraph docGraph = doc.getSDocumentGraph();
+		EList<SToken> docTokens = docGraph.getSortedSTokenByText();
+		SLayer docMorphLayer = SaltFactory.eINSTANCE.createSLayer();
+		docMorphLayer.setSName(TCFMapperImport.LAYER_TCF_MORPHOLOGY);
+		EList<SNode> docMorph = docMorphLayer.getSNodes();
+		
+		SNode sNode = docTokens.get(0);
+		
+		sNode.createSAnnotation(null, "cat", "verb");//Is
+		sNode.createSAnnotation(null, "person", "3");
+		sNode.createSAnnotation(null, "number", "singular");
+		sNode.createSAnnotation(null, "tense", "present");
+		sNode.createSAnnotation(null, "indicative", "true");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
+		//in this last annotation (storage of segment.type) we use a namespace to avoid ambiguities
+		//with potential morphological properties used in <analysis>...</analysis> (therefore namespace = TAG_TC_SEGMENT)
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
+		//the character sequence between <segment>...</segment> will be represented in the same namespace and with key=TAG(=namespace)
+		//I'm not sure I like that
+		docMorph.add(sNode);
+		
+		sNode = docTokens.get(1);//this
+		sNode.createSAnnotation(null, "cat", "determiner");
+		sNode.createSAnnotation(null, "number", "singular");
+		sNode.createSAnnotation(null, "definiteness", "true");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
+		docMorph.add(sNode);
+		
+		sNode = docTokens.get(2);//example
+		sNode.createSAnnotation(null, "cat", "noun");
+		sNode.createSAnnotation(null, "number", "singular");
+		sNode.createSAnnotation(null, "gender", "neuter");
+		sNode.createSAnnotation(null, "case", "nominative");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "example");
+		docMorph.add(sNode);
+		
+		EList<SToken> spanTokens = new BasicEList<SToken>();
+		spanTokens.add(docTokens.get(3));
+		spanTokens.add(docTokens.get(4));
+		
+		sNode = docGraph.createSSpan(spanTokens);//more complicated		
+		sNode.createSAnnotation(null, "cat", "adjective");
+		sNode.createSAnnotation(null, "comparative", "true");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "complicated");
+		docMorph.add(sNode);
+		
+		spanTokens.clear();
+		
+		sNode = docTokens.get(5);//than
+		sNode.createSAnnotation(null, "cat", "conjunction");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "than");
+		docMorph.add(sNode);		
+		
+		sNode = docTokens.get(6);//it
+		sNode.createSAnnotation(null, "cat", "personal pronoun");
+		sNode.createSAnnotation(null, "number", "singular");
+		sNode.createSAnnotation(null, "person", "3");
+		sNode.createSAnnotation(null, "gender", "neuter");
+		sNode.createSAnnotation(null, "case", "nominative");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "it");
+		docMorph.add(sNode);
+		
+		sNode = docTokens.get(7);//appears
+		sNode.createSAnnotation(null, "cat", "verb");
+		sNode.createSAnnotation(null, "person", "3");
+		sNode.createSAnnotation(null, "number", "singular");
+		sNode.createSAnnotation(null, "tense", "present");
+		sNode.createSAnnotation(null, "indicative", "true");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "appear");
+		docMorph.add(sNode);
+		
+		spanTokens.add(docTokens.get(8));
+		spanTokens.add(docTokens.get(9));
+		
+		sNode = docGraph.createSSpan(spanTokens);//to be
+		sNode.createSAnnotation(null, "cat", "verb");
+		sNode.createSAnnotation(null, "infinitive", "true");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
+		docMorph.add(sNode);
+		
+		spanTokens.clear();
+		
+		sNode = docTokens.get(10);//?
+		sNode.createSAnnotation(null, "cat", "punctuation");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
+		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, ".");
+		docMorph.add(sNode);
+		
+		/* setting variables */		
+		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_MORPHOLOGY);
+		tmpOut.getParentFile().mkdirs();
+		PrintWriter p = new PrintWriter(tmpOut);		
+		p.println(outStream.toString());
+		p.close();
+		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
+		
+		/* start mapper */
+		System.out.println(tmpOut);		
+		this.getFixture().mapSDocument();
+		
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
+		assertNotNull(fixGraph.getSLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY));
+		EList<SNode> fixMorph = fixGraph.getSLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY).get(0).getSNodes();
+		
+		assertNotNull(fixMorph);
+		assertNotEquals(fixMorph.size(), 0);
+		assertEquals(docMorph.size(), fixMorph.size());
+		assertNotEquals(fixMorph.size(), fixGraph.getSTokens().size());		
+				
+		SNode docNode = null;
+		SNode fixNode = null;		
+		for(int i=0; i<docMorph.size(); i++){			
+			docNode = docMorph.get(i);
+			fixNode = fixMorph.get(i);
+			/*TEST*/System.out.println("[doc]Node(s):\t\""+docGraph.getSText(docNode)+"\" instance of "+docNode.getClass().getSimpleName());
+			/*TEST*/System.out.println("[fix]Node(s):\t\""+fixGraph.getSText(fixNode)+"\" instance of "+fixNode.getClass().getSimpleName());
+			/* both of the same type? */
 			assertEquals(docNode.getClass(), fixNode.getClass());
+			assertTrue((fixNode instanceof SToken)||(fixNode instanceof SSpan));//necessary?
 			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
 			for(SAnnotation sAnno : docNode.getSAnnotations()){
 				String qName = sAnno.getQName();

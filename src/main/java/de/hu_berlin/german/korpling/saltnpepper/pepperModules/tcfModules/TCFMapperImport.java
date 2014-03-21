@@ -62,22 +62,22 @@ public class TCFMapperImport extends PepperMapperImpl{
 		private int p;
 		private Stack<String> path;	
 		private Stack<String> idPath;
-		private String currentTokenID;		
+		private String currentNodeID;		
 		private String currentAnnoID;
 		private String currentAnnoKey;
 		private SNode currentSNode;
-		private boolean shrinkTokenAnnotation;
+		private boolean shrinkTokenAnnotations;
 		
 		public TCFReader(){
 			super();
 			path = new Stack<String>();
 			idPath = new Stack<String>();
-			currentTokenID = null;
+			currentNodeID = null;
 			currentSNode = null;
 			currentAnnoID = null;
 			currentAnnoKey = null;
 			p = 0;
-			shrinkTokenAnnotation = ((TCFImporterProperties)getProperties()).isShrinkTokenAnnotation(); /* TODO */
+			shrinkTokenAnnotations = ((TCFImporterProperties)getProperties()).isShrinkTokenAnnotation(); /* TODO */
 		}
 		
 		@Override
@@ -106,7 +106,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_TC_PARSE.equals(localName)){
 			}
 			else if (TAG_TC_PARSING.equals(localName)){
-				currentTokenID = null;
+				currentNodeID = null;
 				SLayer syntaxLayer = SaltFactory.eINSTANCE.createSLayer();
 				syntaxLayer.setSName(LAYER_CONSTITUENTS);
 				syntaxLayer.createSAnnotation(null, ATT_TAGSET, attributes.getValue(ATT_TAGSET));
@@ -174,7 +174,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				}
 			}
 			else if(TAG_TC_DEPPARSING.equals(localName)){
-				currentTokenID = null;
+				currentNodeID = null;
 				SLayer depLayer = SaltFactory.eINSTANCE.createSLayer();
 				depLayer.setSName(LAYER_DEPENDENCIES);
 				getSDocument().getSDocumentGraph().addSLayer(depLayer);
@@ -211,7 +211,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_TC_TEXTCORPUS.equals(localName)){				
 			}
 			else if (TAG_TC_LEMMA.equals(localName)){
-				currentTokenID = attributes.getValue(TCFDictionary.ATT_TOKENIDS);
+				currentNodeID = attributes.getValue(TCFDictionary.ATT_TOKENIDS);
 				currentAnnoID = attributes.getValue(TCFDictionary.ATT_ID);
 			}
 			else if (TAG_TOOLINCHAIN.equals(localName)){
@@ -226,7 +226,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_RESOURCEPROXYLIST.equals(localName)){
 			}
 			else if (TAG_TC_TOKEN.equals(localName)){
-				currentTokenID = attributes.getValue(TCFDictionary.ATT_ID);
+				currentNodeID = attributes.getValue(TCFDictionary.ATT_ID);
 			}
 			else if (TAG_COMPONENTS.equals(localName)){
 			}
@@ -251,10 +251,14 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_TOOLCHAIN.equals(localName)){
 			}
 			else if (TAG_TC_TAG.equals(localName)){
-				/* TODO CHECK this tag is also used in morphology (e.g.) -> does this cause errors? 
-				 * I don't think so */
-				currentTokenID = attributes.getValue(ATT_TOKENIDS);
-				currentAnnoID = attributes.getValue(ATT_ID);									
+				/* first check, if we are really in postags 
+				 * and not in morphology (both use tag "tag").
+				 * tag in morphology does not contain attributes.
+				 */
+				if(attributes.getValue(ATT_TOKENIDS)!=null){
+					currentNodeID = attributes.getValue(ATT_TOKENIDS);
+					currentAnnoID = attributes.getValue(ATT_ID);
+				}													
 			}
 			else if (TAG_TC_POSTAGS.equals(localName)){
 				SLayer posLayer = SaltFactory.eINSTANCE.createSLayer();
@@ -265,13 +269,22 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_RESOURCES.equals(localName)){
 			}
 			else if (TAG_TC_ANALYSIS.equals(localName)){
-				String[] currentTokenIDs = attributes.getValue(ATT_TOKENIDS).split(" ");
-				EList<SToken> sTokens = new BasicEList<SToken>();
-				for(int i=0; i<currentTokenIDs.length; i++){
-					sTokens.add((SToken) sNodes.get(currentTokenIDs[i]));					
+				currentNodeID = attributes.getValue(ATT_TOKENIDS);
+				SNode sNode = null;
+				if(currentNodeID.contains(" ")){
+					/* build SSpan */
+					String[] seq = currentNodeID.split(" ");
+					EList<SToken> spanTokens = new BasicEList<SToken>();
+					for(int i=0; i<seq.length; i++){
+						spanTokens.add((SToken)sNodes.get(seq[i]));
+					}
+					sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
 				}
-				currentSNode = getSDocument().getSDocumentGraph().createSSpan(sTokens);
-				getSDocument().getSDocumentGraph().getSLayerByName(LAYER_TCF_MORPHOLOGY).get(0).getNodes().add(currentSNode);
+				else{
+					sNode = shrinkTokenAnnotations ? sNodes.get(currentNodeID) : getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(currentNodeID)); 
+				}
+				sLayers.get(LAYER_TCF_MORPHOLOGY).getSNodes().add(sNode);
+				currentSNode = sNode;
 			}
 			else if (TAG_TC_F.equals(localName)){				
 				currentAnnoKey = attributes.getValue(ATT_NAME);								
@@ -282,7 +295,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_TC_MORPHOLOGY.equals(localName)){
 				SLayer tcfMorphLayer = SaltFactory.eINSTANCE.createSLayer();
 				tcfMorphLayer.setSName(LAYER_TCF_MORPHOLOGY);
-				getSDocument().getSDocumentGraph().addSLayer(tcfMorphLayer);				
+				getSDocument().getSDocumentGraph().addSLayer(tcfMorphLayer);
+				sLayers.put(LAYER_TCF_MORPHOLOGY, tcfMorphLayer);
 			}
 		}
 		
@@ -314,17 +328,17 @@ public class TCFMapperImport extends PepperMapperImpl{
 					p++;
 				}
 				
-				sNodes.put(currentTokenID, getSDocument().getSDocumentGraph().createSToken(currentSTDS, p, p+tok.length()));
+				sNodes.put(currentNodeID, getSDocument().getSDocumentGraph().createSToken(currentSTDS, p, p+tok.length()));
 			}
 			else if(TAG_TC_TAG.equals(path.peek())){
 				/* build annotation – only use in POS */
 				path.pop();
 				if(TAG_TC_POSTAGS.equals(path.peek())){
-					if(!currentTokenID.contains(" ")){
+					if(!currentNodeID.contains(" ")){
 						SAnnotation anno = SaltFactory.eINSTANCE.createSPOSAnnotation();
 						anno.setValue(txt.toString());
-						SNode annoNode = sNodes.get(currentTokenID);
-						if(!shrinkTokenAnnotation){
+						SNode annoNode = sNodes.get(currentNodeID);
+						if(!shrinkTokenAnnotations){
 							annoNode = getSDocument().getSDocumentGraph().createSSpan((SToken)annoNode);							
 						}
 						annoNode.addSAnnotation(anno);
@@ -332,7 +346,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 						sLayers.get(LAYER_POS).getSNodes().add(annoNode);
 					}
 					else{
-						String[] seq = currentTokenID.split(" ");
+						String[] seq = currentNodeID.split(" ");
 						EList<SToken> spanTokens = new BasicEList<SToken>();
 						for(int i=0; i<seq.length; i++){
 							spanTokens.add((SToken)sNodes.get(seq[i]));
@@ -341,7 +355,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 						anno.setValue(txt.toString());
 						SSpan sSpan = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
 						sSpan.addSAnnotation(anno);
-						sNodes.put(currentTokenID, sSpan);
+						sNodes.put(currentNodeID, sSpan);
 						sLayers.get(LAYER_POS).getSNodes().add(sSpan);
 					}
 				}				
@@ -350,7 +364,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				/* build annotation */								
 				SAnnotation anno = SaltFactory.eINSTANCE.createSLemmaAnnotation();
 				anno.setValue(txt.toString());
-				sNodes.get(currentTokenID).addSAnnotation(anno);
+				sNodes.get(currentNodeID).addSAnnotation(anno);
 				labels.put(currentAnnoID, anno);				
 			}
 			else if(TAG_TC_F.equals(path.peek())){

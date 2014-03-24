@@ -74,6 +74,8 @@ public class TCFMapperImportTest {
 	private static final String LOCATION_TEST_MORPHOLOGY = "/pepper-test/tcfImporterTestMorphology.xml";
 	private static final String LOCATION_TEST_REFERENCES = "/pepper-test/tcfImporterTestReferences.xml";
 	
+	private static final boolean DEBUG = true;
+	
 	public TCFMapperImport getFixture() {
 		return fixture;
 	}
@@ -1915,13 +1917,13 @@ public class TCFMapperImportTest {
 									xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "NP");
 									xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c3");
 										xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//"I"
-										xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, ".");
+										xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "PP");
 										xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c4");
 										xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t1");
 										xmlWriter.writeEndElement();//End of "I"
 									xmlWriter.writeEndElement();//End of NP
 									xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//"love"
-									xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, ".");
+									xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "VBZ");
 									xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c5");
 									xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t2");
 									xmlWriter.writeEndElement();//End of "love"
@@ -1929,7 +1931,7 @@ public class TCFMapperImportTest {
 									xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "NP");
 									xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c6");
 										xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//"New York"
-										xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, ".");
+										xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "NNP");
 										xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c7");
 										xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3 t4");
 										xmlWriter.writeEndElement();//End of "New York"
@@ -1953,6 +1955,10 @@ public class TCFMapperImportTest {
 		SDocumentGraph docGraph = doc.getSDocumentGraph();
 		docGraph.createSTextualDS(EXAMPLE_TEXT_SHRINK);
 		docGraph.tokenize();
+		SLayer docSynLayer = SaltFactory.eINSTANCE.createSLayer(); 
+		docGraph.addSLayer(docSynLayer);
+		docSynLayer.setSName(TCFMapperImport.LAYER_CONSTITUENTS);
+		EList<SNode> docConstituents = docSynLayer.getSNodes();
 		
 		SStructure root = SaltFactory.eINSTANCE.createSStructure();//ROOT
 		root.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "ROOT");
@@ -1974,6 +1980,12 @@ public class TCFMapperImportTest {
 		docGraph.addSNode(np2, newYork, STYPE_NAME.SDOMINANCE_RELATION);
 		docGraph.addSNode(root, docGraph.getSTokens().get(4), STYPE_NAME.SDOMINANCE_RELATION);
 		
+		docConstituents.add(root);
+		docConstituents.add(s);
+		docConstituents.add(np1);
+		docConstituents.add(np2);
+		/* spans and tokens do not belong to the constituent layer */
+		
 		/* setting variables */		
 		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_CONSTITUENT_PARSING);
 		tmpOut.getParentFile().mkdirs();
@@ -1988,25 +2000,42 @@ public class TCFMapperImportTest {
 				
 		/* -- compare template salt model to imported salt model -- */
 		
-		SDocumentGraph fixGraph = getFixture().getSDocument().getSDocumentGraph();
-		
-		assertNotEquals(fixGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).size(), 0);	
-		
-		SLayer docSynLayer = docGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0);		
-		SLayer fixSynLayer = fixGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0);
-		
-		assertEquals(docSynLayer.getAllIncludedNodes().size(), fixSynLayer.getAllIncludedNodes().size());
+		SDocumentGraph fixGraph = getFixture().getSDocument().getSDocumentGraph();		
+		assertNotEquals(fixGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).size(), 0);		
 				
-		EList<SNode> docNodes = docGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getSNodes();
-		EList<SNode> fixNodes = fixGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getSNodes();
-		for(int i=0; i<docNodes.size(); i++){			
-//			System.out.println(i+"\tdoc="+docNodes.get(i).getSElementId().toString().replace("de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.impl.SElementIdImpl@", "")+"\t"+docNodes.get(i).getSAnnotation(TCFMapperImport.ANNO_NAME_CONSTITUENT).getValueString());
-//			System.out.println("\t"+docGraph.getSText(docNodes.get(i)));
-//			System.out.println(i+"\tfix="+fixNodes.get(i).getSElementId().toString().replace("de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.impl.SElementIdImpl@", "")+"\t"+fixNodes.get(i).getSAnnotation(TCFDictionary.ATT_CAT).getValueString());
-//			System.out.println("\t"+fixGraph.getSText(fixNodes.get(i)));
-			assertEquals(docNodes.get(i).getSElementId(), fixNodes.get(i).getSElementId());
-			assertEquals(docGraph.getSText(docNodes.get(i)), fixGraph.getSText(fixNodes.get(i)));
-			assertEquals(docNodes.get(i).getSAnnotation(TCFMapperImport.ANNO_NAME_CONSTITUENT).getValue(), fixNodes.get(i).getSAnnotation(TCFDictionary.ATT_CAT).getValue());
+		EList<SNode> fixConstituents = fixGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getSNodes();
+		assertEquals(docConstituents.size(), fixConstituents.size());		
+		
+		SNode docNode = null;
+		SNode fixNode = null;
+		EList<SToken> docOTokens = null;
+		EList<SToken> fixOTokens = null;
+		EList<STYPE_NAME> relTypes = new BasicEList<STYPE_NAME>();
+		relTypes.add(STYPE_NAME.SDOMINANCE_RELATION);
+		if(DEBUG){System.out.println("i\t\tConstituent\tText");}
+		for(int i=0; i<docConstituents.size(); i++){			
+			docNode = docConstituents.get(i);
+			fixNode = fixConstituents.get(i);
+			if(DEBUG){
+				System.out.println("("+i+")");
+				System.out.println(".docNode:\t"+docNode.getSAnnotation(TCFMapperImport.ANNO_NAME_CONSTITUENT).getValueString()+"\t\t"+docGraph.getSText(docNode));
+				System.out.println(".fixNode:\t"+fixNode.getSAnnotation(TCFDictionary.ATT_CAT).getValueString()+"\t\t"+fixGraph.getSText(fixNode));
+			}
+			assertEquals(docNode.getSElementId(), fixNode.getSElementId());
+			assertEquals(docNode.getClass(), fixNode.getClass());
+			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
+			assertEquals(docNode.getSAnnotation(TCFMapperImport.ANNO_NAME_CONSTITUENT).getValue(), fixNode.getSAnnotation(TCFDictionary.ATT_CAT).getValue());
+			docOTokens = docGraph.getOverlappedSTokens(docNode, relTypes);
+			fixOTokens = fixGraph.getOverlappedSTokens(fixNode, relTypes);
+			assertEquals(docOTokens.size(), fixOTokens.size());
+			for(int j=0; j<docOTokens.size(); j++){
+				/* attention! Reassignment of variables */
+				docNode = docOTokens.get(j);
+				fixNode = fixOTokens.get(j);
+				/* compare annotations? */
+				/* compare text? */
+				/* is this whole comparing really necessary? */
+			}
 		}
 	}
 	

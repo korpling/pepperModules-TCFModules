@@ -42,6 +42,9 @@ public class TCFMapperImport extends PepperMapperImpl{
 	public static final String LAYER_CONSTITUENTS = "syntax";
 	public static final String LAYER_LEMMA = "lemma";
 	public static final String ANNO_NAME_CONSTITUENT = "const";
+	public static final String SPAN = "span";//marking element for span ids over single tokens	
+	
+	private static final boolean DEGUG = true;
 	
 	@Override
 	public DOCUMENT_STATUS mapSDocument() {
@@ -67,7 +70,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 		private String currentAnnoID;
 		private String currentAnnoKey;
 		private SNode currentSNode;
-		private boolean shrinkTokenAnnotations;
+		private boolean shrinkTokenAnnotations;		
 		
 		public TCFReader(){
 			super();
@@ -124,11 +127,10 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_TC_CONSTITUENT.equals(localName)){
 				String constID = attributes.getValue(ATT_ID);
-				/* are we dealing with a potential SToken or SStructure? */
-				/* TODO also here we deal with TokenIDs, so PROP_SHRINK_TOKEN_ANNOTATIONS might play a role*/
+				/* are we dealing with a potential SToken (sequence) or a potential SStructure? */
 				String tokenIDs = attributes.getValue(ATT_TOKENIDS);
 				if(tokenIDs==null){
-					/* constituent */					
+					/* SStructure */					
 					SStructure sStruc = SaltFactory.eINSTANCE.createSStructure();
 					sStruc.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));
 					sNodes.put(constID, sStruc);
@@ -136,41 +138,55 @@ public class TCFMapperImport extends PepperMapperImpl{
 					if(idPath.isEmpty()){						
 						/* sStruc is root */
 						getSDocument().getSDocumentGraph().addSNode(sStruc);
-						/*TEST*/System.out.println("Building node: "+sStruc.getSAnnotation(ATT_CAT).getSValue()+" as root");
+						if(DEGUG){System.out.println("Building node: "+sStruc.getSAnnotation(ATT_CAT).getSValue()+" as root");}
 					}
 					else{
 						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sStruc, STYPE_NAME.SDOMINANCE_RELATION);
-						/*TEST*/System.out.println("Building node: "+sStruc.getSAnnotation(ATT_CAT).getSValue()+"-"+constID.replace("c", "")+" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));
+						if(DEGUG){System.out.println("Building node: "+sStruc.getSAnnotation(ATT_CAT).getSValue()+"-"+constID.replace("c", "")+" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));}
 					}					
-					/*TEST*/System.out.println("Pushing to stack: "+attributes.getValue(ATT_CAT));
+					if(DEGUG){System.out.println("Pushing to stack: "+attributes.getValue(ATT_CAT));}
 					idPath.push(constID);					
 				}
 				else{
-					/* token */					
+					/* token */
+					SNode sNode = null;
 					if(!tokenIDs.contains(" ")){
 						/* single token */						
-						/*TODO ask yourself, if a single token can be the direct root not governed by a phrase*/
-						SToken sToken = (SToken)sNodes.get(tokenIDs);
-						sToken.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));
-						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sToken, STYPE_NAME.SDOMINANCE_RELATION);
-						/*TEST*/System.out.println("Taking token:"+getSDocument().getSDocumentGraph().getSText(sToken)+" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));
-						/*TODO SHRINK PROPERTY*/
+						/*TODO ask yourself, if a single token can be the direct root not governed by a phrase*/						
+						if(shrinkTokenAnnotations){
+							sNode = (SToken)sNodes.get(tokenIDs);
+						}
+						else{
+							sNode = sNodes.get(tokenIDs+SPAN);
+							if(sNode==null){
+								sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(tokenIDs));
+								sNodes.put(tokenIDs+SPAN, sNode);
+							}							
+						}
+						sNode.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));//TODO annotation might already exist, we definitely have to use namespaces!
+						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sNode, STYPE_NAME.SDOMINANCE_RELATION);
+						if(DEGUG){System.out.println("Taking token:"+getSDocument().getSDocumentGraph().getSText(sNode)+" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));}						
 						/*we HAVE TO push also tokens onto the stack to avoid that at the end of their xml-element the wrong constituent is popped off the stack*/
+						/*so the pushed id is actually just a dummy -> we don't have to check, if the span should be pushed*/
 						idPath.push(tokenIDs);
 					}
-					else{
-						String[] seq = tokenIDs.split(" ");
-						EList<SToken> sTokensForSpan = new BasicEList<SToken>();
-						for(int i=0; i<seq.length; i++){
-							sTokensForSpan.add((SToken)sNodes.get(seq[i]));							
-						}
-						SSpan sSpan = SaltFactory.eINSTANCE.createSSpan();
-						/*TODO*/
-						sSpan.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));
-						sNodes.put(constID, sSpan);
-						sLayers.get(LAYER_CONSTITUENTS).getSNodes().add(sSpan);/* TODO add span to syntax layer? tokens don't belong there */
+					else{//multiple tokens --> build span
+						sNode = sNodes.get(tokenIDs);
+						if(sNode==null){
+							if(DEGUG){System.out.println("Span does not exist. I build it.");}
+							String[] seq = tokenIDs.split(" ");
+							EList<SToken> sTokensForSpan = new BasicEList<SToken>();
+							for(int i=0; i<seq.length; i++){
+								sTokensForSpan.add((SToken)sNodes.get(seq[i]));							
+							}
+							sNode = getSDocument().getSDocumentGraph().createSSpan(sTokensForSpan);
+							sNodes.put(tokenIDs, sNode);
+							if(DEGUG){System.out.println("Building span: \""+getSDocument().getSDocumentGraph().getSText(sNode)+"\" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));}
+						}						
+						sNode.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));
+						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sNode, STYPE_NAME.SDOMINANCE_RELATION);
 						/*we HAVE TO push also tokens/spans onto the stack to avoid that at the end of their xml-element the wrong constituent is popped off the stack*/
-						idPath.push(constID);/*TODO – which ID? PROBLEMATIC*/
+						idPath.push(tokenIDs);
 					}
 				}
 			}
@@ -254,14 +270,14 @@ public class TCFMapperImport extends PepperMapperImpl{
 				lemmaLayer.setSName(LAYER_LEMMA);
 				getSDocument().getSDocumentGraph().addSLayer(lemmaLayer);
 				sLayers.put(LAYER_LEMMA, lemmaLayer);
-				/*TEST*/System.out.println("Lemma layer created and added.");
+				if(DEGUG){System.out.println("Lemma layer created and added.");}
 			}
 			else if (TAG_TC_SENTENCE.equals(localName)){
 				String[] seq = attributes.getValue(TCFDictionary.ATT_TOKENIDS).split(" ");				
 				EList<SToken> sentenceTokens = new BasicEList<SToken>();
 				for(int i=0; i<seq.length; i++){
 					sentenceTokens.add((SToken)sNodes.get(seq[i]));
-					/*TEST*/System.out.println("Current token added to sentence span: "+getSDocument().getSDocumentGraph().getSText(sNodes.get(seq[i])));
+					if(DEGUG){System.out.println("Current token added to sentence span: "+getSDocument().getSDocumentGraph().getSText(sNodes.get(seq[i])));}
 				}
 				SSpan sentenceSpan = getSDocument().getSDocumentGraph().createSSpan(sentenceTokens);
 				String att = attributes.getValue(TCFDictionary.ATT_ID);
@@ -346,7 +362,7 @@ public class TCFMapperImport extends PepperMapperImpl{
                 java.lang.String qName) throws SAXException{
 			localName = qName.substring(qName.lastIndexOf(":")+1);
 			if(TAG_TC_CONSTITUENT.equals(localName)){
-				/*TEST*/System.out.println("Popping from stack: "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString());
+				if(DEGUG){System.out.println("Popping from stack: "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString());}
 				idPath.pop();
 			}
 		}

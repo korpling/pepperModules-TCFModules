@@ -1955,10 +1955,11 @@ public class TCFMapperImportTest {
 		SDocumentGraph docGraph = doc.getSDocumentGraph();
 		docGraph.createSTextualDS(EXAMPLE_TEXT_SHRINK);
 		docGraph.tokenize();
+		EList<SToken> docTokens = docGraph.getSTokens();
 		SLayer docSynLayer = SaltFactory.eINSTANCE.createSLayer(); 
 		docGraph.addSLayer(docSynLayer);
 		docSynLayer.setSName(TCFMapperImport.LAYER_CONSTITUENTS);
-		EList<SNode> docConstituents = docSynLayer.getSNodes();
+		EList<SNode> docConstituents = docSynLayer.getSNodes();	
 		
 		SStructure root = SaltFactory.eINSTANCE.createSStructure();//ROOT
 		root.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "ROOT");
@@ -1968,22 +1969,27 @@ public class TCFMapperImportTest {
 		np1.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "NP");
 		SStructure np2 = SaltFactory.eINSTANCE.createSStructure();//NP(2)
 		np2.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "NP");
-		SSpan newYork = docGraph.createSSpan(docGraph.getSTokens().get(2));
-		docGraph.addSNode(newYork, docGraph.getSTokens().get(3), STYPE_NAME.SSPANNING_RELATION);
+		SSpan newYork = docGraph.createSSpan(docTokens.get(2));
+		docGraph.addSNode(newYork, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
+		newYork.createSAnnotation(null, TCFDictionary.ATT_CAT, "NNP");
 		
 		docGraph.addSNode(root);
 		docGraph.addSNode(root, s, STYPE_NAME.SDOMINANCE_RELATION);
 		docGraph.addSNode(s, np1, STYPE_NAME.SDOMINANCE_RELATION);
-		docGraph.addSNode(np1, docGraph.getSTokens().get(0), STYPE_NAME.SDOMINANCE_RELATION);
-		docGraph.addSNode(s, docGraph.getSTokens().get(1), STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(np1, docTokens.get(0), STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(s, docTokens.get(1), STYPE_NAME.SDOMINANCE_RELATION);
 		docGraph.addSNode(s, np2, STYPE_NAME.SDOMINANCE_RELATION);
 		docGraph.addSNode(np2, newYork, STYPE_NAME.SDOMINANCE_RELATION);
-		docGraph.addSNode(root, docGraph.getSTokens().get(4), STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(root, docTokens.get(4), STYPE_NAME.SDOMINANCE_RELATION);
 		
 		docConstituents.add(root);
 		docConstituents.add(s);
 		docConstituents.add(np1);
 		docConstituents.add(np2);
+		
+		docTokens.get(0).createSAnnotation(null, TCFDictionary.ATT_CAT, "PP");
+		docTokens.get(1).createSAnnotation(null, TCFDictionary.ATT_CAT, "VBZ");
+		docTokens.get(4).createSAnnotation(null, TCFDictionary.ATT_CAT, ".");
 		/* spans and tokens do not belong to the constituent layer */
 		
 		/* setting variables */		
@@ -1993,6 +1999,7 @@ public class TCFMapperImportTest {
 		p.println(outStream.toString());
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
 		
 		/* start mapper */
 		System.out.println(tmpOut);		
@@ -2010,8 +2017,8 @@ public class TCFMapperImportTest {
 		SNode fixNode = null;
 		EList<SToken> docOTokens = null;
 		EList<SToken> fixOTokens = null;
-		EList<STYPE_NAME> relTypes = new BasicEList<STYPE_NAME>();
-		relTypes.add(STYPE_NAME.SDOMINANCE_RELATION);
+		EList<STYPE_NAME> domRelType = new BasicEList<STYPE_NAME>();
+		domRelType.add(STYPE_NAME.SDOMINANCE_RELATION);
 		if(DEBUG){System.out.println("i\t\tConstituent\tText");}
 		for(int i=0; i<docConstituents.size(); i++){			
 			docNode = docConstituents.get(i);
@@ -2025,17 +2032,241 @@ public class TCFMapperImportTest {
 			assertEquals(docNode.getClass(), fixNode.getClass());
 			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
 			assertEquals(docNode.getSAnnotation(TCFMapperImport.ANNO_NAME_CONSTITUENT).getValue(), fixNode.getSAnnotation(TCFDictionary.ATT_CAT).getValue());
-			docOTokens = docGraph.getOverlappedSTokens(docNode, relTypes);
-			fixOTokens = fixGraph.getOverlappedSTokens(fixNode, relTypes);
+			docOTokens = docGraph.getOverlappedSTokens(docNode, domRelType);
+			fixOTokens = fixGraph.getOverlappedSTokens(fixNode, domRelType);
 			assertEquals(docOTokens.size(), fixOTokens.size());
 			for(int j=0; j<docOTokens.size(); j++){
-				/* attention! Reassignment of variables */
 				docNode = docOTokens.get(j);
 				fixNode = fixOTokens.get(j);
 				/* compare annotations? */
+				assertEquals(docNode.getSAnnotation(TCFDictionary.ATT_CAT).getValue(), fixNode.getSAnnotation(TCFDictionary.ATT_CAT).getValue());				
 				/* compare text? */
-				/* is this whole comparing really necessary? */
+				assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
 			}
+		}
+		/* compare spans: */
+		EList<SSpan> docSpans = docGraph.getSSpans();
+		EList<SSpan> fixSpans = fixGraph.getSSpans();
+		assertNotNull(fixSpans);
+		assertFalse(fixSpans.isEmpty());
+		assertEquals(docSpans.size(), fixSpans.size());
+		if(DEBUG){System.out.println("\n\nSPANS:\n");}
+		for(int i=0; i<docSpans.size(); i++){
+			docNode = docSpans.get(i);
+			fixNode = fixSpans.get(i);			
+			if(DEBUG){
+				System.out.println("IDs:\t"+docNode.getSElementId());
+				System.out.println("\t"+fixNode.getSElementId());
+			}
+			assertEquals(docNode.getSElementId(), fixNode.getSElementId());
+			if(DEBUG){System.out.println("Overlapped Text:\t"+docGraph.getSText(docNode)+"\t"+fixGraph.getSText(fixNode));}
+			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
+			assertNotNull(fixNode.getSAnnotation(TCFDictionary.ATT_CAT));
+			if(DEBUG){System.out.println("Annotation:\t"+docNode.getSAnnotation(TCFDictionary.ATT_CAT).getValueString()+"\t"+fixNode.getSAnnotation(TCFDictionary.ATT_CAT).getValueString());}			
+			assertEquals(docNode.getSAnnotation(TCFDictionary.ATT_CAT).getValue(), fixNode.getSAnnotation(TCFDictionary.ATT_CAT).getValue());
+		}
+	}
+	
+	/**This method tests if a valid TCF-XML-structure containing constituent
+	 * annotations is converted to salt correctly by {@link TCFMapperImport}.  
+	 * @throws XMLStreamException 
+	 * @throws FileNotFoundException 
+	 */
+	@Test
+	public void testConstituentParsingNotShrinked() throws FileNotFoundException, XMLStreamException{
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory o= XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
+		
+		xmlWriter.writeStartDocument();
+		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+			xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+			xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+			xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+			xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+			xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+			xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+			xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
+				xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeCharacters(EXAMPLE_TEXT_SHRINK);
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+							xmlWriter.writeCharacters("I");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+							xmlWriter.writeCharacters("love");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+							xmlWriter.writeCharacters("New");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+							xmlWriter.writeCharacters("York");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+							xmlWriter.writeCharacters(".");
+						xmlWriter.writeEndElement();						
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.TAG_TC_PARSING);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TAGSET, "unknown");
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_PARSE, TCFDictionary.NS_VALUE_TC);
+							xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//root node
+							xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "ROOT");
+							xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c1");
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//S
+								xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "S");
+								xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c2");
+									xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//NP
+									xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "NP");
+									xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c3");
+										xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//"I"
+										xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "PP");
+										xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c4");
+										xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t1");
+										xmlWriter.writeEndElement();//End of "I"
+									xmlWriter.writeEndElement();//End of NP
+									xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//"love"
+									xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "VBZ");
+									xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c5");
+									xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t2");
+									xmlWriter.writeEndElement();//End of "love"
+									xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//NP
+									xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "NP");
+									xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c6");
+										xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//"New York"
+										xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, "NNP");
+										xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c7");
+										xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3 t4");
+										xmlWriter.writeEndElement();//End of "New York"
+									xmlWriter.writeEndElement();//End of NP
+								xmlWriter.writeEndElement();//End of S
+								xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_CONSTITUENT, TCFDictionary.NS_VALUE_TC);//"."
+								xmlWriter.writeAttribute(TCFDictionary.ATT_CAT, ".");
+								xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "c8");
+								xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t5");
+								xmlWriter.writeEndElement();//End of "."
+							xmlWriter.writeEndElement();//End of root node
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();//End of TextCorpus
+			xmlWriter.writeEndElement();
+		xmlWriter.writeEndDocument();
+		
+		/* generating salt sample */
+		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
+		SDocumentGraph docGraph = doc.getSDocumentGraph();
+		docGraph.createSTextualDS(EXAMPLE_TEXT_SHRINK);
+		docGraph.tokenize();
+		EList<SToken> docTokens = docGraph.getSTokens();
+		SLayer docSynLayer = SaltFactory.eINSTANCE.createSLayer(); 
+		docGraph.addSLayer(docSynLayer);
+		docSynLayer.setSName(TCFMapperImport.LAYER_CONSTITUENTS);
+		EList<SNode> docConstituents = docSynLayer.getSNodes();	
+		
+		SSpan sI = docGraph.createSSpan(docTokens.get(0));
+		sI.createSAnnotation(null, TCFDictionary.ATT_CAT, "PP");
+		
+		SSpan sLove = docGraph.createSSpan(docTokens.get(1));
+		sLove.createSAnnotation(null, TCFDictionary.ATT_CAT, "VBZ");
+		
+		SSpan sNewYork = docGraph.createSSpan(docTokens.get(2));		
+		docGraph.addSNode(sNewYork, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
+		sNewYork.createSAnnotation(null, TCFDictionary.ATT_CAT, "NNP");
+		
+		SSpan sStop = docGraph.createSSpan(docTokens.get(4));
+		sStop.createSAnnotation(null, TCFDictionary.ATT_CAT, ".");
+		
+		SStructure root = SaltFactory.eINSTANCE.createSStructure();//ROOT
+		root.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "ROOT");
+		SStructure s = SaltFactory.eINSTANCE.createSStructure();//S
+		s.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "S");
+		SStructure np1 = SaltFactory.eINSTANCE.createSStructure();//NP(1)
+		np1.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "NP");
+		SStructure np2 = SaltFactory.eINSTANCE.createSStructure();//NP(2)
+		np2.createSAnnotation(null, TCFMapperImport.ANNO_NAME_CONSTITUENT, "NP");		
+		
+		docGraph.addSNode(root);
+		docGraph.addSNode(root, s, STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(s, np1, STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(np1, sI, STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(s, sLove, STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(s, np2, STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(np2, sNewYork, STYPE_NAME.SDOMINANCE_RELATION);
+		docGraph.addSNode(root, sStop, STYPE_NAME.SDOMINANCE_RELATION);
+		
+		docConstituents.add(root);
+		docConstituents.add(s);
+		docConstituents.add(np1);
+		docConstituents.add(np2);
+		
+		/* setting variables */		
+		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_CONSTITUENT_PARSING);
+		tmpOut.getParentFile().mkdirs();
+		PrintWriter p = new PrintWriter(tmpOut);		
+		p.println(outStream.toString());
+		p.close();
+		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
+		
+		/* start mapper */
+		System.out.println(tmpOut);		
+		this.getFixture().mapSDocument();
+				
+		/* -- compare template salt model to imported salt model -- */
+		
+		SDocumentGraph fixGraph = getFixture().getSDocument().getSDocumentGraph();		
+		assertNotEquals(fixGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).size(), 0);		
+				
+		EList<SNode> fixConstituents = fixGraph.getSLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getSNodes();
+		assertEquals(docConstituents.size(), fixConstituents.size());		
+		
+		SNode docNode = null;
+		SNode fixNode = null;
+		EList<STYPE_NAME> domRelType = new BasicEList<STYPE_NAME>();
+		domRelType.add(STYPE_NAME.SDOMINANCE_RELATION);
+		if(DEBUG){System.out.println("i\t\tConstituent\tText");}
+		for(int i=0; i<docConstituents.size(); i++){			
+			docNode = docConstituents.get(i);
+			fixNode = fixConstituents.get(i);
+			if(DEBUG){
+				System.out.println("("+i+")");
+				System.out.println(".docNode:\t"+docNode.getSAnnotation(TCFMapperImport.ANNO_NAME_CONSTITUENT).getValueString()+"\t\t"+docGraph.getSText(docNode));
+				System.out.println(".fixNode:\t"+fixNode.getSAnnotation(TCFDictionary.ATT_CAT).getValueString()+"\t\t"+fixGraph.getSText(fixNode));
+			}
+			assertEquals(docNode.getSElementId(), fixNode.getSElementId());
+			assertEquals(docNode.getClass(), fixNode.getClass());
+			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
+			assertEquals(docNode.getSAnnotation(TCFMapperImport.ANNO_NAME_CONSTITUENT).getValue(), fixNode.getSAnnotation(TCFDictionary.ATT_CAT).getValue());			
+		}
+		/* compare spans: */
+		EList<SSpan> docSpans = docGraph.getSSpans();
+		EList<SSpan> fixSpans = fixGraph.getSSpans();
+		assertNotNull(fixSpans);
+		assertFalse(fixSpans.isEmpty());
+		assertEquals(docSpans.size(), fixSpans.size());
+		if(DEBUG){System.out.println("\n\nSPANS:\n");}
+		for(int i=0; i<docSpans.size(); i++){
+			docNode = docSpans.get(i);
+			fixNode = fixSpans.get(i);			
+			if(DEBUG){
+				System.out.println("IDs:\t"+docNode.getSElementId());
+				System.out.println("\t"+fixNode.getSElementId());
+			}
+			assertEquals(docNode.getSElementId(), fixNode.getSElementId());
+			if(DEBUG){System.out.println("Overlapped Text:\t"+docGraph.getSText(docNode)+"\t"+fixGraph.getSText(fixNode));}
+			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
+			assertNotNull(fixNode.getSAnnotation(TCFDictionary.ATT_CAT));
+			if(DEBUG){System.out.println("Annotation:\t"+docNode.getSAnnotation(TCFDictionary.ATT_CAT).getValueString()+"\t"+fixNode.getSAnnotation(TCFDictionary.ATT_CAT).getValueString());}			
+			assertEquals(docNode.getSAnnotation(TCFDictionary.ATT_CAT).getValue(), fixNode.getSAnnotation(TCFDictionary.ATT_CAT).getValue());
 		}
 	}
 	

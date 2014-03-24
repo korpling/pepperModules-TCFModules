@@ -41,7 +41,10 @@ public class TCFMapperImport extends PepperMapperImpl{
 	public static final String LAYER_TCF_MORPHOLOGY = "tcfMorphology";
 	public static final String LAYER_CONSTITUENTS = "syntax";
 	public static final String LAYER_LEMMA = "lemma";
+	
 	public static final String ANNO_NAME_CONSTITUENT = "const";
+	
+	
 	public static final String SPAN = "span";//marking element for span ids over single tokens	
 	
 	private static final boolean DEGUG = true;
@@ -158,8 +161,9 @@ public class TCFMapperImport extends PepperMapperImpl{
 						}
 						else{
 							sNode = sNodes.get(tokenIDs+SPAN);
-							if(sNode==null){
+							if(sNode==null){								
 								sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(tokenIDs));
+								if(DEGUG){System.out.println("Building span over single token \""+getSDocument().getSDocumentGraph().getSText(sNode)+"\"");}
 								sNodes.put(tokenIDs+SPAN, sNode);
 							}							
 						}
@@ -362,7 +366,10 @@ public class TCFMapperImport extends PepperMapperImpl{
                 java.lang.String qName) throws SAXException{
 			localName = qName.substring(qName.lastIndexOf(":")+1);
 			if(TAG_TC_CONSTITUENT.equals(localName)){
-				if(DEGUG){System.out.println("Popping from stack: "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString());}
+				if(DEGUG){
+					String out = shrinkTokenAnnotations ? "Popping from stack: "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString() : "POP()";
+					System.out.println(out);
+				}
 				idPath.pop();
 			}
 		}

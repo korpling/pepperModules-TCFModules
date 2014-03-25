@@ -229,7 +229,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_DESCRIPTION.equals(localName)){
 			}
-			else if (TAG_TC_TEXTCORPUS.equals(localName)){				
+			else if (TAG_TC_TEXTCORPUS.equals(localName)){	
+				getSDocument().getSDocumentGraph().createSMetaAnnotation(null, ATT_LANG, attributes.getValue(ATT_LANG));
 			}
 			else if (TAG_TC_LEMMA.equals(localName)){
 				currentNodeID = attributes.getValue(TCFDictionary.ATT_TOKENIDS);

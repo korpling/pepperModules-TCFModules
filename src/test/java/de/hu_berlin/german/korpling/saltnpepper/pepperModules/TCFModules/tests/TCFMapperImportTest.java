@@ -64,6 +64,7 @@ public class TCFMapperImportTest {
 	private TCFMapperImport fixture;
 	private static final String EXAMPLE_TEXT = "Is this example more complicated than it appears to be?";
 	private static final String EXAMPLE_TEXT_SHRINK = "I love New York.";
+	private static final String EXAMPLE_TEXT_REFERENCE = "I love New York. It is the place to be.";
 	private static final String LOCATION_TEST_PRIMARY_TEXT = "/pepper-test/tcfImporterTestPrimaryData.xml";
 	private static final String LOCATION_TEST_TOKENS = "/pepper-test/tcfImporterTestTokens.xml";
 	private static final String LOCATION_TEST_TOKENS_POS = "/pepper-test/tcfImporterTestTokensPos.xml";
@@ -3233,6 +3234,8 @@ public class TCFMapperImportTest {
 		}
 		
 	}
+
+	
 //	
 //	/**This method tests if a valid TCF-XML-structure containing named entity
 //	 * annotations is converted to salt correctly by {@link TCFMapperImport} 
@@ -3245,84 +3248,100 @@ public class TCFMapperImportTest {
 //		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
 //	}
 	
-//	/**This method tests if a valid TCF-XML-structure containing reference
-//	 * annotations is converted to salt correctly by {@link TCFMapperImport} 
-//	 * @throws XMLStreamException 
-//	 */
-//	@Test
-//	public void testReferences() throws XMLStreamException{
-//		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-//		XMLOutputFactory o= XMLOutputFactory.newFactory();
-//		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
-//		
-//		xmlWriter.writeStartDocument();
-//		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
-//		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
-//		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
-//			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
-//			xmlWriter.writeEndElement();
-//			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
-//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeCharacters(EXAMPLE_TEXT);
-//				xmlWriter.writeEndElement();
-//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
-//						xmlWriter.writeCharacters("Is");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
-//						xmlWriter.writeCharacters("this");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
-//						xmlWriter.writeCharacters("example");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
-//						xmlWriter.writeCharacters("more");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
-//						xmlWriter.writeCharacters("complicated");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
-//						xmlWriter.writeCharacters("than");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
-//						xmlWriter.writeCharacters("it");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
-//						xmlWriter.writeCharacters("appears");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
-//						xmlWriter.writeCharacters("to");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
-//						xmlWriter.writeCharacters("be");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
-//						xmlWriter.writeCharacters("?");
-//					xmlWriter.writeEndElement();
-//				xmlWriter.writeEndElement();
-//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCES, TCFDictionary.NS_VALUE_TC);
-//					
-//				xmlWriter.writeEndElement();
-//			xmlWriter.writeEndElement();
-//		xmlWriter.writeEndElement();
-//	xmlWriter.writeEndDocument();
-//	}
+	/**This method tests if a valid TCF-XML-structure containing reference
+	 * annotations is converted to salt correctly by {@link TCFMapperImport} 
+	 * @throws XMLStreamException 
+	 */
+	@Test
+	public void testReferencesShrinked() throws XMLStreamException{
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory o= XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
+		
+		xmlWriter.writeStartDocument();
+		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
+			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+			xmlWriter.writeEndElement();
+			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeCharacters(EXAMPLE_TEXT);
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+						xmlWriter.writeCharacters("I");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+						xmlWriter.writeCharacters("love");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+						xmlWriter.writeCharacters("New");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+						xmlWriter.writeCharacters("York");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+						xmlWriter.writeCharacters(".");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
+						xmlWriter.writeCharacters("It");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
+						xmlWriter.writeCharacters("is");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
+						xmlWriter.writeCharacters("the");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
+						xmlWriter.writeCharacters("place");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
+						xmlWriter.writeCharacters("to");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
+						xmlWriter.writeCharacters("be");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t12");
+						xmlWriter.writeCharacters(".");
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCES, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ENTITY, TCFDictionary.NS_VALUE_TC);
+						
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();
+			xmlWriter.writeEndElement();
+		xmlWriter.writeEndElement();
+		xmlWriter.writeEndDocument();
+	
+		/* generating salt sample */
+		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+		SDocumentGraph docGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
+		doc.setSDocumentGraph(docGraph);
+		docGraph.createSTextualDS(EXAMPLE_TEXT_REFERENCE);
+		docGraph.tokenize();
+		
+		
+		
+	}
 	
 //	/**This method tests if a valid TCF-XML-structure containing lexical-semantic
 //	 * annotations is converted to salt correctly by {@link TCFMapperImport} 

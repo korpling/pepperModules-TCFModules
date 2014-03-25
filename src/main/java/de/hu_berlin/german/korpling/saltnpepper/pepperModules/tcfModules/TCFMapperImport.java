@@ -151,31 +151,9 @@ public class TCFMapperImport extends PepperMapperImpl{
 					idPath.push(constID);					
 				}
 				else{
-					/* token */
-					SNode sNode = null;
-					if(!tokenIDs.contains(" ")){
-						/* single token */						
-						/*TODO ask yourself, if a single token can be the direct root not governed by a phrase*/						
-						if(shrinkTokenAnnotations){
-							sNode = (SToken)sNodes.get(tokenIDs);
-						}
-						else{
-							sNode = sNodes.get(tokenIDs+SPAN);
-							if(sNode==null){								
-								sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(tokenIDs));
-								if(DEGUG){System.out.println("Building span over single token \""+getSDocument().getSDocumentGraph().getSText(sNode)+"\"");}
-								sNodes.put(tokenIDs+SPAN, sNode);
-							}							
-						}
-						sNode.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));//TODO annotation might already exist, we definitely have to use namespaces!
-						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sNode, STYPE_NAME.SDOMINANCE_RELATION);
-						if(DEGUG){System.out.println("Taking token:"+getSDocument().getSDocumentGraph().getSText(sNode)+" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));}						
-						/*we HAVE TO push also tokens onto the stack to avoid that at the end of their xml-element the wrong constituent is popped off the stack*/
-						/*so the pushed id is actually just a dummy -> we don't have to check, if the span should be pushed*/
-						idPath.push(tokenIDs);
-					}
-					else{//multiple tokens --> build span
-						sNode = sNodes.get(tokenIDs);
+					/* tokens/spans */
+					SNode sNode = sNodes.get(tokenIDs);
+					if(tokenIDs.contains(" ")){
 						if(sNode==null){
 							if(DEGUG){System.out.println("Span does not exist. I build it.");}
 							String[] seq = tokenIDs.split(" ");
@@ -190,6 +168,28 @@ public class TCFMapperImport extends PepperMapperImpl{
 						sNode.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));
 						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sNode, STYPE_NAME.SDOMINANCE_RELATION);
 						/*we HAVE TO push also tokens/spans onto the stack to avoid that at the end of their xml-element the wrong constituent is popped off the stack*/
+						idPath.push(tokenIDs);
+					}
+					else{
+						/* single token */						
+						/*TODO ask yourself, if a single token can be the direct root not governed by a phrase*/						
+						if(shrinkTokenAnnotations){
+							sNode = (SToken)sNodes.get(tokenIDs);
+						}
+						else{
+							sNode = sNodes.get(tokenIDs+SPAN);
+							if(sNode==null){								
+								sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(tokenIDs));
+								if(DEGUG){System.out.println("Building span over single token \""+getSDocument().getSDocumentGraph().getSText(sNode)+"\"");}
+								sNodes.put(tokenIDs+SPAN, sNode);
+							}							
+						}
+						if(sNode==null){sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(tokenIDs));}
+						sNode.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));//TODO annotation might already exist, we definitely have to use namespaces!
+						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sNode, STYPE_NAME.SDOMINANCE_RELATION);
+						if(DEGUG){System.out.println("Taking token:"+getSDocument().getSDocumentGraph().getSText(sNode)+" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));}						
+						/*we HAVE TO push also tokens onto the stack to avoid that at the end of their xml-element the wrong constituent is popped off the stack*/
+						/*so the pushed id is actually just a dummy -> we don't have to check, if the span should be pushed*/
 						idPath.push(tokenIDs);
 					}
 				}
@@ -234,19 +234,27 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_TC_LEMMA.equals(localName)){
 				currentNodeID = attributes.getValue(TCFDictionary.ATT_TOKENIDS);
 				currentAnnoID = attributes.getValue(TCFDictionary.ATT_ID);
-				SNode sNode = null;
+				SNode sNode = sNodes.get(currentNodeID);
 				if(currentNodeID.contains(" ")){
-					/* build a span */
-					String[] seq = currentNodeID.split(" ");
-					EList<SToken> spanTokens = new BasicEList<SToken>();
-					for(int i=0; i<seq.length; i++){
-						spanTokens.add((SToken)sNodes.get(seq[i]));						
+					if(sNode==null){
+						/* build a span */
+						String[] seq = currentNodeID.split(" ");
+						EList<SToken> spanTokens = new BasicEList<SToken>();
+						for(int i=0; i<seq.length; i++){
+							spanTokens.add((SToken)sNodes.get(seq[i]));						
+						}
+						sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
+						sNodes.put(currentNodeID, sNode);
 					}
-					sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
-					sNodes.put(currentNodeID, sNode);
 				}
 				else{
-					sNode = shrinkTokenAnnotations ? (SToken)sNodes.get(currentNodeID) : getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(currentNodeID));					
+					/* single token */
+					sNode = shrinkTokenAnnotations ? (SToken)sNode : sNodes.get(currentNodeID+SPAN);
+					if(sNode==null){
+						sNode = sNodes.get(currentNodeID);
+						sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNode);
+						sNodes.put(currentNodeID+SPAN, sNode);
+					}					
 				}				
 				sLayers.get(LAYER_LEMMA).getSNodes().add(sNode);
 				currentSNode = sNode;
@@ -301,19 +309,27 @@ public class TCFMapperImport extends PepperMapperImpl{
 					/* build node for pos annotation */
 					currentNodeID = attributes.getValue(ATT_TOKENIDS);
 					currentAnnoID = attributes.getValue(ATT_ID);
-					SNode sNode = null;
+					SNode sNode = sNodes.get(currentNodeID);
 					if(currentNodeID.contains(" ")){
-						/*build span*/
-						String[] seq = currentNodeID.split(" ");
-						EList<SToken> spanTokens = new BasicEList<SToken>();
-						for(int i=0; i<seq.length; i++){
-							spanTokens.add((SToken)sNodes.get(seq[i]));
+						if(sNode==null){
+							/*build span*/
+							String[] seq = currentNodeID.split(" ");
+							EList<SToken> spanTokens = new BasicEList<SToken>();
+							for(int i=0; i<seq.length; i++){
+								spanTokens.add((SToken)sNodes.get(seq[i]));
+							}
+							sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
+							sNodes.put(currentNodeID, sNode);
 						}
-						sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
-						sNodes.put(currentNodeID, sNode);
 					}
 					else{
-						sNode = shrinkTokenAnnotations ? (SToken)sNodes.get(currentNodeID) : getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(currentNodeID));
+						/* single token */
+						sNode = shrinkTokenAnnotations ? (SToken)sNode : sNodes.get(currentNodeID+SPAN);
+						if(sNode==null){
+							sNode = sNodes.get(currentNodeID);
+							sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNode);
+							sNodes.put(currentNodeID+SPAN, sNode);
+						}						
 					}					
 					sLayers.get(LAYER_POS).getSNodes().add(sNode);
 					currentSNode = sNode;					
@@ -329,19 +345,27 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_TC_ANALYSIS.equals(localName)){
 				currentNodeID = attributes.getValue(ATT_TOKENIDS);
-				SNode sNode = null;
+				SNode sNode = sNodes.get(currentNodeID);
 				if(currentNodeID.contains(" ")){
-					/* build SSpan */
-					String[] seq = currentNodeID.split(" ");
-					EList<SToken> spanTokens = new BasicEList<SToken>();
-					for(int i=0; i<seq.length; i++){
-						spanTokens.add((SToken)sNodes.get(seq[i]));
-					}
-					sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
-					sNodes.put(currentNodeID, sNode);
+					if(sNode==null){
+						/* build SSpan */
+						String[] seq = currentNodeID.split(" ");
+						EList<SToken> spanTokens = new BasicEList<SToken>();
+						for(int i=0; i<seq.length; i++){
+							spanTokens.add((SToken)sNodes.get(seq[i]));
+						}
+						sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
+						sNodes.put(currentNodeID, sNode);
+					}					
 				}
 				else{
-					sNode = shrinkTokenAnnotations ? (SToken)sNodes.get(currentNodeID) : getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(currentNodeID)); 
+					/* single token */
+					sNode = shrinkTokenAnnotations ? (SToken)sNode : sNodes.get(currentNodeID+SPAN);
+					if(sNode==null){
+						sNode = sNodes.get(currentNodeID);
+						sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNode);
+						sNodes.put(currentNodeID+SPAN, sNode);
+					}					 
 				}
 				sLayers.get(LAYER_TCF_MORPHOLOGY).getSNodes().add(sNode);
 				currentSNode = sNode;

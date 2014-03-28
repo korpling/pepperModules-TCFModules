@@ -159,6 +159,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 					/* tokens/spans */
 					SNode sNode = sNodes.get(tokenIDs);
 					if(tokenIDs.contains(" ")){
+						/* span */
 						if(sNode==null){
 							if(DEGUG){System.out.println("Span does not exist. I build it.");}
 							String[] seq = tokenIDs.split(" ");
@@ -167,7 +168,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 								sTokensForSpan.add((SToken)sNodes.get(seq[i]));							
 							}
 							sNode = getSDocument().getSDocumentGraph().createSSpan(sTokensForSpan);
-							sNodes.put(tokenIDs, sNode);
+							if(useCommonAnnotatedElement){sNodes.put(tokenIDs, sNode);}// store node, if spans should be reused
 							if(DEGUG){System.out.println("Building span: \""+getSDocument().getSDocumentGraph().getSText(sNode)+"\" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));}
 						}						
 						sNode.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));
@@ -186,10 +187,10 @@ public class TCFMapperImport extends PepperMapperImpl{
 							if(sNode==null){								
 								sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(tokenIDs));
 								if(DEGUG){System.out.println("Building span over single token \""+getSDocument().getSDocumentGraph().getSText(sNode)+"\"");}
-								sNodes.put(tokenIDs+SPAN, sNode);
+								if(useCommonAnnotatedElement){sNodes.put(tokenIDs+SPAN, sNode);}// store node, if spans should be reused
 							}							
 						}
-						if(sNode==null){sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(tokenIDs));}
+//						if(sNode==null){sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(tokenIDs));} //when should this ever get null?!
 						sNode.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));//TODO annotation might already exist, we definitely have to use namespaces!
 						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sNode, STYPE_NAME.SDOMINANCE_RELATION);
 						if(DEGUG){System.out.println("Taking token:"+getSDocument().getSDocumentGraph().getSText(sNode)+" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));}						
@@ -250,7 +251,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 							spanTokens.add((SToken)sNodes.get(seq[i]));						
 						}
 						sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
-						sNodes.put(currentNodeID, sNode);
+						if(useCommonAnnotatedElement){sNodes.put(currentNodeID, sNode);}//store if reuse enabled
 					}
 				}
 				else{
@@ -259,7 +260,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 					if(sNode==null){
 						sNode = sNodes.get(currentNodeID);
 						sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNode);
-						sNodes.put(currentNodeID+SPAN, sNode);
+						if(useCommonAnnotatedElement){sNodes.put(currentNodeID+SPAN, sNode);}//store if reuse enabled
 					}					
 				}				
 				sLayers.get(LAYER_LEMMA).getSNodes().add(sNode);
@@ -325,7 +326,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 								spanTokens.add((SToken)sNodes.get(seq[i]));
 							}
 							sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
-							sNodes.put(currentNodeID, sNode);
+							if(useCommonAnnotatedElement){sNodes.put(currentNodeID, sNode);}//store if reuse enabled
 						}
 					}
 					else{
@@ -334,7 +335,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 						if(sNode==null){
 							sNode = sNodes.get(currentNodeID);
 							sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNode);
-							sNodes.put(currentNodeID+SPAN, sNode);
+							if(useCommonAnnotatedElement){sNodes.put(currentNodeID+SPAN, sNode);}//store if reuse enabled
 						}						
 					}					
 					sLayers.get(LAYER_POS).getSNodes().add(sNode);
@@ -361,7 +362,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 							spanTokens.add((SToken)sNodes.get(seq[i]));
 						}
 						sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
-						sNodes.put(currentNodeID, sNode);
+						if(useCommonAnnotatedElement){sNodes.put(currentNodeID, sNode);}//store if reuse enabled
 					}					
 				}
 				else{
@@ -370,7 +371,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 					if(sNode==null){
 						sNode = sNodes.get(currentNodeID);
 						sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNode);
-						sNodes.put(currentNodeID+SPAN, sNode);
+						if(useCommonAnnotatedElement){sNodes.put(currentNodeID+SPAN, sNode);}//store if reuse enabled
 					}					 
 				}
 				sLayers.get(LAYER_TCF_MORPHOLOGY).getSNodes().add(sNode);
@@ -467,7 +468,7 @@ public class TCFMapperImport extends PepperMapperImpl{
                 java.lang.String qName) throws SAXException{
 			localName = qName.substring(qName.lastIndexOf(":")+1);
 			if(TAG_TC_CONSTITUENT.equals(localName)){
-				if(DEGUG){System.out.println(shrinkTokenAnnotations ? "Popping from stack: "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString() : "POP()");}
+				if(DEGUG){System.out.println((shrinkTokenAnnotations)&&(useCommonAnnotatedElement) ? "Popping from stack: "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString() : "POP()");}
 				idPath.pop();
 			}
 		}

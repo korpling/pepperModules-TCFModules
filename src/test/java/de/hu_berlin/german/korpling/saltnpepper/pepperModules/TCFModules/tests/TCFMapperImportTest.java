@@ -75,6 +75,8 @@ public class TCFMapperImportTest {
 	private static final String LOCATION_TEST_MORPHOLOGY = "/pepper-test/tcfImporterTestMorphology.xml";
 	private static final String LOCATION_TEST_REFERENCES = "/pepper-test/tcfImporterTestReferences.xml";
 	
+	private static final boolean SPAN_REUSE = false;
+	
 	private static final boolean DEBUG = true;
 	
 	public TCFMapperImport getFixture() {
@@ -139,10 +141,19 @@ public class TCFMapperImportTest {
 		p.println(outStream.toString());
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
 		
-		/*start mapper*/
+		/* start mapper */
 		System.out.println(tmpOut);		
 		this.getFixture().mapSDocument();
+				
+		System.out.println("============================================");
+		System.out.println("TESTING PRIMARY DATA IMPORT");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
 		
 		/* compare template salt model to imported salt model */
 		assertNotNull(getFixture().getSDocument());
@@ -243,10 +254,19 @@ public class TCFMapperImportTest {
 		p.println(outStream.toString());
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
 		
 		/* start mapper */
 		System.out.println(tmpOut);		
 		this.getFixture().mapSDocument();
+				
+		System.out.println("============================================");
+		System.out.println("TESTING TOKENIZATION");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
 				
 		/* test from testPrimaryData*/
 		SDocumentGraph fixGraph = getFixture().getSDocument().getSDocumentGraph();
@@ -591,10 +611,19 @@ public class TCFMapperImportTest {
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
 		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
 		
 		/* start mapper */
 		System.out.println(tmpOut);		
 		this.getFixture().mapSDocument();
+				
+		System.out.println("============================================");
+		System.out.println("TESTING POS ANNOTATION (SHRINKED)");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
 		
 		/* compare template salt model to imported salt model */
 		
@@ -737,10 +766,19 @@ public class TCFMapperImportTest {
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
 		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
 		
 		/* start mapper */
 		System.out.println(tmpOut);		
 		this.getFixture().mapSDocument();
+				
+		System.out.println("============================================");
+		System.out.println("TESTING POS ANNOTATION (NOT SHRINKED)");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
 		
 		/* compare template salt model to imported salt model */
 		
@@ -859,10 +897,19 @@ public class TCFMapperImportTest {
 		p.println(outStream.toString());
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
-
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
+		
 		/* start mapper */
-		System.out.println(tmpOut);	
+		System.out.println(tmpOut);		
 		this.getFixture().mapSDocument();
+				
+		System.out.println("============================================");
+		System.out.println("TESTING SENTENCE ANNOTATION");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
 
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = getFixture().getSDocument().getSDocumentGraph();
@@ -1184,10 +1231,19 @@ public class TCFMapperImportTest {
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
 		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
 		
 		/* start mapper */
-		System.out.println(tmpOut);			
-		this.getFixture().mapSDocument();		
+		System.out.println(tmpOut);		
+		this.getFixture().mapSDocument();
+				
+		System.out.println("============================================");
+		System.out.println("TESTING LEMMA IMPORT (SHRINKED)");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
 		
 		/* comparing fixture to template */
 		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
@@ -1338,10 +1394,19 @@ public class TCFMapperImportTest {
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
 		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
 		
 		/* start mapper */
-		System.out.println(tmpOut);			
-		this.getFixture().mapSDocument();		
+		System.out.println(tmpOut);		
+		this.getFixture().mapSDocument();
+				
+		System.out.println("============================================");
+		System.out.println("TESTING LEMMA IMPORT (NOT SHRINKED)");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");	
 		
 		/* comparing fixture to template */
 		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
@@ -1535,11 +1600,19 @@ public class TCFMapperImportTest {
 		p.println(outStream.toString());
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
 		
 		/* start mapper */
 		System.out.println(tmpOut);		
 		this.getFixture().mapSDocument();
-		
+				
+		System.out.println("============================================");
+		System.out.println("TESTING DEPENDENCY PARSING (MULTIGOVS OFF)");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
 		/* tests from other methods */
 		
 		/**
@@ -1826,10 +1899,19 @@ public class TCFMapperImportTest {
 		p.println(outStream.toString());
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
 		
 		/* start mapper */
 		System.out.println(tmpOut);		
 		this.getFixture().mapSDocument();
+				
+		System.out.println("============================================");
+		System.out.println("TESTING CONSTITUENT PARSING (OLD – NO SPANS)");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
 				
 		/* -- compare template salt model to imported salt model -- */
 		
@@ -2001,10 +2083,19 @@ public class TCFMapperImportTest {
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
 		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
 		
 		/* start mapper */
 		System.out.println(tmpOut);		
 		this.getFixture().mapSDocument();
+				
+		System.out.println("============================================");
+		System.out.println("TESTING CONSTITUENT PARSING WITH SHRINKED ANNOTATIONS");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
 				
 		/* -- compare template salt model to imported salt model -- */
 		
@@ -2217,11 +2308,20 @@ public class TCFMapperImportTest {
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
 		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
 		
 		/* start mapper */
 		System.out.println(tmpOut);		
 		this.getFixture().mapSDocument();
 				
+		System.out.println("============================================");
+		System.out.println("TESTING CONSTITUENT PARSING");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
+		
 		/* -- compare template salt model to imported salt model -- */
 		
 		SDocumentGraph fixGraph = getFixture().getSDocument().getSDocumentGraph();		
@@ -2280,9 +2380,6 @@ public class TCFMapperImportTest {
 	 */
 	@Test
 	public void testMorphologyNotShrinked() throws XMLStreamException, FileNotFoundException{
-		System.out.println("================================================");
-		System.out.println("TESTING MORPHOLOGY WITH ANNOTATIONS NOT SHRINKED");
-		System.out.println("================================================");
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		XMLOutputFactory o= XMLOutputFactory.newFactory();
 		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
@@ -2713,10 +2810,19 @@ public class TCFMapperImportTest {
 		p.close();
 		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
 		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, SPAN_REUSE);
 		
 		/* start mapper */
 		System.out.println(tmpOut);		
 		this.getFixture().mapSDocument();
+		
+		System.out.println("============================================");
+		System.out.println("TESTING MORPHOLOGY");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
 		
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
@@ -2761,10 +2867,7 @@ public class TCFMapperImportTest {
 	 * @throws FileNotFoundException 
 	 */
 	@Test
-	public void testMorphologyShrinked() throws XMLStreamException, FileNotFoundException{
-		System.out.println("============================================");
-		System.out.println("TESTING MORPHOLOGY WITH SHRINKED ANNOTATIONS");
-		System.out.println("============================================");
+	public void testMorphologyShrinked() throws XMLStreamException, FileNotFoundException{		
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		XMLOutputFactory o= XMLOutputFactory.newFactory();
 		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
@@ -3201,6 +3304,14 @@ public class TCFMapperImportTest {
 		System.out.println(tmpOut);		
 		this.getFixture().mapSDocument();
 		
+		System.out.println("============================================");
+		System.out.println("TESTING MORPHOLOGY WITH SHRINKED ANNOTATIONS");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("============================================");
+		
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
 		assertNotNull(fixGraph.getSLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY));
@@ -3422,7 +3533,7 @@ public class TCFMapperImportTest {
 		docRefLayer.getSRelations().add(reference);
 		
 		/* setting variables */		
-		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_MORPHOLOGY);
+		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_REFERENCES);
 		tmpOut.getParentFile().mkdirs();
 		PrintWriter p = new PrintWriter(tmpOut);		
 		p.println(outStream.toString());

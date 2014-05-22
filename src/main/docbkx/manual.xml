@@ -5,11 +5,15 @@
 		<title>SampleModules</title>
 		<subtitle>User&apos;s Guide</subtitle>
 		<authorgroup>
-			<author><personname><firstname>YOUR</firstname> <surname>
-			NAME</surname></personname></author>
+			<author>
+				<personname><firstname>Martin</firstname>
+					<surname> Klotz</surname></personname>
+			</author>
 		</authorgroup>
-		<copyright><year>THE DATE OF NOW</year> <holder>YOUR NAME, All rights 
-		reserved.</holder></copyright>
+		<copyright>
+			<year>01.06.2014</year>
+			<holder>Martin Klotz, All rights reserved.</holder>
+		</copyright>
 		<releaseinfo>Version ${project.version}</releaseinfo>
 	</info>
 	<preface>

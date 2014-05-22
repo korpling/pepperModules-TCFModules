@@ -116,7 +116,49 @@ public interface TCFDictionary{
 	public static final String TAG_TC_REFERENCE = "reference";			
 	/** constant to address the xml-element 'entity'. **/
 	public static final String TAG_TC_ENTITY = "entity";
-
+	/** constant to address the xml-element 'namedEntities' **/
+	public static final String TAG_TC_NAMEDENTITIES = "namedEntities";
+	/** constant to address the xml-element 'phonetics' **/
+	public static final String TAG_TC_PHONETICS = "phonetics";
+	/** constant to address the xml-element 'pron' **/
+	public static final String TAG_TC_PRON = "pron";
+	/** constant to address the xml-element 'orthography' **/
+	public static final String TAG_TC_ORTHOGRAPHY = "orthography";
+	/** constant to address the xml-element 'correction' **/
+	public static final String TAG_TC_CORRECTION = "correction";
+	/** constant to address the xml-element 'textstructure' **/
+	public static final String TAG_TC_TEXTSTRUCTURE = "textstructure";
+	/** constant to address the xml-element 'textspan' **/
+	public static final String TAG_TC_TEXTSPAN = "textspan";
+	/** constant to address the xml-element 'geo' **/
+	public static final String TAG_TC_GEO = "geo";
+	/** constant to address the xml-element 'src' **/
+	public static final String TAG_TC_SRC = "src";
+	/** constant to address the xml-element 'gpoint' **/
+	public static final String TAG_TC_GPOINT = "gpoint";
+	/** constant to address the xml-element 'synonymy' **/
+	public static final String TAG_TC_SYNONYMY = "synonymy";
+	/** constant to address the xml-element 'antonymy' **/
+	public static final String TAG_TC_ANTONYMY = "antonymy";
+	/** constant to address the xml-element 'hyponymy' **/
+	public static final String TAG_TC_HYPONYMY = "hyponymy";
+	/** constant to address the xml-element 'hyperonymy' **/
+	public static final String TAG_TC_HYPERONYMY = "hyperonymy";
+	/** constant to address the xml-element 'orthform' **/
+	public static final String TAG_TC_ORTHFORM = "orthform";
+	/** constant to address the xml-element 'wsd' **/
+	public static final String TAG_TC_WSD = "wsd";
+	/** constant to address the xml-element 'ws' **/
+	public static final String TAG_TC_WS = "ws";
+	/** constant to address the xml-element 'WordSplittings' **/
+	public static final String TAG_TC_WORDSPLITTINGS = "WordSplittings";
+	/** constant to address the xml-element 'split' **/
+	public static final String TAG_TC_SPLIT = "split";
+	/** constant to address the xml-element 'discourseconnectives' **/
+	public static final String TAG_TC_DISCOURSECONNECTIVES = "discourseconnectives";
+	/** constant to address the xml-element 'discourseconnectives' **/
+	public static final String TAG_TC_CONNECTIVE = "connective";
+	
 	/** constant to address the xml-attribute 'cat'. **/
 	public static final String ATT_CAT= "cat";
 	/** constant to address the xml-attribute 'CMDVersion'. **/
@@ -133,6 +175,8 @@ public interface TCFDictionary{
 	public static final String ATT_XMLNS= "xmlns";
 	/** constant to address the xml-attribute 'tokenIDs'. **/
 	public static final String ATT_TOKENIDS= "tokenIDs";
+	/** constant to address the xml-attribute 'tokID'. **/
+	public static final String ATT_TOKID= "tokID";
 	/** constant to address the xml-attribute 'lang'. **/
 	public static final String ATT_LANG= "lang";
 	/** constant to address the xml-attribute 'xsi:schemaLocation'. **/
@@ -161,4 +205,42 @@ public interface TCFDictionary{
 	public static final String ATT_TYPETAGSET = "typetagset";
 	/** constant to adress the xml-attribute 'reltagset'. **/
 	public static final String ATT_RELTAGSET = "reltagset";
+	/** constant to adress the xml-attribute 'class'. **/
+	public static final String ATT_CLASS = "class";
+	/** constant to adress the xml-attribute 'transcription'. **/
+	public static final String ATT_TRANSCRIPTION = "transcription";
+	/** constant to adress the xml-attribute 'operation'. **/
+	public static final String ATT_OPERATION = "operation";
+	/** constant to adress the xml-attribute 'start'. **/
+	public static final String ATT_START = "start";
+	/** constant to adress the xml-attribute 'end'. **/
+	public static final String ATT_END = "end";
+	/** constant to adress the xml-attribute 'alt'. **/
+	public static final String ATT_ALT = "alt";
+	/** constant to adress the xml-attribute 'lat'. **/
+	public static final String ATT_LAT = "lat";
+	/** constant to adress the xml-attribute 'lon'. **/
+	public static final String ATT_LON = "lon";
+	/** constant to adress the xml-attribute 'continent'. **/
+	public static final String ATT_CONTINENT = "continent";
+	/** constant to adress the xml-attribute 'country'. **/
+	public static final String ATT_COUNTRY = "country";
+	/** constant to adress the xml-attribute 'capital'. **/
+	public static final String ATT_CAPITAL = "capital";
+	/** constant to adress the xml-attribute 'coordFormat'. **/
+	public static final String ATT_COORDFORMAT = "coordFormat";
+	/** constant to adress the xml-attribute 'continentFormat'. **/
+	public static final String ATT_CONTINENTFORMAT = "continentFormat";
+	/** constant to adress the xml-attribute 'countryFormat'. **/
+	public static final String ATT_COUNTRYFORMAT = "countryFormat";
+	/** constant to adress the xml-attribute 'capitalFormat'. **/
+	public static final String ATT_CAPITALFORMAT = "capitalFormat";
+	/** constant to adress the xml-attribute 'lemmaRefs'. **/
+	public static final String ATT_LEMMAREFS = "lemmaRefs";
+	/** constant to adress the xml-attribute 'lexunits'. **/
+	public static final String ATT_LEXUNITS = "lexunits";
+	/** constant to adress the xml-attribute 'src'. **/
+	public static final String ATT_SRC = "src";
+	/** constant to adress the xml-attribute 'comment'. **/
+	public static final String ATT_COMMENT = "comment";
 }

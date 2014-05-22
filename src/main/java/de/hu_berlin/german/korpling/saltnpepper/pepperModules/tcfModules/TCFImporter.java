@@ -69,9 +69,9 @@ public class TCFImporter extends PepperImporterImpl implements PepperImporter
 		this.setVersion("0.0.1");
 		this.addSupportedFormat("TCF", "0.4", null);
 		this.setProperties(new TCFImporterProperties());
-		this.getSDocumentEndings().add(ENDING_XML);
+		this.getSDocumentEndings().add("xml");
 		this.getSDocumentEndings().add("tcf");
-		this.getSDocumentEndings().add(PepperImporter.ENDING_LEAF_FOLDER); //CHECK: does this always work? If not, p.17 (2) and (3) propose solutions 
+//		this.getSDocumentEndings().add(PepperImporter.ENDING_LEAF_FOLDER); //CHECK: does this always work? If not, p.17 (2) and (3) propose solutions 
 	}
 	
 	/**
@@ -87,27 +87,11 @@ public class TCFImporter extends PepperImporterImpl implements PepperImporter
 	 * @param sElementId {@link SElementId} of the {@link SCorpus} or {@link SDocument} to be processed. 
 	 * @return {@link PepperMapper} object to do the mapping task for object connected to given {@link SElementId}
 	 */
-	public PepperMapper createPepperMapper(SElementId sElementId){		
-		return(new TCFMapperImport());
-	}
-	
-	/**
-	 * <strong>OVERRIDE THIS METHOD FOR CUSTOMIZATION</strong>
-	 * 
-	 * This method is called by the pepper framework and returns if a corpus located at the given {@link URI} is importable
-	 * by this importer. If yes, 1 must be returned, if no 0 must be returned. If it is not quite sure, if the given corpus
-	 * is importable by this importer any value between 0 and 1 can be returned. If this method is not overridden, 
-	 * null is returned.
-	 * @return 1 if corpus is importable, 0 if corpus is not importable, 0 < X < 1, if no definitiv answer is possible,  null if method is not overridden 
-	 */
-	public Double isImportable(URI corpusPath)
-	{
-		//TODO some code to analyze the given corpus-structure
-		/*
-		 * maybe check tcf for validity
-		 * see SECTION 5 in Manual
-		 * */
-		return(null);
+	public PepperMapper createPepperMapper(SElementId sElementId){
+		TCFMapperImport mapper=new TCFMapperImport();
+		System.out.println("getSElementId2ResourceTable(): "+getSElementId2ResourceTable());
+		mapper.setResourceURI(getSElementId2ResourceTable().get(sElementId));
+		return(mapper);
 	}
 
 // =================================================== optional ===================================================	

@@ -67,7 +67,9 @@ public class TCFExporter extends PepperExporterImpl implements PepperExporter
 			//TODO change the version of your module, we recommend to synchronize this value with the maven version in your pom.xml
 			this.setVersion("1.1.0");
 			//TODO change "sample" with format name and 1.0 with format version to support
-			this.addSupportedFormat("TCF", "1.0", null); 
+			this.addSupportedFormat("TCF", "1.0", null);			
+			this.setSDocumentEnding("tcf");
+			this.setExportMode(EXPORT_MODE.DOCUMENTS_IN_FILES);
 		}
 		
 		/**
@@ -103,20 +105,5 @@ public class TCFExporter extends PepperExporterImpl implements PepperExporter
 		{
 			//TODO make some initializations if necessary
 			return(super.isReadyToStart());
-		}
-		
-		/**
-		 * <strong>OVERRIDE THIS METHOD FOR CUSTOMIZATION</strong>
-		 * 
-		 * This method is called by {@link #start()} to export the corpus-structure. This method than can create the 
-		 * folder-structure to store the document-structure into it, if necessary. 
-		 * 
-		 * @param corpusGraph {@link SCorpusGraph} object to be exported
-		 */
-		@Override
-		public void exportCorpusStructure(SCorpusGraph corpusGraph) throws PepperModuleException
-		{
-			//TODO remove the following line of code for adoption
-			super.exportCorpusStructure(sCorpusGraph);
 		}
 }

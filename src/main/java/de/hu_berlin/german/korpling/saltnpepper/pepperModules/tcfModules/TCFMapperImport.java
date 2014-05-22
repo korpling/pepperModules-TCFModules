@@ -25,6 +25,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SLemmaAnnotation;
 
 public class TCFMapperImport extends PepperMapperImpl{
 //CHECK-ASK: might it be better to implement and extension of PepperMapperImpl here?	
@@ -34,7 +35,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 	private EMap<String, Label> labels;
 	private EMap<String, SLayer> sLayers;
 	
-	/* CHECK rethink organisation of constant strings */
+	/* TODO CHECK rethink organisation of constant strings */
 	public static final String LEVEL_SENTENCE = "sentence";
 	public static final String LAYER_POS = "pos";
 	public static final String LAYER_DEPENDENCIES = "dependencies";
@@ -43,13 +44,25 @@ public class TCFMapperImport extends PepperMapperImpl{
 	public static final String LAYER_CONSTITUENTS = "syntax";
 	public static final String LAYER_LEMMA = "lemma";
 	public static final String LAYER_REFERENCES = "references";
+	public static final String LAYER_NE = "named entities";
+	public static final String LAYER_PHONETICS = "phonetics";
+	public static final String LAYER_ORTHOGRAPHY = "orthography";
+	public static final String LAYER_GEO = "geography";
+	public static final String LAYER_LS = "lexical-semantics";
+	public static final String LAYER_WORDSENSE = "wordSenseDisambiguation";
+	public static final String LAYER_SPLITTINGS = "wordSplittings";
+	public static final String LAYER_DISCOURSE = "discourseConnectives";
+	public static final String LAYER_TEXTSTRUCTURE = "textstructure";
+	public static final String LAYER_SENTENCES = "sentences";
+	public static final String STYPE_REFERENCE = "reference";
+	public static final String STYPE_DEPENDENCY = "dependency";
 	
 	public static final String ANNO_NAME_CONSTITUENT = "const";
 	
 	public static final String HEAD_MARKER = "refHead";//is annotation key and value for head annotation (online one instance for all necessary)
 	public static final String SPAN = "span";//marking element for span ids over single tokens	
-		
-	private static final boolean DEBUG = true;
+	
+	private static final boolean DEBUG = false;
 	
 	@Override
 	public DOCUMENT_STATUS mapSDocument() {
@@ -63,6 +76,12 @@ public class TCFMapperImport extends PepperMapperImpl{
 		getSDocument().setSDocumentGraph(docGraph);
 		TCFReader reader = new TCFReader();
 		this.readXMLResource(reader, getResourceURI());
+		
+		EList<SToken> toks = getSDocument().getSDocumentGraph().getSTokens();
+		for(SToken tok : toks){
+			System.out.println(tok.getSId()+"="+getSDocument().getSDocumentGraph().getSText(tok));
+		}
+		
 		return(DOCUMENT_STATUS.COMPLETED);
 	}
 	
@@ -71,13 +90,16 @@ public class TCFMapperImport extends PepperMapperImpl{
 		private int p;
 		private Stack<String> path;	
 		private Stack<String> idPath;
+		private StringBuilder chars;
 		private String currentNodeID;		
 		private String currentAnnoID;
 		private String currentAnnoKey;
 		private SNode currentSNode;
+		/* head annotation */
+		private SAnnotation head;
 		/* internal id */
 		private int id = 0;
-		private static final String REF_PREFIX = "rc";
+		private static final String REF_PREFIX = "reference-";
 		/* properties */
 		private boolean shrinkTokenAnnotations;
 		private boolean useCommonAnnotatedElement;
@@ -88,15 +110,19 @@ public class TCFMapperImport extends PepperMapperImpl{
 			super();
 			path = new Stack<String>();
 			idPath = new Stack<String>();
+			chars = new StringBuilder();
 			currentNodeID = null;
 			currentSNode = null;
 			currentAnnoID = null;
 			currentAnnoKey = null;
+			head = SaltFactory.eINSTANCE.createSAnnotation();
+			head.setSName(TCFMapperImport.HEAD_MARKER);
+			head.setSValue(TCFMapperImport.HEAD_MARKER);
 			p = 0;			
 			shrinkTokenAnnotations = ((TCFImporterProperties)getProperties()).isShrinkTokenAnnotation();
 			useCommonAnnotatedElement = ((TCFImporterProperties)getProperties()).isUseCommonAnnotatedElement();
 			ignoreIds = false;
-			id = 0;
+			id = 0;		
 		}
 		
 		@Override
@@ -105,9 +131,9 @@ public class TCFMapperImport extends PepperMapperImpl{
 				String qName,
 				Attributes attributes)throws SAXException
 		{
-			p = 0;
 			localName = qName.substring(qName.lastIndexOf(":")+1);
 			path.push(localName);
+			if(DEBUG){System.out.println("<"+localName+">");}
 			if (TAG_TC_TOKENS.equals(localName)){				
 			}
 			else if (TAG_PID.equals(localName)){
@@ -122,15 +148,11 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_DESCRIPTIONS.equals(localName)){
 			}
-			else if (TAG_TC_PARSE.equals(localName)){
-			}
 			else if (TAG_TC_PARSING.equals(localName)){
 				currentNodeID = null;
-				SLayer syntaxLayer = SaltFactory.eINSTANCE.createSLayer();
-				syntaxLayer.setSName(LAYER_CONSTITUENTS);
+				ignoreIds = false;
+				SLayer syntaxLayer = buildLayer(LAYER_CONSTITUENTS);
 				syntaxLayer.createSAnnotation(null, ATT_TAGSET, attributes.getValue(ATT_TAGSET));
-				sLayers.put(LAYER_CONSTITUENTS, syntaxLayer);
-				getSDocument().getSDocumentGraph().addSLayer(syntaxLayer);
 			}
 			else if (TAG_GENERALINFO.equals(localName)){
 			}
@@ -142,22 +164,28 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_TC_CONSTITUENT.equals(localName)){
 				String constID = attributes.getValue(ATT_ID);
+				if(!ignoreIds){ignoreIds = (constID==null);}
+				if(ignoreIds){constID = Integer.toString(id++);}
 				/* are we dealing with a potential SToken (sequence) or a potential SStructure? */
+				if(DEBUG){System.out.println("startElement().localName=constituent idPath sais: "+idPath);}
 				String tokenIDs = attributes.getValue(ATT_TOKENIDS);
 				if(tokenIDs==null){
 					/* SStructure */					
 					SStructure sStruc = SaltFactory.eINSTANCE.createSStructure();
-					sStruc.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));
+					sStruc.createSAnnotation(LAYER_CONSTITUENTS, ATT_CAT, attributes.getValue(ATT_CAT));
 					sNodes.put(constID, sStruc);
 					sLayers.get(LAYER_CONSTITUENTS).getSNodes().add(sStruc);
-					if(idPath.isEmpty()){						
+					if(idPath.empty()){						
 						/* sStruc is root */
-						getSDocument().getSDocumentGraph().addSNode(sStruc);
 						if(DEBUG){System.out.println("Building node: "+sStruc.getSAnnotation(ATT_CAT).getSValue()+" as root");}
+						getSDocument().getSDocumentGraph().addSNode(sStruc);						
 					}
 					else{
-						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sStruc, STYPE_NAME.SDOMINANCE_RELATION);
-						if(DEBUG){System.out.println("Building node: "+sStruc.getSAnnotation(ATT_CAT).getSValue()+"-"+constID.replace("c", "")+" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));}
+						if(DEBUG){
+							System.out.println("idPath.peek()="+idPath.peek());
+							System.out.println("Building node: "+sStruc.getSAnnotation(ATT_CAT).getSValue()+"-"+constID.replace("c", "")+" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));
+						}
+						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sStruc, STYPE_NAME.SDOMINANCE_RELATION);						
 					}					
 					if(DEBUG){System.out.println("Pushing to stack: "+attributes.getValue(ATT_CAT));}
 					idPath.push(constID);					
@@ -178,7 +206,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 							if(useCommonAnnotatedElement){sNodes.put(tokenIDs, sNode);}// store node, if spans should be reused
 							if(DEBUG){System.out.println("Building span: \""+getSDocument().getSDocumentGraph().getSText(sNode)+"\" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));}
 						}						
-						sNode.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));
+						sNode.createSAnnotation(LAYER_CONSTITUENTS, ATT_CAT, attributes.getValue(ATT_CAT));
 						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sNode, STYPE_NAME.SDOMINANCE_RELATION);
 						/*we HAVE TO push also tokens/spans onto the stack to avoid that at the end of their xml-element the wrong constituent is popped off the stack*/
 						idPath.push(tokenIDs);
@@ -198,7 +226,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 							}							
 						}
 //						if(sNode==null){sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(tokenIDs));} //when should this ever get null?!
-						sNode.createSAnnotation(null, ATT_CAT, attributes.getValue(ATT_CAT));//TODO annotation might already exist, we definitely have to use namespaces!
+						sNode.createSAnnotation(LAYER_CONSTITUENTS, ATT_CAT, attributes.getValue(ATT_CAT));//TODO annotation might already exist, we definitely have to use namespaces!
 						getSDocument().getSDocumentGraph().addSNode(sNodes.get(idPath.peek()), sNode, STYPE_NAME.SDOMINANCE_RELATION);
 						if(DEBUG){System.out.println("Taking token:"+getSDocument().getSDocumentGraph().getSText(sNode)+" and appending it to node "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString()+"-"+idPath.peek().replace("c", ""));}						
 						/*we HAVE TO push also tokens onto the stack to avoid that at the end of their xml-element the wrong constituent is popped off the stack*/
@@ -209,32 +237,29 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if(TAG_TC_DEPPARSING.equals(localName)){
 				currentNodeID = null;
-				SLayer depLayer = SaltFactory.eINSTANCE.createSLayer();
-				depLayer.setSName(LAYER_DEPENDENCIES);
-				getSDocument().getSDocumentGraph().addSLayer(depLayer);
+				SLayer depLayer = buildLayer(LAYER_DEPENDENCIES);
 				/* TODO the same has to be done in SaltSample, still undone */
 				/* TODO the same has to be done for POS both in SaltSample(CHECK) and here */
-				/* TODO CHECK does this layer actually make any sense? */
 				depLayer.createSMetaAnnotation(null, TCFDictionary.ATT_TAGSET, attributes.getValue(TCFDictionary.ATT_TAGSET));
 				depLayer.createSMetaAnnotation(null, TCFDictionary.ATT_EMPTYTOKS, attributes.getValue(TCFDictionary.ATT_EMPTYTOKS));
 				depLayer.createSMetaAnnotation(null, TCFDictionary.ATT_MULTIGOVS, attributes.getValue(TCFDictionary.ATT_MULTIGOVS));
-				sLayers.put(LAYER_DEPENDENCIES, depLayer);
 			}
 			else if(TAG_TC_PARSE.equals(localName)){
-				idPath.clear(); //relevant for constituent parsing				
+				idPath.clear(); //relevant for constituent parsing	
+				if(DEBUG){System.out.println("Stack is empty? "+Boolean.toString(idPath.empty()));}
 			}
 			else if(TAG_TC_DEPENDENCY.equals(localName)){
 				/* is there no governing ID, we skip, because we don't use a root node */
-				if(attributes.getValue(ATT_GOVIDS)!=null){
-					SPointingRelation depRel = SaltFactory.eINSTANCE.createSPointingRelation();
-					depRel.setSource(sNodes.get(attributes.getValue(ATT_GOVIDS))); //CAREFUL TODO multigovs
-					depRel.setTarget(sNodes.get(attributes.getValue(ATT_DEPIDS))); //CAREFUL TODO multigovs
-					depRel.createSAnnotation(null, LEVEL_DEPENDENCY, attributes.getValue(ATT_FUNC));
-					getSDocument().getSDocumentGraph().addSRelation(depRel);				
-					sLayers.get(LAYER_DEPENDENCIES).getEdges().add(depRel);
+				SDocumentGraph graph = getSDocument().getSDocumentGraph();
+				if(attributes.getValue(ATT_GOVIDS)!=null){					
+					SPointingRelation depRel = (SPointingRelation)graph.addSNode(sNodes.get(attributes.getValue(ATT_GOVIDS)), sNodes.get(attributes.getValue(ATT_DEPIDS)), STYPE_NAME.SPOINTING_RELATION);
+					depRel.createSAnnotation(LAYER_DEPENDENCIES, ATT_FUNC, attributes.getValue(ATT_FUNC)); //TODO write into documentation, how I use namespaces
+					sLayers.get(LAYER_DEPENDENCIES).getSRelations().add(depRel);
+					depRel.addSType(STYPE_DEPENDENCY);					
 				}
 			}
 			else if (TAG_TC_SENTENCES.equals(localName)){
+				buildLayer(LAYER_SENTENCES);
 			}
 			else if (TAG_PARAMETER.equals(localName)){
 			}
@@ -242,34 +267,14 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_DESCRIPTION.equals(localName)){
 			}
-			else if (TAG_TC_TEXTCORPUS.equals(localName)){	
-				getSDocument().getSDocumentGraph().createSMetaAnnotation(null, ATT_LANG, attributes.getValue(ATT_LANG));
+			else if (TAG_TC_TEXTCORPUS.equals(localName)){
+				if(attributes.getValue(ATT_LANG)!=null){getSDocument().createSMetaAnnotation(null, ATT_LANG, attributes.getValue(ATT_LANG));}				
 			}
 			else if (TAG_TC_LEMMA.equals(localName)){
+				if(chars.length()>0){chars.delete(0, chars.length());}
 				currentNodeID = attributes.getValue(TCFDictionary.ATT_TOKENIDS);
-				currentAnnoID = attributes.getValue(TCFDictionary.ATT_ID);
-				SNode sNode = sNodes.get(currentNodeID);
-				if(currentNodeID.contains(" ")){
-					if(sNode==null){
-						/* build a span */
-						String[] seq = currentNodeID.split(" ");
-						EList<SToken> spanTokens = new BasicEList<SToken>();
-						for(int i=0; i<seq.length; i++){
-							spanTokens.add((SToken)sNodes.get(seq[i]));						
-						}
-						sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
-						if(useCommonAnnotatedElement){sNodes.put(currentNodeID, sNode);}//store if reuse enabled
-					}
-				}
-				else{
-					/* single token */
-					sNode = shrinkTokenAnnotations ? (SToken)sNode : sNodes.get(currentNodeID+SPAN);
-					if(sNode==null){
-						sNode = sNodes.get(currentNodeID);
-						sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNode);
-						if(useCommonAnnotatedElement){sNodes.put(currentNodeID+SPAN, sNode);}//store if reuse enabled
-					}					
-				}				
+				currentAnnoID = attributes.getValue(TCFDictionary.ATT_ID);				
+				SNode sNode = getSNode(currentNodeID);			
 				sLayers.get(LAYER_LEMMA).getSNodes().add(sNode);
 				currentSNode = sNode;
 			}
@@ -277,6 +282,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_TC_TEXT.equals(localName)){
 				STextualDS primaryText = SaltFactory.eINSTANCE.createSTextualDS();
+				if(chars.length()>0){chars.delete(0, chars.length());}
 				currentSTDS = primaryText;
 				getSDocument().getSDocumentGraph().addSNode(primaryText);
 				/* reset pointer */
@@ -286,29 +292,26 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_TC_TOKEN.equals(localName)){
 				currentNodeID = attributes.getValue(TCFDictionary.ATT_ID);
+				if(chars.length()>0){chars.delete(0, chars.length());}
 			}
 			else if (TAG_COMPONENTS.equals(localName)){
 			}
 			else if (TAG_WEBSERVICETOOLCHAIN.equals(localName)){
 			}
 			else if (TAG_TC_LEMMAS.equals(localName)){
-				SLayer lemmaLayer = SaltFactory.eINSTANCE.createSLayer();
-				lemmaLayer.setSName(LAYER_LEMMA);
-				getSDocument().getSDocumentGraph().addSLayer(lemmaLayer);
-				sLayers.put(LAYER_LEMMA, lemmaLayer);
-				if(DEBUG){System.out.println("Lemma layer created and added.");}
+				buildLayer(LAYER_LEMMA);
 			}
 			else if (TAG_TC_SENTENCE.equals(localName)){
-				String[] seq = attributes.getValue(TCFDictionary.ATT_TOKENIDS).split(" ");				
+				String[] seq = attributes.getValue(ATT_TOKENIDS).split(" ");				
 				EList<SToken> sentenceTokens = new BasicEList<SToken>();
 				for(int i=0; i<seq.length; i++){
 					sentenceTokens.add((SToken)sNodes.get(seq[i]));
 					if(DEBUG){System.out.println("Current token added to sentence span: "+getSDocument().getSDocumentGraph().getSText(sNodes.get(seq[i])));}
 				}
 				SSpan sentenceSpan = getSDocument().getSDocumentGraph().createSSpan(sentenceTokens);
-				String att = attributes.getValue(TCFDictionary.ATT_ID);
-				sentenceSpan.createSAnnotation(null, LEVEL_SENTENCE, att);
+				String att = attributes.getValue(ATT_ID);
 				sNodes.put(att, sentenceSpan);
+				sLayers.get(LAYER_SENTENCES).getSNodes().add(sentenceSpan);
 			}
 			else if (TAG_MD_SERVICES.equals(localName)){
 			}
@@ -319,75 +322,37 @@ public class TCFMapperImport extends PepperMapperImpl{
 				 * and not in morphology (both use tag "tag").
 				 * tag in morphology does not contain attributes.
 				 */
+				if(chars.length()>0){chars.delete(0, chars.length());}
 				if(attributes.getValue(ATT_TOKENIDS)!=null){
 					/* build node for pos annotation */
 					currentNodeID = attributes.getValue(ATT_TOKENIDS);
 					currentAnnoID = attributes.getValue(ATT_ID);
-					SNode sNode = sNodes.get(currentNodeID);
-					if(currentNodeID.contains(" ")){
-						if(sNode==null){
-							/*build span*/
-							String[] seq = currentNodeID.split(" ");
-							EList<SToken> spanTokens = new BasicEList<SToken>();
-							for(int i=0; i<seq.length; i++){
-								spanTokens.add((SToken)sNodes.get(seq[i]));
-							}
-							sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
-							if(useCommonAnnotatedElement){sNodes.put(currentNodeID, sNode);}//store if reuse enabled
-						}
-					}
-					else{
-						/* single token */
-						sNode = shrinkTokenAnnotations ? (SToken)sNode : sNodes.get(currentNodeID+SPAN);
-						if(sNode==null){
-							sNode = sNodes.get(currentNodeID);
-							sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNode);
-							if(useCommonAnnotatedElement){sNodes.put(currentNodeID+SPAN, sNode);}//store if reuse enabled
-						}						
-					}					
+					SNode sNode = getSNode(currentNodeID);					
 					sLayers.get(LAYER_POS).getSNodes().add(sNode);
-					currentSNode = sNode;					
-				}													
+					currentSNode = sNode;
+					if(DEBUG){
+						System.out.println("currentSNode is of type "+currentSNode.getClass().getSimpleName()+" : ["+ getSDocument().getSDocumentGraph().getSText(currentSNode) +"]");
+					}
+				}				
 			}
 			else if (TAG_TC_POSTAGS.equals(localName)){
-				SLayer posLayer = SaltFactory.eINSTANCE.createSLayer();
-				posLayer.setSName(LAYER_POS);
-				sLayers.put(LAYER_POS, posLayer);
-				getSDocument().getSDocumentGraph().addSLayer(posLayer);
+				SLayer posLayer = buildLayer(LAYER_POS);
+				if(attributes.getValue(ATT_TAGSET)!=null){posLayer.createSMetaAnnotation(null, ATT_TAGSET, attributes.getValue(ATT_TAGSET));}
 			}
 			else if (TAG_RESOURCES.equals(localName)){
 			}
 			else if (TAG_TC_ANALYSIS.equals(localName)){
 				currentNodeID = attributes.getValue(ATT_TOKENIDS);
-				SNode sNode = sNodes.get(currentNodeID);
-				if(currentNodeID.contains(" ")){
-					if(sNode==null){
-						/* build SSpan */
-						String[] seq = currentNodeID.split(" ");
-						EList<SToken> spanTokens = new BasicEList<SToken>();
-						for(int i=0; i<seq.length; i++){
-							spanTokens.add((SToken)sNodes.get(seq[i]));
-						}
-						sNode = getSDocument().getSDocumentGraph().createSSpan(spanTokens);
-						if(useCommonAnnotatedElement){sNodes.put(currentNodeID, sNode);}//store if reuse enabled
-					}					
-				}
-				else{
-					/* single token */
-					sNode = shrinkTokenAnnotations ? (SToken)sNode : sNodes.get(currentNodeID+SPAN);
-					if(sNode==null){
-						sNode = sNodes.get(currentNodeID);
-						sNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNode);
-						if(useCommonAnnotatedElement){sNodes.put(currentNodeID+SPAN, sNode);}//store if reuse enabled
-					}					 
-				}
+				SNode sNode = getSNode(currentNodeID);
 				sLayers.get(LAYER_TCF_MORPHOLOGY).getSNodes().add(sNode);
 				currentSNode = sNode;
 			}
-			else if (TAG_TC_F.equals(localName)){				
+			else if (TAG_TC_F.equals(localName)){
+				if(chars.length()>0){chars.delete(0, chars.length());}
 				currentAnnoKey = attributes.getValue(ATT_NAME);								
 			}
 			else if (TAG_TC_SEGMENT.equals(localName)){
+				if(chars.length()>0){chars.delete(0, chars.length());}
 				currentSNode.createSAnnotation(TAG_TC_SEGMENT, ATT_TYPE, attributes.getValue(ATT_TYPE));				
 			}
 			else if (TAG_TC_MORPHOLOGY.equals(localName)){
@@ -399,19 +364,29 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_TC_REFERENCES.equals(localName)){
 				ignoreIds = false;
 				currentNodeID = null;
-				SLayer refLayer = SaltFactory.eINSTANCE.createSLayer();
-				refLayer.setSName(LAYER_REFERENCES);
-				refLayer.createSAnnotation(null, ATT_TYPETAGSET, attributes.getValue(ATT_TYPETAGSET));
-				refLayer.createSAnnotation(null, ATT_RELTAGSET, attributes.getValue(ATT_TYPETAGSET));
-				getSDocument().getSDocumentGraph().addSLayer(refLayer);
-				sLayers.put(LAYER_REFERENCES, refLayer);
+				SLayer refLayer = buildLayer(LAYER_REFERENCES);				
+				if(attributes.getValue(ATT_TYPETAGSET)!=null){refLayer.createSMetaAnnotation(null, ATT_TYPETAGSET, attributes.getValue(ATT_TYPETAGSET));}
+				if(attributes.getValue(ATT_RELTAGSET)!=null){refLayer.createSMetaAnnotation(null, ATT_RELTAGSET, attributes.getValue(ATT_TYPETAGSET));}				
 			}
-			else if (TAG_TC_ENTITY.equals(localName)){
-				currentSNode = null;
-				idPath.clear();
+			else if (TAG_TC_ENTITY.equals(localName)){				
+				path.pop();
+				if(path.peek().equals(TAG_TC_NAMEDENTITIES)){
+					currentNodeID = attributes.getValue(ATT_TOKENIDS);
+					SNode sNode = getSNode(currentNodeID);
+					/* annotate */
+					String annoVal = attributes.getValue(ATT_CLASS);
+					if(annoVal!=null){sNode.createSAnnotation(LAYER_NE, ATT_CLASS, annoVal);}
+					/* add to layer */
+					sLayers.get(LAYER_NE).getSNodes().add(sNode);
+				}
+				else if(path.peek().equals(TAG_TC_REFERENCES)){
+					currentSNode = null;
+					idPath.clear();					
+				}
 			}
 			else if (TAG_TC_REFERENCE.equals(localName)){
-				if(!ignoreIds){ignoreIds = (currentNodeID==attributes.getValue(ATT_ID));}				
+				if(!ignoreIds){ignoreIds = (attributes.getValue(ATT_ID).equals(currentNodeID));}
+				if(DEBUG){System.out.println("currentNodeID=\""+currentNodeID+"\"; ATT_ID=\""+attributes.getValue(ATT_ID)+"\"");}
 				StringBuilder ref = new StringBuilder();
 				/* id of reference: */				
 				currentNodeID = ignoreIds ? REF_PREFIX+ id++ : attributes.getValue(ATT_ID);
@@ -420,6 +395,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				/* store node in currentSNode */
 				currentSNode = sNodes.get(tokenIDs);
 				if(DEBUG){
+					System.out.println("ignoreIds? "+(ignoreIds ? "Yes" : "No"));
 					System.out.println("Current SNode ID = "+currentNodeID);
 					System.out.println("contains token(s): "+tokenIDs+" ["+getSDocument().getSDocumentGraph().getSText(sNodes.get(tokenIDs))+"]");
 					System.out.println("Current SNode = "+currentSNode);
@@ -447,7 +423,9 @@ public class TCFMapperImport extends PepperMapperImpl{
 					}
 				}
 				/* annotate */
-				currentSNode.createSAnnotation(TAG_TC_REFERENCE, ATT_TYPE, attributes.getValue(ATT_TYPE));
+				if(currentSNode.getSAnnotation(LAYER_REFERENCES+"::"+ATT_TYPE)==null){//references can be used in several entities, e.g. "them" with "her" and "him"
+					currentSNode.createSAnnotation(LAYER_REFERENCES, ATT_TYPE, attributes.getValue(ATT_TYPE));
+				}
 				sNodes.put(currentNodeID, currentSNode);//map with reference id
 				sLayers.get(LAYER_REFERENCES).getSNodes().add(currentSNode);
 				
@@ -458,78 +436,269 @@ public class TCFMapperImport extends PepperMapperImpl{
 					idPath.push(ref.toString());
 				}								
 			}
+			else if (TAG_TC_NAMEDENTITIES.equals(localName)){
+				SLayer namedEntities = buildLayer(LAYER_NE);		
+				String annoVal = attributes.getValue(ATT_TYPE);
+				if(annoVal!=null){namedEntities.createSMetaAnnotation(null, ATT_TYPE, annoVal);}			
+			}
+			else if (TAG_TC_PHONETICS.equals(localName)){
+				SLayer phoLayer = buildLayer(LAYER_PHONETICS);
+				String annoVal = attributes.getValue(ATT_TRANSCRIPTION);
+				if(annoVal!=null){phoLayer.createSMetaAnnotation(null, ATT_TRANSCRIPTION, annoVal);}
+			}
+			else if (TAG_TC_PRON.equals(localName)){
+				chars.delete(0, chars.length());
+				currentNodeID = attributes.getValue(ATT_TOKID);
+				currentSNode = shrinkTokenAnnotations ? (SToken)sNodes.get(currentNodeID) : 
+						(useCommonAnnotatedElement ? sNodes.get(currentNodeID+SPAN) : getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(currentNodeID)));
+				if(currentSNode==null){//only possible if useCommonAnnotatedElement==true
+					currentSNode = getSDocument().getSDocumentGraph().createSSpan((SToken)sNodes.get(currentNodeID));
+					sNodes.put(currentNodeID+SPAN, currentSNode);
+				}
+				sLayers.get(LAYER_PHONETICS).getSNodes().add(currentSNode);
+			}
+			else if (TAG_TC_ORTHOGRAPHY.equals(localName)){
+				buildLayer(LAYER_ORTHOGRAPHY);
+			}
+			else if (TAG_TC_CORRECTION.equals(localName)){
+				chars.delete(0, chars.length());
+				currentNodeID = attributes.getValue(ATT_TOKENIDS);				
+				SNode sNode = getSNode(currentNodeID);
+				SAnnotation correction = sNode.createSAnnotation(LAYER_ORTHOGRAPHY, TAG_TC_CORRECTION, null); 
+				String opVal = attributes.getValue(ATT_OPERATION);
+				if(opVal!=null){
+					SAnnotation operation = SaltFactory.eINSTANCE.createSAnnotation();
+					operation.setName(ATT_OPERATION);
+					operation.setNamespace(LAYER_ORTHOGRAPHY);
+					operation.setValue(attributes.getValue(ATT_OPERATION));
+					correction.addLabel(operation);
+				}								
+				sLayers.get(LAYER_ORTHOGRAPHY).getSNodes().add(sNode);
+				currentSNode = sNode;
+			}
+			else if (TAG_TC_GEO.equals(localName)){//only once allowed
+				SLayer geoLayer = buildLayer(LAYER_GEO);				
+				for(int i=0; i<attributes.getLength(); i++){
+					geoLayer.createSMetaAnnotation(null, attributes.getLocalName(i), attributes.getValue(i));
+					System.out.println("Created annotation "+attributes.getLocalName(i)+" and assigned value "+attributes.getValue(i));
+				}
+			}
+			else if (TAG_TC_SRC.equals(localName)){//only once in <geo> allowed (but obligatory!)
+				chars.delete(0, chars.length());				
+			}
+			else if (TAG_TC_GPOINT.equals(localName)){//multiple in <geo> allowed (not obligatory)
+				SNode sNode = getSNode(attributes.getValue(ATT_TOKENIDS));
+				/* annotate */
+				if(attributes.getValue(ATT_ALT)!=null){sNode.createSAnnotation(LAYER_GEO, ATT_ALT, attributes.getValue(ATT_ALT));}
+				if(attributes.getValue(ATT_LAT)!=null){sNode.createSAnnotation(LAYER_GEO, ATT_LAT, attributes.getValue(ATT_LAT));}
+				if(attributes.getValue(ATT_LON)!=null){sNode.createSAnnotation(LAYER_GEO, ATT_LON, attributes.getValue(ATT_LON));}
+				if(attributes.getValue(ATT_CONTINENT)!=null){sNode.createSAnnotation(LAYER_GEO, ATT_CONTINENT, attributes.getValue(ATT_CONTINENT));}
+				if(attributes.getValue(ATT_COUNTRY)!=null){sNode.createSAnnotation(LAYER_GEO, ATT_COUNTRY, attributes.getValue(ATT_COUNTRY));}
+				if(attributes.getValue(ATT_CAPITAL)!=null){sNode.createSAnnotation(LAYER_GEO, ATT_CAPITAL, attributes.getValue(ATT_CAPITAL));}
+				sLayers.get(LAYER_GEO).getSNodes().add(sNode);
+			}
+			else if (TAG_TC_SYNONYMY.equals(localName) || TAG_TC_ANTONYMY.equals(localName) || TAG_TC_HYPONYMY.equals(localName) || TAG_TC_HYPERONYMY.equals(localName)){
+				if(!sLayers.containsKey(LAYER_LS)){
+					buildLayer(LAYER_LS);				
+				}				
+			}
+			else if (TAG_TC_ORTHFORM.equals(localName)){
+				path.pop();
+				chars.delete(0, chars.length());
+				currentAnnoID = attributes.getValue(ATT_LEMMAREFS);
+				SLemmaAnnotation lemma = (SLemmaAnnotation)labels.get(currentAnnoID);
+				SAnnotation anno = SaltFactory.eINSTANCE.createSAnnotation();
+				anno.setNamespace(LAYER_LS);
+				anno.setName(path.peek());
+				lemma.addLabel(anno);
+				sLayers.get(LAYER_LS).getSNodes().add((SNode)lemma.getSAnnotatableElement());
+			}
+			else if (TAG_TC_WSD.equals(localName)){
+				buildLayer(LAYER_WORDSENSE);
+				String annoVal = attributes.getValue(ATT_SRC);
+				if(annoVal!=null){sLayers.get(LAYER_WORDSENSE).createSAnnotation(null, ATT_SRC, annoVal);}
+			}
+			else if (TAG_TC_WS.equals(localName)){
+				SNode sNode = getSNode(attributes.getValue(ATT_TOKENIDS));
+				if(attributes.getValue(ATT_LEXUNITS)!=null){sNode.createSAnnotation(LAYER_WORDSENSE, ATT_LEXUNITS, attributes.getValue(ATT_LEXUNITS));}
+				if(attributes.getValue(ATT_COMMENT)!=null){sNode.createSAnnotation(LAYER_WORDSENSE, ATT_COMMENT, attributes.getValue(ATT_COMMENT));}
+				sLayers.get(LAYER_WORDSENSE).getSNodes().add(sNode);
+			}
+			else if (TAG_TC_WORDSPLITTINGS.equals(localName)){
+				SLayer splitLayer = buildLayer(LAYER_SPLITTINGS);
+				if(attributes.getValue(ATT_TYPE)!=null){splitLayer.createSAnnotation(null, ATT_TYPE, attributes.getValue(ATT_TYPE));}
+			}
+			else if (TAG_TC_SPLIT.equals(localName)){
+				chars.delete(0, chars.length());
+				currentSNode = getSNode(attributes.getValue(ATT_TOKID));
+				sLayers.get(LAYER_SPLITTINGS).getSNodes().add(currentSNode);
+			}
+			else if (TAG_TC_DISCOURSECONNECTIVES.equals(localName)){
+				SLayer discourseLayer = buildLayer(LAYER_DISCOURSE);
+				String annoVal = attributes.getValue(ATT_TAGSET);
+				if(annoVal!=null){discourseLayer.createSMetaAnnotation(null, ATT_TAGSET, annoVal);}
+			}
+			else if (TAG_TC_CONNECTIVE.equals(localName)){
+				SNode sNode = getSNode(attributes.getValue(ATT_TOKENIDS));
+				String annoVal = attributes.getValue(ATT_TYPE);
+				if(annoVal!=null){sNode.createSAnnotation(LAYER_DISCOURSE, ATT_TYPE, annoVal);}
+				sLayers.get(LAYER_DISCOURSE).getSNodes().add(sNode);
+			}
+			else if (TAG_TC_TEXTSTRUCTURE.equals(localName)){
+				buildLayer(LAYER_TEXTSTRUCTURE);
+			}
+			else if (TAG_TC_TEXTSPAN.equals(localName)){
+				currentNodeID = attributes.getValue(ATT_TOKENIDS);
+				SNode sNode = getSNode(attributes.getValue(currentNodeID));
+				/* TODO */
+			}
 		}
 		
 		@Override
 		public void endElement(java.lang.String uri,
-                java.lang.String localName,
-                java.lang.String qName) throws SAXException{
+                String localName,
+                String qName) throws SAXException{
 			localName = qName.substring(qName.lastIndexOf(":")+1);
 			if(TAG_TC_CONSTITUENT.equals(localName)){
 				if(DEBUG){System.out.println((shrinkTokenAnnotations)&&(useCommonAnnotatedElement) ? "Popping from stack: "+sNodes.get(idPath.peek()).getSAnnotation(ATT_CAT).getValueString() : "POP()");}
 				idPath.pop();			
 			}
-			if(TAG_TC_ENTITY.equals(localName)){
-				String[] seq = null;
-				SPointingRelation reference = null;
-				while(!idPath.isEmpty()){
-					seq = idPath.pop().split("#");
-					if(seq.length!=1){
-						/* relation on antecedent */
-						reference = SaltFactory.eINSTANCE.createSPointingRelation();
-						reference.setSSource(sNodes.get(seq[0]));
-						reference.setSTarget(sNodes.get(seq[1]));
-						reference.createSAnnotation(TAG_TC_REFERENCE, ATT_REL, seq[2]);
-						sLayers.get(LAYER_REFERENCES).getSRelations().add(reference);
+			else if(TAG_TC_ENTITY.equals(localName)){
+				if(TAG_TC_REFERENCE.equals(path.peek())){
+					String[] seq = null;
+					while(!idPath.empty()){
+						seq = idPath.pop().split("#");
+						if(seq.length!=1){
+							/* relation on antecedent */
+							SPointingRelation ref = (SPointingRelation)getSDocument().getSDocumentGraph().addSNode(sNodes.get(seq[0]), sNodes.get(seq[1]), STYPE_NAME.SPOINTING_RELATION);							
+							ref.createSAnnotation(LAYER_REFERENCES, ATT_REL, seq[2]);
+							ref.addSType(STYPE_REFERENCE);
+							sLayers.get(LAYER_REFERENCES).getSRelations().add(ref);
+						}					
 					}
 				}
 			}
-		}
-		
-		@Override
-		public void characters(char[] ch, int start, int length) throws SAXException{
-			StringBuilder txt = new StringBuilder();
-			for(int i=start; i<start+length; i++){
-				txt.append(ch[i]);
+			else if(TAG_TC_TEXT.equals(localName)){
+				String oldtext = currentSTDS.getSText();
+				currentSTDS.setSText(oldtext==null ? chars.toString() : oldtext+chars.toString());
+				if(DEBUG){System.out.println("add text to current STextualDS: "+chars.toString());}
 			}
-			if(TAG_TC_TEXT.equals(path.peek())){				
-				currentSTDS.setSText(txt.toString());
+			else if(TAG_TC_TAG.equals(localName)){
+				/* build annotation – only use in POS */
+				path.pop();
+				if(DEBUG){System.out.println("\tpop() executed. New stack peek: "+path.peek());}
+				if(TAG_TC_POSTAGS.equals(path.peek())){
+					SAnnotation sAnno = SaltFactory.eINSTANCE.createSPOSAnnotation();
+					sAnno.setValue(chars.toString());
+					currentSNode.addSAnnotation(sAnno);
+					labels.put(currentAnnoID, sAnno);
+					if(DEBUG){
+						System.out.println("\tAdding SPOSAnnotation ["+sAnno.getQName()+"="+sAnno.getValueString()+"] to "+currentSNode.getClass().getSimpleName()+":["+getSDocument().getSDocumentGraph().getSText(currentSNode)+"]");						
+					}
+				}
 			}
-			else if(TAG_TC_TOKEN.equals(path.peek())){
+			else if(TAG_TC_F.equals(localName)){
+				/* build annotation */
+				currentSNode.createSAnnotation(null, currentAnnoKey, chars.toString());
+			}
+			else if(TAG_TC_LEMMA.equals(localName)){
+				/* build annotation */
+				if(DEBUG){
+					System.out.println("building lemma annotation for SNode ["+getSDocument().getSDocumentGraph().getSText(currentSNode)+"]");
+					System.out.println("value="+chars.toString());
+				}
+				SAnnotation anno = SaltFactory.eINSTANCE.createSLemmaAnnotation();
+				anno.setValue(chars.toString());
+				currentSNode.addSAnnotation(anno);
+				labels.put(currentAnnoID, anno);
+			}
+			else if(TAG_TC_TOKEN.equals(localName)){
 				/* build token */				
 				String primaryData = currentSTDS.getSText();
-				String tok = txt.toString();
+				String tok = chars.toString();
+				if(DEBUG){System.out.println("building token: ["+tok+"] with p start value "+p);}
 				while(!primaryData.substring(p).startsWith(tok)){
 					p++;
 				}
 				
 				sNodes.put(currentNodeID, getSDocument().getSDocumentGraph().createSToken(currentSTDS, p, p+tok.length()));
 			}
-			else if(TAG_TC_TAG.equals(path.peek())){
-				/* build annotation – only use in POS */
-				path.pop();
-				if(TAG_TC_POSTAGS.equals(path.peek())){
-					SAnnotation sAnno = SaltFactory.eINSTANCE.createSPOSAnnotation();
-					sAnno.setValue(txt.toString());
-					currentSNode.addSAnnotation(sAnno);
-					labels.put(currentAnnoID, sAnno);
-				}				
+			else if(TAG_TC_SEGMENT.equals(localName)){
+				/* build annotation TODO */
+//				currentSNode.createSAnnotation(TAG_TC_SEGMENT, TAG_TC_SEGMENT, chars.toString());				
 			}
-			else if(TAG_TC_LEMMA.equals(path.peek())){
-				/* build annotation */								
-				SAnnotation anno = SaltFactory.eINSTANCE.createSLemmaAnnotation();
-				anno.setValue(txt.toString());
-				currentSNode.addSAnnotation(anno);
-				labels.put(currentAnnoID, anno);				
+			else if(TAG_TC_TOKENS.equals(localName)){
 			}
-			else if(TAG_TC_F.equals(path.peek())){
-				/* build annotation */
-				currentSNode.createSAnnotation(null, currentAnnoKey, txt.toString());				
+			else if(TAG_TC_PRON.equals(localName)){
+				currentSNode.createSAnnotation(LAYER_PHONETICS, TAG_TC_PRON, chars.toString());
 			}
-			else if(TAG_TC_SEGMENT.equals(path.peek())){
-				/* build annotation */
-				currentSNode.createSAnnotation(TAG_TC_SEGMENT, TAG_TC_SEGMENT, txt.toString());				
+			else if (TAG_TC_CORRECTION.equals(localName)){
+				System.out.println(currentSNode.getSAnnotation(LAYER_ORTHOGRAPHY+"::"+TAG_TC_CORRECTION));
+				currentSNode.getSAnnotation(LAYER_ORTHOGRAPHY+"::"+TAG_TC_CORRECTION).setValue(chars.toString());
 			}
+			else if (TAG_TC_SRC.equals(localName)){
+				sLayers.get(LAYER_GEO).createSMetaAnnotation(null, TAG_TC_SRC, chars.toString());
+			}
+			else if (TAG_TC_ORTHFORM.equals(localName)){
+				labels.get(currentAnnoID).getLabel(LAYER_LS, path.peek()).setValue(chars.toString());
+			}
+			else if (TAG_TC_SPLIT.equals(localName)){
+				currentSNode.createSAnnotation(LAYER_SPLITTINGS, TAG_TC_SPLIT, chars.toString());
+			}
+			else if (TAG_TC_TEXTCORPUS.equals(localName)){
+				
+			}
+			else if (TAG_TC_DEPPARSING.equals(localName)){
+			}
+		}
+		
+		private boolean isPrettyPrint(String s){
+			return s.replace(" ", "").replace("\t", "").replace("\n", "").replace("\r", "").isEmpty();			
+		}
+		
+		@Override
+		public void characters(char[] ch, int start, int length) throws SAXException{							
+			StringBuilder txt = new StringBuilder();
+			for(int i=start; i<start+length; i++){
+				txt.append(ch[i]);
+			}
+			boolean add = !isPrettyPrint(txt.toString());
+			if(add){
+				chars.append(txt.toString());
+			}
+		}
+		
+		private SNode getSNode(String id){
+			SNode sNode = sNodes.get(id);			
+			SDocumentGraph graph = getSDocument().getSDocumentGraph();
+			if(id.contains(" ")){
+				if(sNode==null){					
+					/*build span*/
+					String[] seq = id.split(" ");
+					sNode = graph.createSSpan((SToken)sNodes.get(seq[0]));
+					for(int i=1; i<seq.length; i++){
+						graph.addSNode(sNode, (SToken)sNodes.get(seq[i]), STYPE_NAME.SSPANNING_RELATION);
+					}
+					if(useCommonAnnotatedElement){sNodes.put(id, sNode);}
+				}
+			}
+			else{//single token				
+				sNode = shrinkTokenAnnotations ? (SToken)sNode : (useCommonAnnotatedElement ? sNodes.get(id+SPAN) : graph.createSSpan((SToken)sNode));
+				if(sNode==null){//only if shrinkTokenAnnotations==false and useCommonAnnotatedElement==true
+					/* build span over single token */
+					sNode = graph.createSSpan((SToken)sNodes.get(id));
+					sNodes.put(id+SPAN, sNode);
+				}
+			}
+			return sNode;
+		}
+		
+		private SLayer buildLayer(String name){
+			SLayer newLayer = SaltFactory.eINSTANCE.createSLayer();
+			newLayer.setSName(name);
+			sLayers.put(name, newLayer);
+			getSDocument().getSDocumentGraph().addSLayer(newLayer);
+			return newLayer;
 		}
 }
 

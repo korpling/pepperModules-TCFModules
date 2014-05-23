@@ -640,7 +640,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				/* build token */				
 				String primaryData = currentSTDS.getSText();
 				String tok = chars.toString();
-				if(DEBUG){System.out.println("building token: ["+tok+"] with p start value "+p);}
+				System.out.println("building token: ["+tok+"] with p start value "+p);
 				while(!primaryData.substring(p).startsWith(tok)){
 					p++;
 				}

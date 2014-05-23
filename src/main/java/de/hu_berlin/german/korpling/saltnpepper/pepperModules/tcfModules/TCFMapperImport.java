@@ -547,10 +547,34 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_TC_TEXTSTRUCTURE.equals(localName)){
 				buildLayer(LAYER_TEXTSTRUCTURE);
 			}
-			else if (TAG_TC_TEXTSPAN.equals(localName)){
-				currentNodeID = attributes.getValue(ATT_TOKENIDS);
-				SNode sNode = getSNode(attributes.getValue(currentNodeID));
-				/* TODO */
+			else if (TAG_TC_TEXTSPAN.equals(localName)){				
+				if(attributes.getValue(ATT_START)!=null && attributes.getValue(ATT_END)!=null){
+					SDocumentGraph graph = getSDocument().getSDocumentGraph();
+					SToken startToken = (SToken)sNodes.get(attributes.getValue(ATT_START));
+					SToken endToken = (SToken)sNodes.get(attributes.getValue(ATT_END));
+					SNode sNode = null;
+					if(startToken.equals(endToken)){
+						sNode = shrinkTokenAnnotations ? startToken : graph.createSSpan(startToken);
+					}
+					else{
+						/* we ignore useCommonAnnotatedElement here */
+						EList<SToken> allTokens = graph.getSortedSTokenByText();					
+						int j=0;
+						while(j<allTokens.size() && !allTokens.get(j).equals(startToken)){
+							j++;
+						}
+						sNode = graph.createSSpan(startToken);
+						do{
+							graph.addSNode(sNode, allTokens.get(j), STYPE_NAME.SSPANNING_RELATION);
+							j++;
+						}while(j<allTokens.size() && !allTokens.get(j).equals(endToken));
+						graph.addSNode(sNode, allTokens.get(j), STYPE_NAME.SSPANNING_RELATION);
+					}
+					/* annotate */
+					sNode.createSAnnotation(LAYER_TEXTSTRUCTURE, ATT_TYPE, attributes.getValue(ATT_TYPE));
+					
+					sLayers.get(LAYER_TEXTSTRUCTURE).getSNodes().add(sNode);
+				}
 			}
 		}
 		
@@ -669,6 +693,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 		}
 		
 		private SNode getSNode(String id){
+			if(id==null){return null;}			
 			SNode sNode = sNodes.get(id);			
 			SDocumentGraph graph = getSDocument().getSDocumentGraph();
 			if(id.contains(" ")){

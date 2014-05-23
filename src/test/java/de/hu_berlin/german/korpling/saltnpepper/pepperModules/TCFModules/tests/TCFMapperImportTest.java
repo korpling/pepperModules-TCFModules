@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.Iterator;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -29,6 +30,7 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFDict
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFImporterProperties;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFMapperImport;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
@@ -3539,6 +3541,287 @@ public class TCFMapperImportTest {
 	 * @throws FileNotFoundException 
 	 */
 	@Test
+	public void testReferencesShrinked2() throws XMLStreamException, FileNotFoundException{
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory o= XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
+		
+		xmlWriter.writeStartDocument();
+		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
+			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+			xmlWriter.writeEndElement();
+			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeCharacters(EXAMPLE_TEXT_REFERENCE);
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+						xmlWriter.writeCharacters("I");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+						xmlWriter.writeCharacters("love");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+						xmlWriter.writeCharacters("New");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+						xmlWriter.writeCharacters("York");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+						xmlWriter.writeCharacters(".");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
+						xmlWriter.writeCharacters("It");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
+						xmlWriter.writeCharacters("is");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
+						xmlWriter.writeCharacters("the");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
+						xmlWriter.writeCharacters("most");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
+						xmlWriter.writeCharacters("beautiful");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
+						xmlWriter.writeCharacters("place");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t12");
+						xmlWriter.writeCharacters(".");
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCES, TCFDictionary.NS_VALUE_TC);
+				xmlWriter.writeAttribute(TCFDictionary.ATT_TYPETAGSET, "unknown");
+				xmlWriter.writeAttribute(TCFDictionary.ATT_RELTAGSET, "unknown");					
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ENTITY, TCFDictionary.NS_VALUE_TC);//entity "New York"						
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc2");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t6");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t6");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "pronoun");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "anaphoric");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc1");
+						xmlWriter.writeEndElement();//End of NY-2
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc3");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t8 t9 t10 t11");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t11");//we choose the nominal head, not the determiner
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "noun");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "non-anaphoric");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc1");
+						xmlWriter.writeEndElement();//End of NY-3
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-1
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3 t4");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t3 t4");//no clearly identified head
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "name");
+						xmlWriter.writeEndElement();//End of NY-1
+					xmlWriter.writeEndElement();//End of entity "New York"
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ENTITY, TCFDictionary.NS_VALUE_TC);//start pseudo entity						
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc4");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t2");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "test");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "anaphoric");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc5");
+						xmlWriter.writeEndElement();
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc5");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t7");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "test");
+						xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();//end of pseudo entity
+				xmlWriter.writeEndElement();
+			xmlWriter.writeEndElement();
+		xmlWriter.writeEndElement();
+		xmlWriter.writeEndDocument();
+	
+		/* generating salt sample */
+		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+		SDocumentGraph docGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
+		doc.setSDocumentGraph(docGraph);
+		docGraph.createSTextualDS(EXAMPLE_TEXT_REFERENCE);
+		docGraph.tokenize();
+		EList<SToken> docTokens = docGraph.getSTokens();
+		
+		//head marker:
+		SAnnotation refHead = SaltFactory.eINSTANCE.createSAnnotation();
+		refHead.setName(TCFMapperImport.HEAD_MARKER);
+		refHead.setValue(TCFMapperImport.HEAD_MARKER);
+		
+		//reference layer:
+		SLayer docRefLayer = SaltFactory.eINSTANCE.createSLayer();
+		docRefLayer.setSName(TCFMapperImport.LAYER_REFERENCES);
+		docRefLayer.createSMetaAnnotation(null, TCFDictionary.ATT_TYPETAGSET, "unknown");
+		docRefLayer.createSMetaAnnotation(null, TCFDictionary.ATT_RELTAGSET, "unknown");
+		
+		//relation:
+		SPointingRelation reference = SaltFactory.eINSTANCE.createSPointingRelation();
+		
+		//entity "New York":
+		///"New York"
+		SSpan newYork = docGraph.createSSpan(docTokens.get(2));
+		docGraph.addSNode(newYork, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
+		newYork.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "name");
+		docTokens.get(2).addSAnnotation(refHead);
+		docTokens.get(3).addSAnnotation(refHead);
+		docRefLayer.getSNodes().add(newYork);		
+		///"the most beautiful place"
+		SSpan theMostBeautifulPlace = docGraph.createSSpan(docTokens.get(7));
+		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(8), STYPE_NAME.SSPANNING_RELATION);
+		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(9), STYPE_NAME.SSPANNING_RELATION);
+		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(10), STYPE_NAME.SSPANNING_RELATION);		
+		theMostBeautifulPlace.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "noun");		
+		docTokens.get(10).addSAnnotation(refHead);
+		reference = (SPointingRelation)docGraph.addSNode(theMostBeautifulPlace, newYork, STYPE_NAME.SPOINTING_RELATION);
+		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "non-anaphoric");
+		docRefLayer.getSNodes().add(theMostBeautifulPlace);
+		docRefLayer.getSRelations().add(reference);
+		///"it"
+		docTokens.get(5).createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");		
+		docTokens.get(5).addSAnnotation(refHead);
+		reference = (SPointingRelation)docGraph.addSNode(docTokens.get(5), newYork, STYPE_NAME.SPOINTING_RELATION);
+		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "anaphoric");
+		docRefLayer.getSNodes().add(docTokens.get(5));
+		docRefLayer.getSRelations().add(reference);
+		
+		//test entity
+		///love
+		docTokens.get(1).createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "test");
+		docRefLayer.getSNodes().add(docTokens.get(1));
+		///is
+		docTokens.get(6).createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "test");
+		docRefLayer.getSNodes().add(docTokens.get(6));
+		///relation:
+		reference = (SPointingRelation)docGraph.addSNode(docTokens.get(1), docTokens.get(6), STYPE_NAME.SPOINTING_RELATION);
+		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "non-anaphoric");
+		docRefLayer.getSRelations().add(reference);
+		
+		/* setting variables */		
+		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_REFERENCES);
+		tmpOut.getParentFile().mkdirs();
+		PrintWriter p = new PrintWriter(tmpOut);		
+		p.println(outStream.toString());
+		p.close();
+		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
+		
+		/* start mapper */
+		System.out.println(tmpOut);		
+		this.getFixture().mapSDocument();
+		
+		/* compare template salt model to imported salt model */		
+		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
+		assertNotNull(fixGraph.getSLayerByName(TCFMapperImport.LAYER_REFERENCES));
+		SLayer fixRefLayer = fixGraph.getSLayerByName(TCFMapperImport.LAYER_REFERENCES).get(0);
+		assertFalse(fixRefLayer.getSNodes().isEmpty());
+		assertFalse(fixRefLayer.getSRelations().isEmpty());		
+		assertEquals(docRefLayer.getSNodes().size(), fixRefLayer.getSNodes().size());
+		EList<SRelation> docReferences = docRefLayer.getSRelations();
+		EList<SRelation> fixReferences = fixRefLayer.getSRelations();
+		assertEquals(docReferences.size(), fixReferences.size());
+		assertNotNull(fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET));
+		assertNotNull(fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET));
+		assertEquals(docRefLayer.getSAnnotation(TCFDictionary.ATT_TYPETAGSET), fixRefLayer.getSAnnotation(TCFDictionary.ATT_TYPETAGSET));
+		assertEquals(docRefLayer.getSAnnotation(TCFDictionary.ATT_RELTAGSET), fixRefLayer.getSAnnotation(TCFDictionary.ATT_RELTAGSET));
+		
+		SRelation docRef = null;
+		SRelation fixRef = null;		
+		for(int i=0; i<docReferences.size(); i++){
+			docRef = docReferences.get(i);
+			fixRef = fixReferences.get(i);		
+			/* compare source */
+			assertNotNull(fixRef.getSSource());
+			assertEquals(docGraph.getSText(docRef.getSSource()), fixGraph.getSText(fixRef.getSSource()));
+			assertNotNull(fixRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
+			assertEquals(docRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE), fixRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
+			assertEquals(docRef.getSSource().getClass(), fixRef.getSSource().getClass());
+			/* compare relation */
+			assertNotNull(fixRef.getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL));
+			if(DEBUG){
+				System.out.println("[DOC:]"+docGraph.getSText(docRef.getSTarget())+"<--"+docRef.getSAnnotation(TCFDictionary.TAG_TC_REFERENCE+"::"+TCFDictionary.ATT_REL).getValueString()+"--"+docGraph.getSText(docRef.getSSource()));
+				System.out.println("[FIX:]"+fixGraph.getSText(fixRef.getSTarget())+"<--"+fixRef.getSAnnotation(TCFDictionary.TAG_TC_REFERENCE+"::"+TCFDictionary.ATT_REL).getValueString()+"--"+fixGraph.getSText(fixRef.getSSource()));
+			}
+			/* compare target */
+			assertNotNull(fixRef.getSTarget());
+			assertEquals(docGraph.getSText(docRef.getSTarget()), fixGraph.getSText(fixRef.getSTarget()));
+			assertNotNull(fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
+			assertEquals(docRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());
+			assertEquals(docRef.getSTarget().getClass(), fixRef.getSTarget().getClass());
+		}
+		
+		StringBuilder tree = new StringBuilder();
+		int j;
+		System.out.println("FIX:");
+		for(SNode sNode : fixGraph.getSNodes()){
+			tree.append(fixGraph.getSText(sNode));
+			tree.append("--");
+			j=0;
+			if(sNode.getOutgoingSRelations().size()>0){
+				while(!(sNode.getOutgoingSRelations().get(j) instanceof SPointingRelation)){
+					j++;
+					if(j==sNode.getOutgoingSRelations().size()){break;}				
+				}
+				if(j<sNode.getOutgoingSRelations().size()){
+					tree.append(sNode.getOutgoingSRelations().get(j).getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL).getValue());
+					tree.append("->");
+					tree.append(fixGraph.getSText((SNode)sNode.getOutgoingSRelations().get(j).getTarget()));
+					System.out.println(tree.toString());								
+				}
+			}
+			tree.delete(0, tree.length());
+		}
+		//doc
+		System.out.println("DOC:");
+		for(SNode sNode : docGraph.getSNodes()){
+			tree.append(docGraph.getSText(sNode));
+			tree.append("--");
+			j=0;
+			if(sNode.getOutgoingSRelations().size()>0){
+				while(!(sNode.getOutgoingSRelations().get(j) instanceof SPointingRelation)){
+					j++;
+					if(j==sNode.getOutgoingSRelations().size()){break;}				
+				}
+				if(j<sNode.getOutgoingSRelations().size()){
+					tree.append(sNode.getOutgoingSRelations().get(j).getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL).getValue());
+					tree.append("->");
+					tree.append(docGraph.getSText((SNode)sNode.getOutgoingSRelations().get(j).getTarget()));
+					System.out.println(tree.toString());								
+				}
+			}
+			tree.delete(0, tree.length());
+		}
+	}
+	
+	/**This method tests if a valid TCF-XML-structure containing reference
+	 * annotations is converted to salt correctly by {@link TCFMapperImport} 
+	 * @throws XMLStreamException 
+	 * @throws FileNotFoundException 
+	 */
+	@Test
 	public void testReferencesNotShrinked() throws XMLStreamException, FileNotFoundException{
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		XMLOutputFactory o= XMLOutputFactory.newFactory();
@@ -6571,452 +6854,437 @@ public class TCFMapperImportTest {
 			assertEquals(docNode.getSAnnotation(TCFMapperImport.LAYER_DISCOURSE+"::"+TCFDictionary.ATT_TYPE), fixNode.getSAnnotation(TCFMapperImport.LAYER_DISCOURSE+"::"+TCFDictionary.ATT_TYPE));
 		}
 	}
-
-	/*TODO*/
-	/**This method tests if a valid TCF-XML-structure containing match information
-	 * is converted to salt correctly 
+	
+	/**This method tests if a valid TCF-XML-structure containing text structure
+	 * annotations is converted to salt correctly 
 	 * @throws XMLStreamException 
-	 * @throws FileNotFoundException 
-	 */		
+	 * @throws FileNotFoundException */
 	@Test
-	public void testMatches(){
+	public void testTextStructureShrinked() throws XMLStreamException, FileNotFoundException{
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory o= XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
 		
+		xmlWriter.writeStartDocument();
+		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
+			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+			xmlWriter.writeEndElement();
+			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeCharacters(EXAMPLE_TEXT);
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);					
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+						xmlWriter.writeCharacters("Is");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+						xmlWriter.writeCharacters("this");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+						xmlWriter.writeCharacters("example");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+						xmlWriter.writeCharacters("more");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+						xmlWriter.writeCharacters("complicated");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
+						xmlWriter.writeCharacters("than");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
+						xmlWriter.writeCharacters("it");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
+						xmlWriter.writeCharacters("appears");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
+						xmlWriter.writeCharacters("to");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
+						xmlWriter.writeCharacters("be");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
+						xmlWriter.writeCharacters("?");
+					xmlWriter.writeEndElement();					
+					xmlWriter.writeEndElement();					
+				xmlWriter.writeEndElement();//end of tokens
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSTRUCTURE, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "paragraph");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t5");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "page");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t6");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "page");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t1");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);					
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t2");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t5");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t6");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();
+			xmlWriter.writeEndElement();
+		xmlWriter.writeEndDocument();
+		
+		/* generating salt sample */
+		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+		SDocumentGraph docGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
+		doc.setSDocumentGraph(docGraph);
+		docGraph.createSTextualDS(EXAMPLE_TEXT);
+		docGraph.tokenize();
+		EList<SToken> docTokens = docGraph.getSTokens();
+		SLayer docTextLayer = SaltFactory.eINSTANCE.createSLayer();
+		docTextLayer.setSName(TCFMapperImport.LAYER_TEXTSTRUCTURE);
+		EList<SNode> docTextNodes = docTextLayer.getSNodes();
+		
+		//paragraph:
+		SSpan sSpan = docGraph.createSSpan(docTokens);
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "paragraph");
+		docTextNodes.add(sSpan);
+		
+		//page1:
+		EList<SToken> spanTokens = new BasicEList<SToken>();
+		spanTokens.add(docTokens.get(0));
+		spanTokens.add(docTokens.get(1));
+		spanTokens.add(docTokens.get(2));
+		spanTokens.add(docTokens.get(3));
+		spanTokens.add(docTokens.get(4));
+		sSpan = docGraph.createSSpan(spanTokens);
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "page");
+		docTextNodes.add(sSpan);
+		
+		//page2:
+		spanTokens.clear();
+		spanTokens.add(docTokens.get(5));
+		spanTokens.add(docTokens.get(6));
+		spanTokens.add(docTokens.get(7));
+		spanTokens.add(docTokens.get(8));
+		spanTokens.add(docTokens.get(9));
+		spanTokens.add(docTokens.get(10));
+		sSpan = docGraph.createSSpan(spanTokens);
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "page");
+		docTextNodes.add(sSpan);
+		
+		//line1:
+		docTokens.get(0).createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
+		docTextNodes.add(docTokens.get(0));
+		
+		//line2:
+		spanTokens.clear();
+		spanTokens.add(docTokens.get(1));
+		spanTokens.add(docTokens.get(2));
+		spanTokens.add(docTokens.get(3));
+		spanTokens.add(docTokens.get(4));
+		sSpan = docGraph.createSSpan(spanTokens);
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
+		docTextNodes.add(sSpan);
+		
+		//line3:
+		spanTokens.clear();
+		spanTokens.add(docTokens.get(5));
+		spanTokens.add(docTokens.get(6));
+		spanTokens.add(docTokens.get(7));
+		spanTokens.add(docTokens.get(8));
+		spanTokens.add(docTokens.get(9));
+		spanTokens.add(docTokens.get(10));
+		sSpan = docGraph.createSSpan(spanTokens);
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
+		docTextNodes.add(sSpan);
+		
+		/* setting variables */		
+		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_TEXTSTRUCTURE);
+		tmpOut.getParentFile().mkdirs();
+		PrintWriter p = new PrintWriter(tmpOut);		
+		p.println(outStream.toString());
+		p.close();
+		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, false);
+		
+		/* start mapper */
+		System.out.println(tmpOut);		
+		this.getFixture().mapSDocument();
+		
+		System.out.println("============================================");
+		System.out.println("TESTING TEXT STRUCTURE ANNOTATION");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("");
+		System.out.println("============================================");
+		
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
+		assertEquals(1, fixGraph.getSLayerByName(TCFMapperImport.LAYER_TEXTSTRUCTURE).size());
+		EList<SNode> fixTextNodes = fixGraph.getSLayerByName(TCFMapperImport.LAYER_TEXTSTRUCTURE).get(0).getSNodes();
+		assertEquals(docTextNodes.size(), fixTextNodes.size());
+		SNode docNode = null;
+		SNode fixNode = null;
+		for(int i=0; i<docTextNodes.size(); i++){
+			docNode = docTextNodes.get(i);
+			fixNode = fixTextNodes.get(i);
+			assertEquals(docNode.getClass(), fixNode.getClass());
+			assertEquals(docNode.getSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE+"::"+TCFDictionary.ATT_TYPE), docNode.getSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE+"::"+TCFDictionary.ATT_TYPE));
+			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
+		}
 	}
 
-//	/*TODO*/	
-//	/**This method tests if a valid TCF-XML-structure containing text structure
-//	 * annotations is converted to salt correctly 
-//	 * @throws XMLStreamException 
-//	 * @throws FileNotFoundException */
-//	@Test
-//	public void testTextStructureShrinked() throws XMLStreamException, FileNotFoundException{
-//		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-//		XMLOutputFactory o= XMLOutputFactory.newFactory();
-//		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
-//		
-//		xmlWriter.writeStartDocument();
-//		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
-//		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
-//		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
-//			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
-//			xmlWriter.writeEndElement();
-//			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
-//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeCharacters(EXAMPLE_TEXT+"\n"+EXAMPLE_TEXT);
-//				xmlWriter.writeEndElement();
-//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);					
-//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
-//						xmlWriter.writeCharacters("Is");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
-//						xmlWriter.writeCharacters("this");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
-//						xmlWriter.writeCharacters("example");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
-//						xmlWriter.writeCharacters("more");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
-//						xmlWriter.writeCharacters("complicated");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
-//						xmlWriter.writeCharacters("than");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
-//						xmlWriter.writeCharacters("it");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
-//						xmlWriter.writeCharacters("appears");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
-//						xmlWriter.writeCharacters("to");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
-//						xmlWriter.writeCharacters("be");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
-//						xmlWriter.writeCharacters("?");
-//					xmlWriter.writeEndElement();					
-//					xmlWriter.writeEndElement();					
-//				xmlWriter.writeEndElement();//end of tokens
-//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSTRUCTURE, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "paragraph");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t5");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "page");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t6");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "page");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t1");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);					
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t2");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t5");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t6");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
-//					xmlWriter.writeEndElement();
-//				xmlWriter.writeEndElement();
-//			xmlWriter.writeEndElement();
-//		xmlWriter.writeEndElement();
-//		xmlWriter.writeEndDocument();
-//		
-//		/* generating salt sample */
-//		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
-//		SDocumentGraph docGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
-//		doc.setSDocumentGraph(docGraph);
-//		docGraph.createSTextualDS(EXAMPLE_TEXT+"\n"+EXAMPLE_TEXT);
-//		docGraph.tokenize();
-//		EList<SToken> docTokens = docGraph.getSTokens();
-//		SLayer docTextLayer = SaltFactory.eINSTANCE.createSLayer();
-//		docTextLayer.setSName(TCFMapperImport.LAYER_TEXTSTRUCTURE);
-//		EList<SNode> docTextNodes = docTextLayer.getSNodes();
-//		
-//		//paragraph:
-//		SSpan sSpan = docGraph.createSSpan(docTokens);
-//		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "paragraph");
-//		docTextNodes.add(sSpan);
-//		
-//		//page1:
-//		EList<SToken> spanTokens = new BasicEList<SToken>();
-//		spanTokens.add(docTokens.get(0));
-//		spanTokens.add(docTokens.get(1));
-//		spanTokens.add(docTokens.get(2));
-//		spanTokens.add(docTokens.get(3));
-//		spanTokens.add(docTokens.get(4));
-//		sSpan = docGraph.createSSpan(spanTokens);
-//		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "page");
-//		docTextNodes.add(sSpan);
-//		
-//		//page2:
-//		spanTokens.clear();
-//		spanTokens.add(docTokens.get(5));
-//		spanTokens.add(docTokens.get(6));
-//		spanTokens.add(docTokens.get(7));
-//		spanTokens.add(docTokens.get(8));
-//		spanTokens.add(docTokens.get(9));
-//		spanTokens.add(docTokens.get(10));
-//		sSpan = docGraph.createSSpan(spanTokens);
-//		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "page");
-//		docTextNodes.add(sSpan);
-//		
-//		//line1:
-//		docTokens.get(0).createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
-//		docTextNodes.add(docTokens.get(0));
-//		
-//		//line2:
-//		spanTokens.clear();
-//		spanTokens.add(docTokens.get(1));
-//		spanTokens.add(docTokens.get(2));
-//		spanTokens.add(docTokens.get(3));
-//		spanTokens.add(docTokens.get(4));
-//		sSpan = docGraph.createSSpan(spanTokens);
-//		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
-//		docTextNodes.add(sSpan);
-//		
-//		//line3:
-//		spanTokens.clear();
-//		spanTokens.add(docTokens.get(5));
-//		spanTokens.add(docTokens.get(6));
-//		spanTokens.add(docTokens.get(7));
-//		spanTokens.add(docTokens.get(8));
-//		spanTokens.add(docTokens.get(9));
-//		spanTokens.add(docTokens.get(10));
-//		sSpan = docGraph.createSSpan(spanTokens);
-//		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
-//		docTextNodes.add(sSpan);
-//		
-//		/* setting variables */		
-//		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_TEXTSTRUCTURE);
-//		tmpOut.getParentFile().mkdirs();
-//		PrintWriter p = new PrintWriter(tmpOut);		
-//		p.println(outStream.toString());
-//		p.close();
-//		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
-//		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
-//		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, false);
-//		
-//		/* start mapper */
-//		System.out.println(tmpOut);		
-//		this.getFixture().mapSDocument();
-//		
-//		System.out.println("============================================");
-//		System.out.println("TESTING TEXT STRUCTURE ANNOTATION");
-//		System.out.println("--------------------------------------------");
-//		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
-//		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
-//		System.out.println("--------------------------------------------");
-//		System.out.println("");
-//		System.out.println("============================================");
-//		
-//		/* compare template salt model to imported salt model */
-//		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
-//		assertEquals(1, fixGraph.getSLayerByName(TCFMapperImport.LAYER_TEXTSTRUCTURE).size());
-//		EList<SNode> fixTextNodes = fixGraph.getSLayerByName(TCFMapperImport.LAYER_TEXTSTRUCTURE).get(0).getSNodes();
-//		assertEquals(docTextNodes.size(), fixTextNodes.size());
-//		SNode docNode = null;
-//		SNode fixNode = null;
-//		for(int i=0; i<docTextNodes.size(); i++){
-//			docNode = docTextNodes.get(i);
-//			fixNode = fixTextNodes.get(i);
-//			assertEquals(docNode.getClass(), fixNode.getClass());
-//			assertEquals(docNode.getSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE+"::"+TCFDictionary.ATT_TYPE), docNode.getSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE+"::"+TCFDictionary.ATT_TYPE));
-//			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
-//		}
-//	}
-	
-//	/*TODO*/
-//	/**This method tests if a valid TCF-XML-structure containing text structure
-//	 * annotations is converted to salt correctly 
-//	 * @throws XMLStreamException 
-//	 * @throws FileNotFoundException */
-//	@Test
-//	public void testTextStructureNotShrinked() throws XMLStreamException, FileNotFoundException{
-//		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-//		XMLOutputFactory o= XMLOutputFactory.newFactory();
-//		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
-//		
-//		xmlWriter.writeStartDocument();
-//		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
-//		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
-//		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
-//		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
-//			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
-//			xmlWriter.writeEndElement();
-//			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
-//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeCharacters(EXAMPLE_TEXT+"\n"+EXAMPLE_TEXT);
-//				xmlWriter.writeEndElement();
-//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);					
-//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
-//						xmlWriter.writeCharacters("Is");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
-//						xmlWriter.writeCharacters("this");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
-//						xmlWriter.writeCharacters("example");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
-//						xmlWriter.writeCharacters("more");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
-//						xmlWriter.writeCharacters("complicated");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
-//						xmlWriter.writeCharacters("than");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
-//						xmlWriter.writeCharacters("it");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
-//						xmlWriter.writeCharacters("appears");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
-//						xmlWriter.writeCharacters("to");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
-//						xmlWriter.writeCharacters("be");
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
-//						xmlWriter.writeCharacters("?");
-//					xmlWriter.writeEndElement();					
-//					xmlWriter.writeEndElement();					
-//				xmlWriter.writeEndElement();//end of tokens
-//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSTRUCTURE, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "paragraph");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t5");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "page");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t6");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "page");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t1");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);					
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t2");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t5");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
-//					xmlWriter.writeEndElement();
-//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t6");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
-//					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
-//					xmlWriter.writeEndElement();
-//				xmlWriter.writeEndElement();
-//			xmlWriter.writeEndElement();
-//		xmlWriter.writeEndElement();
-//		xmlWriter.writeEndDocument();
-//		
-//		/* generating salt sample */
-//		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
-//		SDocumentGraph docGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
-//		doc.setSDocumentGraph(docGraph);
-//		docGraph.createSTextualDS(EXAMPLE_TEXT+"\n"+EXAMPLE_TEXT);
-//		docGraph.tokenize();
-//		EList<SToken> docTokens = docGraph.getSTokens();
-//		SLayer docTextLayer = SaltFactory.eINSTANCE.createSLayer();
-//		docTextLayer.setSName(TCFMapperImport.LAYER_TEXTSTRUCTURE);
-//		EList<SNode> docTextNodes = docTextLayer.getSNodes();
-//		
-//		//paragraph:
-//		SSpan sSpan = docGraph.createSSpan(docTokens);
-//		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "paragraph");
-//		docTextNodes.add(sSpan);
-//		
-//		//page1:
-//		EList<SToken> spanTokens = new BasicEList<SToken>();
-//		spanTokens.add(docTokens.get(0));
-//		spanTokens.add(docTokens.get(1));
-//		spanTokens.add(docTokens.get(2));
-//		spanTokens.add(docTokens.get(3));
-//		spanTokens.add(docTokens.get(4));
-//		sSpan = docGraph.createSSpan(spanTokens);
-//		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "page");
-//		docTextNodes.add(sSpan);
-//		
-//		//page2:
-//		spanTokens.clear();
-//		spanTokens.add(docTokens.get(5));
-//		spanTokens.add(docTokens.get(6));
-//		spanTokens.add(docTokens.get(7));
-//		spanTokens.add(docTokens.get(8));
-//		spanTokens.add(docTokens.get(9));
-//		spanTokens.add(docTokens.get(10));
-//		sSpan = docGraph.createSSpan(spanTokens);
-//		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "page");
-//		docTextNodes.add(sSpan);
-//		
-//		//line1:
-//		sSpan = docGraph.createSSpan(docTokens.get(0));
-//		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
-//		docTextNodes.add(sSpan);
-//		
-//		//line2:
-//		spanTokens.clear();
-//		spanTokens.add(docTokens.get(1));
-//		spanTokens.add(docTokens.get(2));
-//		spanTokens.add(docTokens.get(3));
-//		spanTokens.add(docTokens.get(4));
-//		sSpan = docGraph.createSSpan(spanTokens);
-//		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
-//		docTextNodes.add(sSpan);
-//		
-//		//line3:
-//		spanTokens.clear();
-//		spanTokens.add(docTokens.get(5));
-//		spanTokens.add(docTokens.get(6));
-//		spanTokens.add(docTokens.get(7));
-//		spanTokens.add(docTokens.get(8));
-//		spanTokens.add(docTokens.get(9));
-//		spanTokens.add(docTokens.get(10));
-//		sSpan = docGraph.createSSpan(spanTokens);
-//		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
-//		docTextNodes.add(sSpan);
-//		
-//		/* setting variables */		
-//		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_TEXTSTRUCTURE);
-//		tmpOut.getParentFile().mkdirs();
-//		PrintWriter p = new PrintWriter(tmpOut);		
-//		p.println(outStream.toString());
-//		p.close();
-//		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
-//		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
-//		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, false);
-//		
-//		/* start mapper */
-//		System.out.println(tmpOut);		
-//		this.getFixture().mapSDocument();
-//		
-//		System.out.println("============================================");
-//		System.out.println("TESTING TEXT STRUCTURE ANNOTATION");
-//		System.out.println("--------------------------------------------");
-//		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
-//		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
-//		System.out.println("--------------------------------------------");
-//		System.out.println("");
-//		System.out.println("============================================");
-//		
-//		/* compare template salt model to imported salt model */
-//		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
-//		assertEquals(1, fixGraph.getSLayerByName(TCFMapperImport.LAYER_TEXTSTRUCTURE).size());
-//		EList<SNode> fixTextNodes = fixGraph.getSLayerByName(TCFMapperImport.LAYER_TEXTSTRUCTURE).get(0).getSNodes();
-//		assertEquals(docTextNodes.size(), fixTextNodes.size());
-//		SNode docNode = null;
-//		SNode fixNode = null;
-//		for(int i=0; i<docTextNodes.size(); i++){
-//			docNode = docTextNodes.get(i);
-//			fixNode = fixTextNodes.get(i);
-//			assertTrue(fixNode instanceof SSpan);
-//			assertEquals(docNode.getSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE+"::"+TCFDictionary.ATT_TYPE), docNode.getSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE+"::"+TCFDictionary.ATT_TYPE));
-//			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
-//		}
-//	}
+	/**This method tests if a valid TCF-XML-structure containing text structure
+	 * annotations is converted to salt correctly 
+	 * @throws XMLStreamException 
+	 * @throws FileNotFoundException */
+	@Test
+	public void testTextStructureNotShrinked() throws XMLStreamException, FileNotFoundException{
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory o= XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
+		
+		xmlWriter.writeStartDocument();
+		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "0.4");
+			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+			xmlWriter.writeEndElement();
+			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeCharacters(EXAMPLE_TEXT);
+				xmlWriter.writeEndElement();
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);					
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+						xmlWriter.writeCharacters("Is");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+						xmlWriter.writeCharacters("this");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+						xmlWriter.writeCharacters("example");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+						xmlWriter.writeCharacters("more");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+						xmlWriter.writeCharacters("complicated");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
+						xmlWriter.writeCharacters("than");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
+						xmlWriter.writeCharacters("it");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
+						xmlWriter.writeCharacters("appears");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
+						xmlWriter.writeCharacters("to");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
+						xmlWriter.writeCharacters("be");
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
+						xmlWriter.writeCharacters("?");
+					xmlWriter.writeEndElement();					
+					xmlWriter.writeEndElement();					
+				xmlWriter.writeEndElement();//end of tokens
+				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSTRUCTURE, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "paragraph");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t5");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "page");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t6");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "page");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t1");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);					
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t2");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t5");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
+					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t6");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t11");
+					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();
+			xmlWriter.writeEndElement();
+		xmlWriter.writeEndDocument();
+		
+		/* generating salt sample */
+		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+		SDocumentGraph docGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
+		doc.setSDocumentGraph(docGraph);
+		docGraph.createSTextualDS(EXAMPLE_TEXT);
+		docGraph.tokenize();
+		EList<SToken> docTokens = docGraph.getSTokens();
+		SLayer docTextLayer = SaltFactory.eINSTANCE.createSLayer();
+		docTextLayer.setSName(TCFMapperImport.LAYER_TEXTSTRUCTURE);
+		EList<SNode> docTextNodes = docTextLayer.getSNodes();
+		
+		//paragraph:
+		SSpan sSpan = docGraph.createSSpan(docTokens);
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "paragraph");
+		docTextNodes.add(sSpan);
+		
+		//page1:
+		EList<SToken> spanTokens = new BasicEList<SToken>();
+		spanTokens.add(docTokens.get(0));
+		spanTokens.add(docTokens.get(1));
+		spanTokens.add(docTokens.get(2));
+		spanTokens.add(docTokens.get(3));
+		spanTokens.add(docTokens.get(4));
+		sSpan = docGraph.createSSpan(spanTokens);
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "page");
+		docTextNodes.add(sSpan);
+		
+		//page2:
+		spanTokens.clear();
+		spanTokens.add(docTokens.get(5));
+		spanTokens.add(docTokens.get(6));
+		spanTokens.add(docTokens.get(7));
+		spanTokens.add(docTokens.get(8));
+		spanTokens.add(docTokens.get(9));
+		spanTokens.add(docTokens.get(10));
+		sSpan = docGraph.createSSpan(spanTokens);
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "page");
+		docTextNodes.add(sSpan);
+		
+		//line1:
+		sSpan = docGraph.createSSpan(docTokens.get(0));
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
+		docTextNodes.add(sSpan);
+		
+		//line2:
+		spanTokens.clear();
+		spanTokens.add(docTokens.get(1));
+		spanTokens.add(docTokens.get(2));
+		spanTokens.add(docTokens.get(3));
+		spanTokens.add(docTokens.get(4));
+		sSpan = docGraph.createSSpan(spanTokens);
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
+		docTextNodes.add(sSpan);
+		
+		//line3:
+		spanTokens.clear();
+		spanTokens.add(docTokens.get(5));
+		spanTokens.add(docTokens.get(6));
+		spanTokens.add(docTokens.get(7));
+		spanTokens.add(docTokens.get(8));
+		spanTokens.add(docTokens.get(9));
+		spanTokens.add(docTokens.get(10));
+		sSpan = docGraph.createSSpan(spanTokens);
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
+		docTextNodes.add(sSpan);
+		
+		/* setting variables */		
+		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_TEXTSTRUCTURE);
+		tmpOut.getParentFile().mkdirs();
+		PrintWriter p = new PrintWriter(tmpOut);		
+		p.println(outStream.toString());
+		p.close();
+		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
+		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT, false);
+		
+		/* start mapper */
+		System.out.println(tmpOut);		
+		this.getFixture().mapSDocument();
+		
+		System.out.println("============================================");
+		System.out.println("TESTING TEXT STRUCTURE ANNOTATION");
+		System.out.println("--------------------------------------------");
+		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("");
+		System.out.println("============================================");
+		
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
+		assertEquals(1, fixGraph.getSLayerByName(TCFMapperImport.LAYER_TEXTSTRUCTURE).size());
+		EList<SNode> fixTextNodes = fixGraph.getSLayerByName(TCFMapperImport.LAYER_TEXTSTRUCTURE).get(0).getSNodes();
+		assertEquals(docTextNodes.size(), fixTextNodes.size());
+		SNode docNode = null;
+		SNode fixNode = null;
+		for(int i=0; i<docTextNodes.size(); i++){
+			docNode = docTextNodes.get(i);
+			fixNode = fixTextNodes.get(i);
+			assertTrue(fixNode instanceof SSpan);
+			assertEquals(docNode.getSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE+"::"+TCFDictionary.ATT_TYPE), docNode.getSAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE+"::"+TCFDictionary.ATT_TYPE));
+			assertEquals(docGraph.getSText(docNode), fixGraph.getSText(fixNode));
+		}
+	}
 }

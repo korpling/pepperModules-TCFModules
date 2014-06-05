@@ -3644,7 +3644,7 @@ public class TCFMapperImportTest {
 						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t2");
 						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "");
 						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "test");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "anaphoric");
+						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "non-anaphoric");
 						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc5");
 						xmlWriter.writeEndElement();
 						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);
@@ -4118,7 +4118,7 @@ public class TCFMapperImportTest {
 						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t3 t4");//no clearly identified head
 						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "name");
 						xmlWriter.writeEndElement();//End of NY-1
-						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2 ("it")
 						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
 						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t6");
 						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t6");
@@ -4126,7 +4126,7 @@ public class TCFMapperImportTest {
 						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "anaphoric");
 						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc1");
 						xmlWriter.writeEndElement();//End of NY-2
-						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2
+						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2 ("the most beautiful place")
 						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
 						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t8 t9 t10 t11");
 						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t11");//we choose the nominal head, not the determiner
@@ -4176,18 +4176,15 @@ public class TCFMapperImportTest {
 		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(9), STYPE_NAME.SSPANNING_RELATION);
 		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(10), STYPE_NAME.SSPANNING_RELATION);		
 		theMostBeautifulPlace.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "noun");		
-		docTokens.get(10).addSAnnotation(refHead);		
-		reference.setSSource(theMostBeautifulPlace);
-		reference.setSTarget(newYork);
+		docTokens.get(10).addSAnnotation(refHead);
+		reference = (SPointingRelation)docGraph.addSNode(theMostBeautifulPlace, newYork, STYPE_NAME.SPOINTING_RELATION);
 		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "non-anaphoric");
 		docRefLayer.getSNodes().add(theMostBeautifulPlace);
 		docRefLayer.getSRelations().add(reference);
 		///"it"
 		docTokens.get(5).createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");		
 		docTokens.get(5).addSAnnotation(refHead);
-		reference = SaltFactory.eINSTANCE.createSPointingRelation();
-		reference.setSSource(docTokens.get(5));
-		reference.setSTarget(newYork);
+		reference = (SPointingRelation)docGraph.addSNode(docTokens.get(5), newYork, STYPE_NAME.SPOINTING_RELATION);
 		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "anaphoric");
 		docRefLayer.getSNodes().add(docTokens.get(5));
 		docRefLayer.getSRelations().add(reference);
@@ -4228,6 +4225,48 @@ public class TCFMapperImportTest {
 		assertNotNull(fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET));
 		assertEquals(docRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET).getValue(), fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET).getValue());
 		assertEquals(docRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET).getValue(), fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET).getValue());
+		
+		StringBuilder tree = new StringBuilder();
+		int j;
+		System.out.println("FIX:");
+		for(SNode sNode : fixGraph.getSNodes()){
+			tree.append(fixGraph.getSText(sNode));
+			tree.append("--");
+			j=0;
+			if(sNode.getOutgoingSRelations().size()>0){
+				while(!(sNode.getOutgoingSRelations().get(j) instanceof SPointingRelation)){
+					j++;
+					if(j==sNode.getOutgoingSRelations().size()){break;}				
+				}
+				if(j<sNode.getOutgoingSRelations().size()){
+					tree.append(sNode.getOutgoingSRelations().get(j).getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL).getValue());
+					tree.append("->");
+					tree.append(fixGraph.getSText((SNode)sNode.getOutgoingSRelations().get(j).getTarget()));
+					System.out.println(tree.toString());								
+				}
+			}
+			tree.delete(0, tree.length());
+		}
+		//doc
+		System.out.println("DOC:");
+		for(SNode sNode : docGraph.getSNodes()){
+			tree.append(docGraph.getSText(sNode));
+			tree.append("--");
+			j=0;
+			if(sNode.getOutgoingSRelations().size()>0){
+				while(!(sNode.getOutgoingSRelations().get(j) instanceof SPointingRelation)){
+					j++;
+					if(j==sNode.getOutgoingSRelations().size()){break;}				
+				}
+				if(j<sNode.getOutgoingSRelations().size()){
+					tree.append(sNode.getOutgoingSRelations().get(j).getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL).getValue());
+					tree.append("->");
+					tree.append(docGraph.getSText((SNode)sNode.getOutgoingSRelations().get(j).getTarget()));
+					System.out.println(tree.toString());								
+				}
+			}
+			tree.delete(0, tree.length());
+		}
 		
 		SRelation docRef = null;
 		SRelation fixRef = null;

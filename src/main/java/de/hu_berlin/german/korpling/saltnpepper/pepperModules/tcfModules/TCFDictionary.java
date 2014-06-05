@@ -84,6 +84,10 @@ public interface TCFDictionary{
 	public static final String TAG_COMPONENTS= "Components";
 	/** constant to address the xml-element 'WebServiceToolChain'. **/
 	public static final String TAG_WEBSERVICETOOLCHAIN= "WebServiceToolChain";
+	/** constant to address the xml-element 'ResourceTitle'. **/
+	public static final String TAG_RESOURCETITLE= "ResourceTitle";
+	/** constant to address the xml-element 'Version'. **/
+	public static final String TAG_VERSION= "Version";
 	/** constant to address the xml-element 'tc:lemmas'. **/
 	public static final String TAG_TC_LEMMAS= "lemmas";
 	/** constant to address the xml-element 'tc:sentence'. **/
@@ -158,9 +162,81 @@ public interface TCFDictionary{
 	public static final String TAG_TC_DISCOURSECONNECTIVES = "discourseconnectives";
 	/** constant to address the xml-element 'discourseconnectives' **/
 	public static final String TAG_TC_CONNECTIVE = "connective";
+	/** constant to address the xml-element 'MdCreator' **/
+	public static final String TAG_MDCREATOR = "MdCreator";
+	/** constant to address the xml-element 'MdCreationDate' **/
+	public static final String TAG_MDCREATIONDATE = "MdCreationDate";
+	/** constant to address the xml-element 'MdSelfLink' **/
+	public static final String TAG_MDSELFLINK = "MdSelfLink";
+	/** constant to address the xml-element 'MdProfile' **/
+	public static final String TAG_MDPROFILE = "MdProfile";
+	/** constant to address the xml-element 'MdCollectionDisplayName' **/
+	public static final String TAG_MDCOLLECTIONDISPLAYNAME = "MdCollectionDisplayName";
+	/** constant to address the xml-element 'ResourceProxy' **/
+	public static final String TAG_RESOURCEPROXY = "ResourceProxy";
+	/** constant to address the xml-element 'ResourceType' **/
+	public static final String TAG_RESOURCETYPE = "ResourceType";
+	/** constant to address the xml-element 'ResourceRef' **/
+	public static final String TAG_RESOURCEREF = "ResourceRef";
+	/** constant to address the xml-element 'JournalFileProxy' **/
+	public static final String TAG_JOURNALFILEPROXY = "JournalFileProxy";
+	/** constant to address the xml-element 'JournalFileRef' **/
+	public static final String TAG_JOURNALFILEREF = "JournalFileRef";
+	/** constant to address the xml-element 'ResourceRelation' **/
+	public static final String TAG_RESOURCERELATION = "ResourceRelation";
+	/** constant to address the xml-element 'RelationType' **/
+	public static final String TAG_RELATIONTYPE = "RelationType";
+	/** constant to address the xml-element 'Res1' **/
+	public static final String TAG_RES1 = "Res1";
+	/** constant to address the xml-element 'Res2' **/
+	public static final String TAG_RES2 = "Res2";
+	/** constant to address the xml-element 'IsPartOfList' **/
+	public static final String TAG_ISPARTOFLIST = "IsPartOfList";
+	/** constant to address the xml-element 'IsPartOf' **/
+	public static final String TAG_ISPARTOF = "IsPartOf";
+	/** constant to address the xml-element 'LifeCycleStatus'. **/
+	public static final String TAG_LIFECYCLESTATUS= "LifeCycleStatus";
+	/** constant to address the xml-element 'StartYear'. **/
+	public static final String TAG_STARTYEAR= "StartYear";
+	/** constant to address the xml-element 'CompletionYear'. **/
+	public static final String TAG_COMPLETIONYEAR= "CompletionYear";
+	/** constant to address the xml-element 'PublicationDate'. **/
+	public static final String TAG_PUBLICATIONDATE= "PublicationDate";
+	/** constant to address the xml-element 'LastUpdate'. **/
+	public static final String TAG_LASTUPDATE= "LastUpdate";
+	/** constant to address the xml-element 'TimeCoverage'. **/
+	public static final String TAG_TIMECOVERAGE= "TimeCoverage";
+	/** constant to address the xml-element 'LegalOwner'. **/
+	public static final String TAG_LEGALOWNER= "LegalOwner";
+	/** constant to address the xml-element 'Genre'. **/
+	public static final String TAG_GENRE= "Genre";
+	/** constant to address the xml-element 'Location'. **/
+	public static final String TAG_LOCATION= "Location";
+	/** constant to address the xml-element 'Adress'. **/
+	public static final String TAG_ADDRESS= "Adress";
+	/** constant to address the xml-element 'Region'. **/
+	public static final String TAG_REGION= "Region";
+	/** constant to address the xml-element 'ContinentName'. **/
+	public static final String TAG_CONTINENTNAME= "ContinentName";
+	/** constant to address the xml-element 'Country'. **/
+	public static final String TAG_COUNTRY= "Country";
+	/** constant to address the xml-element 'CountryName'. **/
+	public static final String TAG_COUNTRYNAME= "CountryName";
+	/** constant to address the xml-element 'CountryCoding'. **/
+	public static final String TAG_COUNTRYCODING= "CountryCoding";
+	/** constant to address the xml-element 'tags'. **/
+	public static final String TAG_TAGS= "tags";
+	/** constant to address the xml-element 'tag'. **/
+	public static final String TAG_TAG= "tag";
 	
+	/** constant to address the xml-attribute 'ref'. **/
+	public static final String ATT_REF= "ref";
+	/** constant to address the xml-attribute 'ComponentId'. **/
+	public static final String ATT_COMPONENTID= "ComponentId";
 	/** constant to address the xml-attribute 'cat'. **/
 	public static final String ATT_CAT= "cat";
+	/** constant to address the xml-attribute 'mimetype'. **/
+	public static final String ATT_MIMETYPE= "mimetype";
 	/** constant to address the xml-attribute 'CMDVersion'. **/
 	public static final String ATT_CMDVERSION= "CMDVersion";
 	/** constant to address the xml-attribute 'tagset'. **/

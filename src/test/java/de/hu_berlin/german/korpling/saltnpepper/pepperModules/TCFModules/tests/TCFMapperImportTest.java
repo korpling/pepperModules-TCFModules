@@ -4032,480 +4032,480 @@ public class TCFMapperImportTest {
 		/*TODO compare head markings*/
 	}
 	
-	/**This method tests if a valid TCF-XML-structure containing reference
-	 * annotations is converted to salt correctly by {@link TCFMapperImport} 
-	 * @throws XMLStreamException 
-	 * @throws FileNotFoundException 
-	 */
-	@Test
-	public void testReferencesShrinkedIgnoreIds() throws XMLStreamException, FileNotFoundException{
-		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		XMLOutputFactory o= XMLOutputFactory.newFactory();
-		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
-		
-		xmlWriter.writeStartDocument();
-		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
-		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
-		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
-		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
-		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
-		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
-		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
-		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
-			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
-			xmlWriter.writeEndElement();
-			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
-				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
-					xmlWriter.writeCharacters(EXAMPLE_TEXT_REFERENCE);
-				xmlWriter.writeEndElement();
-				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
-						xmlWriter.writeCharacters("I");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
-						xmlWriter.writeCharacters("love");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
-						xmlWriter.writeCharacters("New");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
-						xmlWriter.writeCharacters("York");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
-						xmlWriter.writeCharacters(".");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
-						xmlWriter.writeCharacters("It");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
-						xmlWriter.writeCharacters("is");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
-						xmlWriter.writeCharacters("the");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
-						xmlWriter.writeCharacters("most");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
-						xmlWriter.writeCharacters("beautiful");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
-						xmlWriter.writeCharacters("place");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t12");
-						xmlWriter.writeCharacters(".");
-					xmlWriter.writeEndElement();
-				xmlWriter.writeEndElement();
-				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCES, TCFDictionary.NS_VALUE_TC);
-				xmlWriter.writeAttribute(TCFDictionary.ATT_TYPETAGSET, "unknown");
-				xmlWriter.writeAttribute(TCFDictionary.ATT_RELTAGSET, "unknown");					
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ENTITY, TCFDictionary.NS_VALUE_TC);//entity "New York"
-						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-1
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3 t4");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t3 t4");//no clearly identified head
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "name");
-						xmlWriter.writeEndElement();//End of NY-1
-						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2 ("it")
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t6");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t6");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "pronoun");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "anaphoric");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc1");
-						xmlWriter.writeEndElement();//End of NY-2
-						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2 ("the most beautiful place")
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t8 t9 t10 t11");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t11");//we choose the nominal head, not the determiner
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "noun");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "non-anaphoric");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc1");
-						xmlWriter.writeEndElement();//End of NY-3
-					xmlWriter.writeEndElement();//End of entity "New York"
-				xmlWriter.writeEndElement();
-			xmlWriter.writeEndElement();
-		xmlWriter.writeEndElement();
-		xmlWriter.writeEndDocument();
-	
-		/* generating salt sample */
-		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
-		SDocumentGraph docGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
-		doc.setSDocumentGraph(docGraph);
-		docGraph.createSTextualDS(EXAMPLE_TEXT_REFERENCE);
-		docGraph.tokenize();
-		EList<SToken> docTokens = docGraph.getSTokens();
-		
-		//head marker:
-		SAnnotation refHead = SaltFactory.eINSTANCE.createSAnnotation();
-		refHead.setName(TCFMapperImport.HEAD_MARKER);
-		refHead.setValue(TCFMapperImport.HEAD_MARKER);
-		
-		//reference layer:
-		SLayer docRefLayer = SaltFactory.eINSTANCE.createSLayer();
-		docRefLayer.setSName(TCFMapperImport.LAYER_REFERENCES);
-		docRefLayer.createSMetaAnnotation(null, TCFDictionary.ATT_TYPETAGSET, "unknown");
-		docRefLayer.createSMetaAnnotation(null, TCFDictionary.ATT_RELTAGSET, "unknown");
-		
-		//relation:
-		SPointingRelation reference = SaltFactory.eINSTANCE.createSPointingRelation();
-		
-		//entity "New York":
-		///"New York"
-		SSpan newYork = docGraph.createSSpan(docTokens.get(2));
-		docGraph.addSNode(newYork, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
-		newYork.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "name");
-		docTokens.get(2).addSAnnotation(refHead);
-		docTokens.get(3).addSAnnotation(refHead);
-		docRefLayer.getSNodes().add(newYork);		
-		///"the most beautiful place"
-		SSpan theMostBeautifulPlace = docGraph.createSSpan(docTokens.get(7));
-		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(8), STYPE_NAME.SSPANNING_RELATION);
-		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(9), STYPE_NAME.SSPANNING_RELATION);
-		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(10), STYPE_NAME.SSPANNING_RELATION);		
-		theMostBeautifulPlace.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "noun");		
-		docTokens.get(10).addSAnnotation(refHead);
-		reference = (SPointingRelation)docGraph.addSNode(theMostBeautifulPlace, newYork, STYPE_NAME.SPOINTING_RELATION);
-		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "non-anaphoric");
-		docRefLayer.getSNodes().add(theMostBeautifulPlace);
-		docRefLayer.getSRelations().add(reference);
-		///"it"
-		docTokens.get(5).createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");		
-		docTokens.get(5).addSAnnotation(refHead);
-		reference = (SPointingRelation)docGraph.addSNode(docTokens.get(5), newYork, STYPE_NAME.SPOINTING_RELATION);
-		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "anaphoric");
-		docRefLayer.getSNodes().add(docTokens.get(5));
-		docRefLayer.getSRelations().add(reference);
-		
-		/* setting variables */		
-		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_REFERENCES);
-		tmpOut.getParentFile().mkdirs();
-		PrintWriter p = new PrintWriter(tmpOut);		
-		p.println(outStream.toString());
-		p.close();
-		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
-		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
-		
-		/* start mapper */
-		System.out.println(tmpOut);		
-		this.getFixture().mapSDocument();
-		
-		System.out.println("============================================");
-		System.out.println("TESTING REFERENCE ANNOTATION (SHRINKED)");
-		System.out.println("--------------------------------------------");
-		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
-		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
-		System.out.println("--------------------------------------------");
-		System.out.println("IGNORE IDS");
-		System.out.println("============================================");
-		
-		/* compare template salt model to imported salt model */		
-		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
-		assertNotNull(fixGraph.getSLayerByName(TCFMapperImport.LAYER_REFERENCES));
-		SLayer fixRefLayer = fixGraph.getSLayerByName(TCFMapperImport.LAYER_REFERENCES).get(0);
-		assertFalse(fixRefLayer.getSNodes().isEmpty());
-		assertFalse(fixRefLayer.getSRelations().isEmpty());		
-		assertEquals(docRefLayer.getSNodes().size(), fixRefLayer.getSNodes().size());
-		EList<SRelation> docReferences = docRefLayer.getSRelations();
-		EList<SRelation> fixReferences = fixRefLayer.getSRelations();
-		assertEquals(docReferences.size(), fixReferences.size());
-		assertNotNull(fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET));
-		assertNotNull(fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET));
-		assertEquals(docRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET).getValue(), fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET).getValue());
-		assertEquals(docRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET).getValue(), fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET).getValue());
-		
-		StringBuilder tree = new StringBuilder();
-		int j;
-		System.out.println("FIX:");
-		for(SNode sNode : fixGraph.getSNodes()){
-			tree.append(fixGraph.getSText(sNode));
-			tree.append("--");
-			j=0;
-			if(sNode.getOutgoingSRelations().size()>0){
-				while(!(sNode.getOutgoingSRelations().get(j) instanceof SPointingRelation)){
-					j++;
-					if(j==sNode.getOutgoingSRelations().size()){break;}				
-				}
-				if(j<sNode.getOutgoingSRelations().size()){
-					tree.append(sNode.getOutgoingSRelations().get(j).getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL).getValue());
-					tree.append("->");
-					tree.append(fixGraph.getSText((SNode)sNode.getOutgoingSRelations().get(j).getTarget()));
-					System.out.println(tree.toString());								
-				}
-			}
-			tree.delete(0, tree.length());
-		}
-		//doc
-		System.out.println("DOC:");
-		for(SNode sNode : docGraph.getSNodes()){
-			tree.append(docGraph.getSText(sNode));
-			tree.append("--");
-			j=0;
-			if(sNode.getOutgoingSRelations().size()>0){
-				while(!(sNode.getOutgoingSRelations().get(j) instanceof SPointingRelation)){
-					j++;
-					if(j==sNode.getOutgoingSRelations().size()){break;}				
-				}
-				if(j<sNode.getOutgoingSRelations().size()){
-					tree.append(sNode.getOutgoingSRelations().get(j).getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL).getValue());
-					tree.append("->");
-					tree.append(docGraph.getSText((SNode)sNode.getOutgoingSRelations().get(j).getTarget()));
-					System.out.println(tree.toString());								
-				}
-			}
-			tree.delete(0, tree.length());
-		}
-		
-		SRelation docRef = null;
-		SRelation fixRef = null;
-		for(int i=0; i<docReferences.size(); i++){
-			docRef = docReferences.get(i);
-			fixRef = fixReferences.get(i);
-			/* compare source */
-			assertNotNull(fixRef.getSSource());
-			assertEquals(docGraph.getSText(docRef.getSSource()), fixGraph.getSText(fixRef.getSSource()));
-			assertNotNull(fixRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
-			assertEquals(docRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());
-			assertEquals(docRef.getSSource().getClass(), fixRef.getSSource().getClass());
-			/* compare relation */
-			assertNotNull(fixRef.getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL));
-			/* compare target */
-			assertNotNull(fixRef.getSTarget());
-			assertEquals(docGraph.getSText(docRef.getSTarget()), fixGraph.getSText(fixRef.getSTarget()));
-			assertNotNull(fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
-			assertEquals(docRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());
-			assertEquals(docRef.getSTarget().getClass(), fixRef.getSTarget().getClass());
-		}
-		/*TODO compare head markings*/
-	}
-	
-	/**This method tests if a valid TCF-XML-structure containing reference
-	 * annotations is converted to salt correctly by {@link TCFMapperImport} 
-	 * @throws XMLStreamException 
-	 * @throws FileNotFoundException 
-	 */
-	@Test
-	public void testReferencesNotShrinkedIgnoreIds() throws XMLStreamException, FileNotFoundException{
-		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		XMLOutputFactory o= XMLOutputFactory.newFactory();
-		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
-		
-		xmlWriter.writeStartDocument();
-		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
-		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
-		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
-		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
-		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
-		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
-		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
-		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
-			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
-			xmlWriter.writeEndElement();
-			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
-				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
-					xmlWriter.writeCharacters(EXAMPLE_TEXT_REFERENCE);
-				xmlWriter.writeEndElement();
-				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
-						xmlWriter.writeCharacters("I");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
-						xmlWriter.writeCharacters("love");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
-						xmlWriter.writeCharacters("New");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
-						xmlWriter.writeCharacters("York");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
-						xmlWriter.writeCharacters(".");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
-						xmlWriter.writeCharacters("It");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
-						xmlWriter.writeCharacters("is");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
-						xmlWriter.writeCharacters("the");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
-						xmlWriter.writeCharacters("most");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
-						xmlWriter.writeCharacters("beautiful");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
-						xmlWriter.writeCharacters("place");
-					xmlWriter.writeEndElement();
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t12");
-						xmlWriter.writeCharacters(".");
-					xmlWriter.writeEndElement();
-				xmlWriter.writeEndElement();
-				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCES, TCFDictionary.NS_VALUE_TC);
-				xmlWriter.writeAttribute(TCFDictionary.ATT_TYPETAGSET, "unknown");
-				xmlWriter.writeAttribute(TCFDictionary.ATT_RELTAGSET, "unknown");					
-					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ENTITY, TCFDictionary.NS_VALUE_TC);//entity "New York"
-						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-1
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3 t4");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t3 t4");//no clearly identified head
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "name");
-						xmlWriter.writeEndElement();//End of NY-1
-						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t6");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t6");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "pronoun");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "anaphoric");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc1");
-						xmlWriter.writeEndElement();//End of NY-2
-						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2
-						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t8 t9 t10 t11");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t11");//we choose the nominal head, not the determiner
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "noun");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "non-anaphoric");
-						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc1");
-						xmlWriter.writeEndElement();//End of NY-3
-					xmlWriter.writeEndElement();//End of entity "New York"
-				xmlWriter.writeEndElement();
-			xmlWriter.writeEndElement();
-		xmlWriter.writeEndElement();
-		xmlWriter.writeEndDocument();
-	
-		/* generating salt sample */
-		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
-		SDocumentGraph docGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
-		doc.setSDocumentGraph(docGraph);
-		docGraph.createSTextualDS(EXAMPLE_TEXT_REFERENCE);
-		docGraph.tokenize();
-		EList<SToken> docTokens = docGraph.getSTokens();
-		
-		//head marker:
-		SAnnotation refHead = SaltFactory.eINSTANCE.createSAnnotation();
-		refHead.setName(TCFMapperImport.HEAD_MARKER);
-		refHead.setValue(TCFMapperImport.HEAD_MARKER);
-		
-		//reference layer:
-		SLayer docRefLayer = SaltFactory.eINSTANCE.createSLayer();
-		docRefLayer.setSName(TCFMapperImport.LAYER_REFERENCES);
-		docRefLayer.createSMetaAnnotation(null, TCFDictionary.ATT_TYPETAGSET, "unknown");
-		docRefLayer.createSMetaAnnotation(null, TCFDictionary.ATT_RELTAGSET, "unknown");
-		
-		//relation:
-		SPointingRelation reference = SaltFactory.eINSTANCE.createSPointingRelation();
-		
-		//entity "New York":
-		///"New York"
-		SSpan newYork = docGraph.createSSpan(docTokens.get(2));
-		docGraph.addSNode(newYork, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
-		newYork.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "name");
-		docTokens.get(2).addSAnnotation(refHead);
-		docTokens.get(3).addSAnnotation(refHead);
-		docRefLayer.getSNodes().add(newYork);		
-		///"the most beautiful place"
-		SSpan theMostBeautifulPlace = docGraph.createSSpan(docTokens.get(7));
-		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(8), STYPE_NAME.SSPANNING_RELATION);
-		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(9), STYPE_NAME.SSPANNING_RELATION);
-		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(10), STYPE_NAME.SSPANNING_RELATION);		
-		theMostBeautifulPlace.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "noun");		
-		docTokens.get(10).addSAnnotation(refHead);		
-		reference.setSSource(theMostBeautifulPlace);
-		reference.setSTarget(newYork);
-		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "non-anaphoric");
-		docRefLayer.getSNodes().add(theMostBeautifulPlace);
-		docRefLayer.getSRelations().add(reference);
-		///"it"
-		SSpan it = docGraph.createSSpan(docTokens.get(5));
-		it.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");		
-		it.addSAnnotation(refHead);
-		reference = SaltFactory.eINSTANCE.createSPointingRelation();
-		reference.setSSource(it);
-		reference.setSTarget(newYork);
-		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "anaphoric");
-		docRefLayer.getSNodes().add(it);
-		docRefLayer.getSRelations().add(reference);
-		
-		/* setting variables */		
-		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_REFERENCES);
-		tmpOut.getParentFile().mkdirs();
-		PrintWriter p = new PrintWriter(tmpOut);		
-		p.println(outStream.toString());
-		p.close();
-		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
-		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
-		
-		/* start mapper */
-		System.out.println(tmpOut);		
-		this.getFixture().mapSDocument();
-		
-		/* compare template salt model to imported salt model */		
-		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
-		assertNotNull(fixGraph.getSLayerByName(TCFMapperImport.LAYER_REFERENCES));
-		SLayer fixRefLayer = fixGraph.getSLayerByName(TCFMapperImport.LAYER_REFERENCES).get(0);
-		assertFalse(fixRefLayer.getSNodes().isEmpty());
-		assertFalse(fixRefLayer.getSRelations().isEmpty());		
-		assertEquals(docRefLayer.getSNodes().size(), fixRefLayer.getSNodes().size());
-		EList<SRelation> docReferences = docRefLayer.getSRelations();
-		EList<SRelation> fixReferences = fixRefLayer.getSRelations();
-		assertEquals(docReferences.size(), fixReferences.size());
-		assertNotNull(fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET));
-		assertNotNull(fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET));
-		assertEquals(docRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET).getValue(), fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET).getValue());
-		assertEquals(docRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET).getValue(), fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET).getValue());
-		
-		SRelation docRef = null;
-		SRelation fixRef = null;
-		for(int i=0; i<docReferences.size(); i++){
-			docRef = docReferences.get(i);
-			fixRef = fixReferences.get(i);
-			/* compare source */
-			assertNotNull(fixRef.getSSource());
-			assertEquals(docGraph.getSText(docRef.getSSource()), fixGraph.getSText(fixRef.getSSource()));
-			//type SSpan?			
-			assertTrue(fixRef.getSSource() instanceof SSpan);			
-			//compare annotations
-			assertNotNull(fixRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
-			assertEquals(docRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());			
-			/* compare relation */
-			assertNotNull(fixRef.getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL));
-			/* compare target */
-			assertNotNull(fixRef.getSTarget());
-			assertEquals(docGraph.getSText(docRef.getSTarget()), fixGraph.getSText(fixRef.getSTarget()));
-			//type SSpan?
-			assertTrue(fixRef.getSSource() instanceof SSpan);
-			//compare annotations
-			assertNotNull(fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
-			assertEquals(docRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());			
-		}
-		/*TODO compare head markings*/
-	}
+//	/**This method tests if a valid TCF-XML-structure containing reference
+//	 * annotations is converted to salt correctly by {@link TCFMapperImport} 
+//	 * @throws XMLStreamException 
+//	 * @throws FileNotFoundException 
+//	 */
+//	@Test
+//	public void testReferencesShrinkedIgnoreIds() throws XMLStreamException, FileNotFoundException{
+//		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+//		XMLOutputFactory o= XMLOutputFactory.newFactory();
+//		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
+//		
+//		xmlWriter.writeStartDocument();
+//		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+//		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+//		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+//		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+//		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+//		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+//		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+//		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
+//			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+//			xmlWriter.writeEndElement();
+//			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+//					xmlWriter.writeCharacters(EXAMPLE_TEXT_REFERENCE);
+//				xmlWriter.writeEndElement();
+//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+//						xmlWriter.writeCharacters("I");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+//						xmlWriter.writeCharacters("love");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+//						xmlWriter.writeCharacters("New");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+//						xmlWriter.writeCharacters("York");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+//						xmlWriter.writeCharacters(".");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
+//						xmlWriter.writeCharacters("It");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
+//						xmlWriter.writeCharacters("is");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
+//						xmlWriter.writeCharacters("the");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
+//						xmlWriter.writeCharacters("most");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
+//						xmlWriter.writeCharacters("beautiful");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
+//						xmlWriter.writeCharacters("place");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t12");
+//						xmlWriter.writeCharacters(".");
+//					xmlWriter.writeEndElement();
+//				xmlWriter.writeEndElement();
+//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCES, TCFDictionary.NS_VALUE_TC);
+//				xmlWriter.writeAttribute(TCFDictionary.ATT_TYPETAGSET, "unknown");
+//				xmlWriter.writeAttribute(TCFDictionary.ATT_RELTAGSET, "unknown");					
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ENTITY, TCFDictionary.NS_VALUE_TC);//entity "New York"
+//						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-1
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3 t4");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t3 t4");//no clearly identified head
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "name");
+//						xmlWriter.writeEndElement();//End of NY-1
+//						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2 ("it")
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t6");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t6");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "pronoun");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "anaphoric");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc1");
+//						xmlWriter.writeEndElement();//End of NY-2
+//						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2 ("the most beautiful place")
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t8 t9 t10 t11");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t11");//we choose the nominal head, not the determiner
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "noun");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "non-anaphoric");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc1");
+//						xmlWriter.writeEndElement();//End of NY-3
+//					xmlWriter.writeEndElement();//End of entity "New York"
+//				xmlWriter.writeEndElement();
+//			xmlWriter.writeEndElement();
+//		xmlWriter.writeEndElement();
+//		xmlWriter.writeEndDocument();
+//	
+//		/* generating salt sample */
+//		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+//		SDocumentGraph docGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
+//		doc.setSDocumentGraph(docGraph);
+//		docGraph.createSTextualDS(EXAMPLE_TEXT_REFERENCE);
+//		docGraph.tokenize();
+//		EList<SToken> docTokens = docGraph.getSTokens();
+//		
+//		//head marker:
+//		SAnnotation refHead = SaltFactory.eINSTANCE.createSAnnotation();
+//		refHead.setName(TCFMapperImport.HEAD_MARKER);
+//		refHead.setValue(TCFMapperImport.HEAD_MARKER);
+//		
+//		//reference layer:
+//		SLayer docRefLayer = SaltFactory.eINSTANCE.createSLayer();
+//		docRefLayer.setSName(TCFMapperImport.LAYER_REFERENCES);
+//		docRefLayer.createSMetaAnnotation(null, TCFDictionary.ATT_TYPETAGSET, "unknown");
+//		docRefLayer.createSMetaAnnotation(null, TCFDictionary.ATT_RELTAGSET, "unknown");
+//		
+//		//relation:
+//		SPointingRelation reference = SaltFactory.eINSTANCE.createSPointingRelation();
+//		
+//		//entity "New York":
+//		///"New York"
+//		SSpan newYork = docGraph.createSSpan(docTokens.get(2));
+//		docGraph.addSNode(newYork, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
+//		newYork.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "name");
+//		docTokens.get(2).addSAnnotation(refHead);
+//		docTokens.get(3).addSAnnotation(refHead);
+//		docRefLayer.getSNodes().add(newYork);		
+//		///"the most beautiful place"
+//		SSpan theMostBeautifulPlace = docGraph.createSSpan(docTokens.get(7));
+//		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(8), STYPE_NAME.SSPANNING_RELATION);
+//		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(9), STYPE_NAME.SSPANNING_RELATION);
+//		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(10), STYPE_NAME.SSPANNING_RELATION);		
+//		theMostBeautifulPlace.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "noun");		
+//		docTokens.get(10).addSAnnotation(refHead);
+//		reference = (SPointingRelation)docGraph.addSNode(theMostBeautifulPlace, newYork, STYPE_NAME.SPOINTING_RELATION);
+//		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "non-anaphoric");
+//		docRefLayer.getSNodes().add(theMostBeautifulPlace);
+//		docRefLayer.getSRelations().add(reference);
+//		///"it"
+//		docTokens.get(5).createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");		
+//		docTokens.get(5).addSAnnotation(refHead);
+//		reference = (SPointingRelation)docGraph.addSNode(docTokens.get(5), newYork, STYPE_NAME.SPOINTING_RELATION);
+//		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "anaphoric");
+//		docRefLayer.getSNodes().add(docTokens.get(5));
+//		docRefLayer.getSRelations().add(reference);
+//		
+//		/* setting variables */		
+//		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_REFERENCES);
+//		tmpOut.getParentFile().mkdirs();
+//		PrintWriter p = new PrintWriter(tmpOut);		
+//		p.println(outStream.toString());
+//		p.close();
+//		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+//		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, true);
+//		
+//		/* start mapper */
+//		System.out.println(tmpOut);		
+//		this.getFixture().mapSDocument();
+//		
+//		System.out.println("============================================");
+//		System.out.println("TESTING REFERENCE ANNOTATION (SHRINKED)");
+//		System.out.println("--------------------------------------------");
+//		System.out.println("SHRINK TOKEN ANNOTATIONS:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS).getValue().toString());
+//		System.out.println("USE COMMON ANNOTATED ELEMENT:\t"+this.getFixture().getProperties().getProperty(TCFImporterProperties.PROP_USE_COMMON_ANNOTATED_ELEMENT).getValue().toString());
+//		System.out.println("--------------------------------------------");
+//		System.out.println("IGNORE IDS");
+//		System.out.println("============================================");
+//		
+//		/* compare template salt model to imported salt model */		
+//		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
+//		assertNotNull(fixGraph.getSLayerByName(TCFMapperImport.LAYER_REFERENCES));
+//		SLayer fixRefLayer = fixGraph.getSLayerByName(TCFMapperImport.LAYER_REFERENCES).get(0);
+//		assertFalse(fixRefLayer.getSNodes().isEmpty());
+//		assertFalse(fixRefLayer.getSRelations().isEmpty());		
+//		assertEquals(docRefLayer.getSNodes().size(), fixRefLayer.getSNodes().size());
+//		EList<SRelation> docReferences = docRefLayer.getSRelations();
+//		EList<SRelation> fixReferences = fixRefLayer.getSRelations();
+//		assertEquals(docReferences.size(), fixReferences.size());
+//		assertNotNull(fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET));
+//		assertNotNull(fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET));
+//		assertEquals(docRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET).getValue(), fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET).getValue());
+//		assertEquals(docRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET).getValue(), fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET).getValue());
+//		
+//		StringBuilder tree = new StringBuilder();
+//		int j;
+//		System.out.println("FIX:");
+//		for(SNode sNode : fixGraph.getSNodes()){
+//			tree.append(fixGraph.getSText(sNode));
+//			tree.append("--");
+//			j=0;
+//			if(sNode.getOutgoingSRelations().size()>0){
+//				while(!(sNode.getOutgoingSRelations().get(j) instanceof SPointingRelation)){
+//					j++;
+//					if(j==sNode.getOutgoingSRelations().size()){break;}				
+//				}
+//				if(j<sNode.getOutgoingSRelations().size()){
+//					tree.append(sNode.getOutgoingSRelations().get(j).getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL).getValue());
+//					tree.append("->");
+//					tree.append(fixGraph.getSText((SNode)sNode.getOutgoingSRelations().get(j).getTarget()));
+//					System.out.println(tree.toString());								
+//				}
+//			}
+//			tree.delete(0, tree.length());
+//		}
+//		//doc
+//		System.out.println("DOC:");
+//		for(SNode sNode : docGraph.getSNodes()){
+//			tree.append(docGraph.getSText(sNode));
+//			tree.append("--");
+//			j=0;
+//			if(sNode.getOutgoingSRelations().size()>0){
+//				while(!(sNode.getOutgoingSRelations().get(j) instanceof SPointingRelation)){
+//					j++;
+//					if(j==sNode.getOutgoingSRelations().size()){break;}				
+//				}
+//				if(j<sNode.getOutgoingSRelations().size()){
+//					tree.append(sNode.getOutgoingSRelations().get(j).getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL).getValue());
+//					tree.append("->");
+//					tree.append(docGraph.getSText((SNode)sNode.getOutgoingSRelations().get(j).getTarget()));
+//					System.out.println(tree.toString());								
+//				}
+//			}
+//			tree.delete(0, tree.length());
+//		}
+//		
+//		SRelation docRef = null;
+//		SRelation fixRef = null;
+//		for(int i=0; i<docReferences.size(); i++){
+//			docRef = docReferences.get(i);
+//			fixRef = fixReferences.get(i);
+//			/* compare source */
+//			assertNotNull(fixRef.getSSource());
+//			assertEquals(docGraph.getSText(docRef.getSSource()), fixGraph.getSText(fixRef.getSSource()));
+//			assertNotNull(fixRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
+//			assertEquals(docRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());
+//			assertEquals(docRef.getSSource().getClass(), fixRef.getSSource().getClass());
+//			/* compare relation */
+//			assertNotNull(fixRef.getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL));
+//			/* compare target */
+//			assertNotNull(fixRef.getSTarget());
+//			assertEquals(docGraph.getSText(docRef.getSTarget()), fixGraph.getSText(fixRef.getSTarget()));
+//			assertNotNull(fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
+//			assertEquals(docRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());
+//			assertEquals(docRef.getSTarget().getClass(), fixRef.getSTarget().getClass());
+//		}
+//		/*TODO compare head markings*/
+//	}
+//	
+//	/**This method tests if a valid TCF-XML-structure containing reference
+//	 * annotations is converted to salt correctly by {@link TCFMapperImport} 
+//	 * @throws XMLStreamException 
+//	 * @throws FileNotFoundException 
+//	 */
+//	@Test
+//	public void testReferencesNotShrinkedIgnoreIds() throws XMLStreamException, FileNotFoundException{
+//		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+//		XMLOutputFactory o= XMLOutputFactory.newFactory();
+//		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
+//		
+//		xmlWriter.writeStartDocument();
+//		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
+//		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
+//		xmlWriter.writeNamespace(TCFDictionary.NS_WL, TCFDictionary.NS_VALUE_WL);
+//		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
+//		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
+//		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
+//		xmlWriter.writeNamespace(TCFDictionary.NS_TC, TCFDictionary.NS_VALUE_TC);
+//		xmlWriter.writeAttribute(TCFDictionary.ATT_VERSION, "4.0");
+//			xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
+//			xmlWriter.writeEndElement();
+//			xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
+//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
+//					xmlWriter.writeCharacters(EXAMPLE_TEXT_REFERENCE);
+//				xmlWriter.writeEndElement();
+//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t1");
+//						xmlWriter.writeCharacters("I");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t2");
+//						xmlWriter.writeCharacters("love");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t3");
+//						xmlWriter.writeCharacters("New");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t4");
+//						xmlWriter.writeCharacters("York");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t5");
+//						xmlWriter.writeCharacters(".");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t6");
+//						xmlWriter.writeCharacters("It");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t7");
+//						xmlWriter.writeCharacters("is");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t8");
+//						xmlWriter.writeCharacters("the");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t9");
+//						xmlWriter.writeCharacters("most");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t10");
+//						xmlWriter.writeCharacters("beautiful");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t11");
+//						xmlWriter.writeCharacters("place");
+//					xmlWriter.writeEndElement();
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t12");
+//						xmlWriter.writeCharacters(".");
+//					xmlWriter.writeEndElement();
+//				xmlWriter.writeEndElement();
+//				xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCES, TCFDictionary.NS_VALUE_TC);
+//				xmlWriter.writeAttribute(TCFDictionary.ATT_TYPETAGSET, "unknown");
+//				xmlWriter.writeAttribute(TCFDictionary.ATT_RELTAGSET, "unknown");					
+//					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_ENTITY, TCFDictionary.NS_VALUE_TC);//entity "New York"
+//						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-1
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t3 t4");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t3 t4");//no clearly identified head
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "name");
+//						xmlWriter.writeEndElement();//End of NY-1
+//						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t6");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t6");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "pronoun");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "anaphoric");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc1");
+//						xmlWriter.writeEndElement();//End of NY-2
+//						xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_REFERENCE, TCFDictionary.NS_VALUE_TC);//NY-2
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "rc1");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t8 t9 t10 t11");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_MINTOKIDS, "t11");//we choose the nominal head, not the determiner
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "noun");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_REL, "non-anaphoric");
+//						xmlWriter.writeAttribute(TCFDictionary.ATT_TARGET, "rc1");
+//						xmlWriter.writeEndElement();//End of NY-3
+//					xmlWriter.writeEndElement();//End of entity "New York"
+//				xmlWriter.writeEndElement();
+//			xmlWriter.writeEndElement();
+//		xmlWriter.writeEndElement();
+//		xmlWriter.writeEndDocument();
+//	
+//		/* generating salt sample */
+//		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
+//		SDocumentGraph docGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
+//		doc.setSDocumentGraph(docGraph);
+//		docGraph.createSTextualDS(EXAMPLE_TEXT_REFERENCE);
+//		docGraph.tokenize();
+//		EList<SToken> docTokens = docGraph.getSTokens();
+//		
+//		//head marker:
+//		SAnnotation refHead = SaltFactory.eINSTANCE.createSAnnotation();
+//		refHead.setName(TCFMapperImport.HEAD_MARKER);
+//		refHead.setValue(TCFMapperImport.HEAD_MARKER);
+//		
+//		//reference layer:
+//		SLayer docRefLayer = SaltFactory.eINSTANCE.createSLayer();
+//		docRefLayer.setSName(TCFMapperImport.LAYER_REFERENCES);
+//		docRefLayer.createSMetaAnnotation(null, TCFDictionary.ATT_TYPETAGSET, "unknown");
+//		docRefLayer.createSMetaAnnotation(null, TCFDictionary.ATT_RELTAGSET, "unknown");
+//		
+//		//relation:
+//		SPointingRelation reference = SaltFactory.eINSTANCE.createSPointingRelation();
+//		
+//		//entity "New York":
+//		///"New York"
+//		SSpan newYork = docGraph.createSSpan(docTokens.get(2));
+//		docGraph.addSNode(newYork, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
+//		newYork.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "name");
+//		docTokens.get(2).addSAnnotation(refHead);
+//		docTokens.get(3).addSAnnotation(refHead);
+//		docRefLayer.getSNodes().add(newYork);		
+//		///"the most beautiful place"
+//		SSpan theMostBeautifulPlace = docGraph.createSSpan(docTokens.get(7));
+//		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(8), STYPE_NAME.SSPANNING_RELATION);
+//		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(9), STYPE_NAME.SSPANNING_RELATION);
+//		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(10), STYPE_NAME.SSPANNING_RELATION);		
+//		theMostBeautifulPlace.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "noun");		
+//		docTokens.get(10).addSAnnotation(refHead);		
+//		reference.setSSource(theMostBeautifulPlace);
+//		reference.setSTarget(newYork);
+//		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "non-anaphoric");
+//		docRefLayer.getSNodes().add(theMostBeautifulPlace);
+//		docRefLayer.getSRelations().add(reference);
+//		///"it"
+//		SSpan it = docGraph.createSSpan(docTokens.get(5));
+//		it.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");		
+//		it.addSAnnotation(refHead);
+//		reference = SaltFactory.eINSTANCE.createSPointingRelation();
+//		reference.setSSource(it);
+//		reference.setSTarget(newYork);
+//		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "anaphoric");
+//		docRefLayer.getSNodes().add(it);
+//		docRefLayer.getSRelations().add(reference);
+//		
+//		/* setting variables */		
+//		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_REFERENCES);
+//		tmpOut.getParentFile().mkdirs();
+//		PrintWriter p = new PrintWriter(tmpOut);		
+//		p.println(outStream.toString());
+//		p.close();
+//		this.getFixture().setResourceURI(URI.createFileURI(tmpOut.getAbsolutePath()));
+//		this.getFixture().getProperties().setPropertyValue(TCFImporterProperties.PROP_SHRINK_TOKEN_ANNOTATIONS, false);
+//		
+//		/* start mapper */
+//		System.out.println(tmpOut);		
+//		this.getFixture().mapSDocument();
+//		
+//		/* compare template salt model to imported salt model */		
+//		SDocumentGraph fixGraph = this.getFixture().getSDocument().getSDocumentGraph();
+//		assertNotNull(fixGraph.getSLayerByName(TCFMapperImport.LAYER_REFERENCES));
+//		SLayer fixRefLayer = fixGraph.getSLayerByName(TCFMapperImport.LAYER_REFERENCES).get(0);
+//		assertFalse(fixRefLayer.getSNodes().isEmpty());
+//		assertFalse(fixRefLayer.getSRelations().isEmpty());		
+//		assertEquals(docRefLayer.getSNodes().size(), fixRefLayer.getSNodes().size());
+//		EList<SRelation> docReferences = docRefLayer.getSRelations();
+//		EList<SRelation> fixReferences = fixRefLayer.getSRelations();
+//		assertEquals(docReferences.size(), fixReferences.size());
+//		assertNotNull(fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET));
+//		assertNotNull(fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET));
+//		assertEquals(docRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET).getValue(), fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_TYPETAGSET).getValue());
+//		assertEquals(docRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET).getValue(), fixRefLayer.getSMetaAnnotation(TCFDictionary.ATT_RELTAGSET).getValue());
+//		
+//		SRelation docRef = null;
+//		SRelation fixRef = null;
+//		for(int i=0; i<docReferences.size(); i++){
+//			docRef = docReferences.get(i);
+//			fixRef = fixReferences.get(i);
+//			/* compare source */
+//			assertNotNull(fixRef.getSSource());
+//			assertEquals(docGraph.getSText(docRef.getSSource()), fixGraph.getSText(fixRef.getSSource()));
+//			//type SSpan?			
+//			assertTrue(fixRef.getSSource() instanceof SSpan);			
+//			//compare annotations
+//			assertNotNull(fixRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
+//			assertEquals(docRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getSSource().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());			
+//			/* compare relation */
+//			assertNotNull(fixRef.getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL));
+//			/* compare target */
+//			assertNotNull(fixRef.getSTarget());
+//			assertEquals(docGraph.getSText(docRef.getSTarget()), fixGraph.getSText(fixRef.getSTarget()));
+//			//type SSpan?
+//			assertTrue(fixRef.getSSource() instanceof SSpan);
+//			//compare annotations
+//			assertNotNull(fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
+//			assertEquals(docRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());			
+//		}
+//		/*TODO compare head markings*/
+//	}
 	
 	/**This method tests if a valid TCF-XML-structure containing phonetic
 	 * annotation is converted to salt correctly

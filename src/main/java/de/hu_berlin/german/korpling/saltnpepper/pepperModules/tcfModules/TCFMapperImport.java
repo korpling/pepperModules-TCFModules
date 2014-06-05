@@ -2,8 +2,6 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 
 import java.util.Stack;
 
-import javax.sound.midi.SysexMessage;
-
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EList;
@@ -16,7 +14,6 @@ import org.xml.sax.ext.DefaultHandler2;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.TCFModules.tests.TCFMapperImportTest;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -30,7 +27,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SLemmaAnnotation;
 
 public class TCFMapperImport extends PepperMapperImpl{
@@ -460,7 +456,6 @@ public class TCFMapperImport extends PepperMapperImpl{
 				}else if(ignoreIds){
 					idPath.push(currentSNode.getSId().toString());//target of all the others
 				}
-				System.out.println("STACK(idPath) sais: "+idPath.peek()+ (ignoreIds ? "ignoreIds" : ""));
 			}
 			else if (TAG_TC_NAMEDENTITIES.equals(localName)){
 				SLayer namedEntities = buildLayer(LAYER_NE);		
@@ -749,8 +744,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 				if(chars.length()>0){getSDocument().createSMetaAnnotation(null, TAG_MDCOLLECTIONDISPLAYNAME, chars.toString());}
 			}
 			else if (TAG_TC_TEXTCORPUS.equals(localName)){				
-				System.out.println("Bye bye");
-				System.exit(0);				
+//				System.out.println("Bye bye");
+//				System.exit(0);				
 			}
 		}
 		

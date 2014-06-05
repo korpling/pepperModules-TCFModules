@@ -8,7 +8,7 @@ This module has been developed in corporation of the [Clarin-D](http://de.clarin
   
 License
 -------
-Copyright 2014 Clarin-D, Humboldt University of Berlin.
+Copyright 2014 Clarin-D, Humboldt Universität zu Berlin.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

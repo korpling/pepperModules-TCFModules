@@ -725,9 +725,9 @@ public class TCFMapperImport extends PepperMapperImpl{
 			return newLayer;
 		}
 		
-		private Label annotateSNode(SNode sNode, String namespace, String name, String value, boolean acceptNullValue, boolean isMetaAnnotation){			
+		private Label annotateSNode(SNode sNode, String namespace, String name, String value, boolean acceptEmptyOrNullValues, boolean isMetaAnnotation){			
 			if(sNode==null || name==null){return null;}
-			if(value==null && !acceptNullValue){return null;}
+			if((value==null || value.isEmpty()) && !acceptEmptyOrNullValues){return null;}
 			String qName = namespace==null ? name : namespace+"::"+name;
 			Label anno = isMetaAnnotation ? sNode.getSMetaAnnotation(qName) : sNode.getSAnnotation(qName);
 			if(anno!=null){

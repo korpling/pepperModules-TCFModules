@@ -29,10 +29,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SLemmaAnnotation;
 
-public class TCFMapperImport extends PepperMapperImpl{
-//CHECK-ASK: might it be better to implement and extension of PepperMapperImpl here?	
+public class TCFMapperImport extends PepperMapperImpl{	
 		
-	/* TODO CHECK rethink organisation of constant strings */
 	public static final String LEVEL_SENTENCE = "sentence";
 	public static final String LAYER_POS = "pos";
 	public static final String LAYER_DEPENDENCIES = "dependencies";
@@ -271,6 +269,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_TC_TEXTCORPUS.equals(localName)){				
 				annotateSNode(getSDocument(), null, ATT_LANG, attributes.getValue(ATT_LANG), false, true);
+				/* work-around to get document name: */
+				annotateSNode(getSDocument(), null, "document", getSDocument().getSName(), false, true);
 			}
 			else if (TAG_TC_LEMMA.equals(localName)){
 				if(chars.length()>0){chars.delete(0, chars.length());}

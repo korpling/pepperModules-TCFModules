@@ -276,11 +276,11 @@ public class TCFMapperImport extends PepperMapperImpl{
 				metaId = 0;
 				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAGS).append(CLN).append(ATT_COMPONENTID).toString(), attributes.getValue(ATT_COMPONENTID), false, true);						
 			}
-			else if (TAG_TAG.equals(localName)){
-				metaId++;
-				chars.delete(0, chars.length());
-				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAG).append(metaId).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
-			}
+//			else if (TAG_TAG.equals(localName)){
+//				metaId++;
+//				chars.delete(0, chars.length());
+//				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAG).append(metaId).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
+//			}
 			else if (TAG_TC_CONSTITUENT.equals(localName)){
 				String constID = attributes.getValue(ATT_ID);
 				if(!ignoreIds){ignoreIds = (constID==null);}
@@ -880,9 +880,9 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_DESCRIPTION.equals(localName)){
 				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_DESCRIPTION).append(metaId).toString(), chars.toString(), false, true);
 			}
-			else if (TAG_TAG.equals(localName)){
-				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAG).append(metaId).toString(), chars.toString(), false, true);
-			}
+//			else if (TAG_TAG.equals(localName)){
+//				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAG).append(metaId).toString(), chars.toString(), false, true);
+//			}
 			else if (TAG_PID.equals(localName)){
 				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_TOOLCHAIN).append(CLN).append(TAG_TOOLINCHAIN).append(metaId).append(CLN).append(TAG_PID).toString(), chars.toString(), false, true);
 			}

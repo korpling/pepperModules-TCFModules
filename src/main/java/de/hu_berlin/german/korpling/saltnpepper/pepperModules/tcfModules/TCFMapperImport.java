@@ -531,9 +531,9 @@ public class TCFMapperImport extends PepperMapperImpl{
 				}
 			}
 			else if (TAG_TC_NAMEDENTITIES.equals(localName)){
-				SLayer namedEntities = buildLayer(LAYER_NE);		
+				SLayer namedEntities = buildLayer(LAYER_NE);
 				String annoVal = attributes.getValue(ATT_TYPE);
-				if(annoVal!=null){namedEntities.createSMetaAnnotation(null, ATT_TYPE, annoVal);}				
+				if(annoVal!=null){namedEntities.createSMetaAnnotation(null, ATT_TYPE, annoVal);}
 			}
 			else if (TAG_TC_PHONETICS.equals(localName)){
 				SLayer phoLayer = buildLayer(LAYER_PHONETICS);

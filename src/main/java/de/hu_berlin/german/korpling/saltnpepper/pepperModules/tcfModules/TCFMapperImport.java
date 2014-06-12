@@ -276,11 +276,6 @@ public class TCFMapperImport extends PepperMapperImpl{
 				metaId = 0;
 				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAGS).append(CLN).append(ATT_COMPONENTID).toString(), attributes.getValue(ATT_COMPONENTID), false, true);						
 			}
-//			else if (TAG_TAG.equals(localName)){
-//				metaId++;
-//				chars.delete(0, chars.length());
-//				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAG).append(metaId).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
-//			}
 			else if (TAG_TC_CONSTITUENT.equals(localName)){
 				String constID = attributes.getValue(ATT_ID);
 				if(!ignoreIds){ignoreIds = (constID==null);}
@@ -372,8 +367,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_TC_TEXTCORPUS.equals(localName)){				
 				annotateSNode(getSDocument(), null, ATT_LANG, attributes.getValue(ATT_LANG), false, true);
 				/* work-around to get document name: */
-				Label anno = annotateSNode(getSDocument(), null, "document", getSDocument().getSName(), false, true);
-				System.out.println("document="+anno.getValue());
+				annotateSNode(getSDocument(), null, "document", getSDocument().getSName(), false, true);		
 			}
 			else if (TAG_TC_LEMMA.equals(localName)){
 				if(chars.length()>0){chars.delete(0, chars.length());}
@@ -448,15 +442,21 @@ public class TCFMapperImport extends PepperMapperImpl{
 				 * and not in morphology (both use tag "tag").
 				 * tag in morphology does not contain attributes.
 				 */
+				path.pop();
 				if(chars.length()>0){chars.delete(0, chars.length());}
-				if(attributes.getValue(ATT_TOKENIDS)!=null){
+				if(/*attributes.getValue(ATT_TOKENIDS)!=null*/TAG_TC_POSTAGS.equals(path.peek())){
 					/* build node for pos annotation */
 					currentNodeID = attributes.getValue(ATT_TOKENIDS);
 					currentAnnoID = attributes.getValue(ATT_ID);
 					SNode sNode = getSNode(currentNodeID);					
 					sLayers.get(LAYER_POS).getSNodes().add(sNode);
 					currentSNode = sNode;
-				}				
+				}
+				else if(TAG_TAGS.equals(path.peek())){
+					metaId++;
+					chars.delete(0, chars.length());
+					annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAG).append(metaId).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
+				}
 			}
 			else if (TAG_TC_POSTAGS.equals(localName)){
 				SLayer posLayer = buildLayer(LAYER_POS);
@@ -716,12 +716,15 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if(TAG_TC_TAG.equals(localName)){
 				/* build annotation – only use in POS */
-				path.pop();
+				//path is popped after opening tag
 				if(TAG_TC_POSTAGS.equals(path.peek())){
 					SAnnotation sAnno = SaltFactory.eINSTANCE.createSPOSAnnotation();
 					sAnno.setValue(chars.toString());
 					currentSNode.addSAnnotation(sAnno);
 					labels.put(currentAnnoID, sAnno);
+				}
+				if(TAG_TAGS.equals(localName)){
+					annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAG).append(metaId).toString(), chars.toString(), false, true);
 				}
 			}
 			else if(TAG_TC_F.equals(localName)){
@@ -880,9 +883,6 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_DESCRIPTION.equals(localName)){
 				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_DESCRIPTION).append(metaId).toString(), chars.toString(), false, true);
 			}
-//			else if (TAG_TAG.equals(localName)){
-//				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAG).append(metaId).toString(), chars.toString(), false, true);
-//			}
 			else if (TAG_PID.equals(localName)){
 				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_TOOLCHAIN).append(CLN).append(TAG_TOOLINCHAIN).append(metaId).append(CLN).append(TAG_PID).toString(), chars.toString(), false, true);
 			}

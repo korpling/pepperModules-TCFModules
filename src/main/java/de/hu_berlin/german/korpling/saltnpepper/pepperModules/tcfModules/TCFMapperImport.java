@@ -52,6 +52,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 	public static final String STYPE_REFERENCE = "reference";
 	public static final String STYPE_DEPENDENCY = "dependency";
 	
+	private static final String BAD_TOKENIZATION_ERROR_MESSAGE = "Bad tokenization: Full text not matching token text! Conversion can produce errors!";
+		
 	private static final String REF_SEPERATOR = "%%%";
 	public static final String ANNO_NAME_CONSTITUENT = "const";
 	
@@ -88,9 +90,11 @@ public class TCFMapperImport extends PepperMapperImpl{
 		private SNode currentSNode;
 		/* head annotation */
 		private SAnnotation head;
-		/* internal id */
-		private int id = 0;
+		/* internal ids */
+		private int id;
+		private int metaId;
 		private static final String REF_PREFIX = "reference-";
+		private static final String CLN = ":";
 		/* properties */
 		private boolean shrinkTokenAnnotations;
 		private boolean useCommonAnnotatedElement;
@@ -98,7 +102,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 		private boolean ignoreIds;
 		
 		public TCFReader(){
-			super();
+			super();			
 			sNodes = new BasicEMap<String, SNode>();
 			labels = new BasicEMap<String, Label>();
 			sLayers = new BasicEMap<String, SLayer>();
@@ -117,7 +121,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 			useCommonAnnotatedElement = ((TCFImporterProperties)getProperties()).isUseCommonAnnotatedElement();
 			logger.info(shrinkTokenAnnotations ? "shrinkTokenAnnotations=true" : "shrinkTokenAnnotations=false - import might take a little longer");
 			ignoreIds = false;
-			id = 0;		
+			id = 0;	
+			metaId = 0;
 		}
 		
 		@Override
@@ -128,7 +133,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 		{
 			localName = qName.substring(qName.lastIndexOf(":")+1);
 			path.push(localName);
-			logger.debug((new StringBuilder()).append(localName).append(REF_SEPERATOR).append(attributes.toString()).toString());
+			logger.debug((new StringBuilder()).append(localName).append(REF_SEPERATOR).append(attributes.getLength()).toString());
+			System.out.println((new StringBuilder()).append(localName).append(REF_SEPERATOR).append(attributes.getLength()>0 ? attributes.getValue(0) : "-").toString());
 			if (TAG_TC_TOKENS.equals(localName)){				
 			}
 			else if (TAG_MDCREATOR.equals(localName)){
@@ -146,17 +152,48 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_MDCOLLECTIONDISPLAYNAME.equals(localName)){
 				chars.delete(0, chars.length());
 			}
-			else if (TAG_PID.equals(localName)){
+			else if (TAG_ISPARTOFLIST.equals(localName)){
+				metaId = 0;
+			}
+			else if (TAG_ISPARTOF.equals(localName)){
+				chars.delete(0, chars.length());
+				metaId++;
 			}
 			else if (TAG_RESOURCERELATIONLIST.equals(localName)){
+				metaId = 0;
+			}
+			else if (TAG_RESOURCERELATION.equals(localName)){
+				metaId++;
+			}
+			else if (TAG_RELATIONTYPE.equals(localName)){
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_RES1.equals(localName)){
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_RES2.equals(localName)){
+				chars.delete(0, chars.length());
 			}
 			else if (TAG_JOURNALFILEPROXYLIST.equals(localName)){
+				metaId = 0;
+			}
+			else if (TAG_JOURNALFILEPROXY.equals(localName)){
+				metaId++;
+			}
+			else if (TAG_JOURNALFILEREF.equals(localName)){
+				chars.delete(0, chars.length());
 			}
 			else if (TAG_WL_D_SPIN.equals(localName)){
 			}
-			else if (TAG_RESOURCENAME.equals(localName)){
-			}
 			else if (TAG_DESCRIPTIONS.equals(localName)){
+				metaId = 0;
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_DESCRIPTIONS).toString(), attributes.getValue(ATT_COMPONENTID), false, true);
+			}
+			else if (TAG_DESCRIPTION.equals(localName)){
+				metaId++;
+				chars.delete(0, chars.length());
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_DESCRIPTION).append(metaId).append(CLN).append(ATT_TYPE).toString(), attributes.getValue(ATT_TYPE), false, true);
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_DESCRIPTION).append(metaId).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
 			}
 			else if (TAG_TC_PARSING.equals(localName)){
 				currentNodeID = null;
@@ -165,14 +202,84 @@ public class TCFMapperImport extends PepperMapperImpl{
 				syntaxLayer.createSAnnotation(null, ATT_TAGSET, attributes.getValue(ATT_TAGSET));
 			}
 			else if (TAG_GENERALINFO.equals(localName)){
+				metaId = 0;
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(ATT_COMPONENTID).toString(), attributes.getValue(ATT_COMPONENTID), false, true);				
+			}
+			else if (TAG_RESOURCENAME.equals(localName)){
+				chars.delete(0, chars.length());
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_RESOURCENAME).append(++metaId).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
+			}
+			else if (TAG_RESOURCETITLE.equals(localName)){
+				chars.delete(0, chars.length());
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_RESOURCETITLE).append(++metaId).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
+			}
+			else if (TAG_RESOURCECLASS.equals(localName)){
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_TIMECOVERAGE.equals(localName)){
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_LEGALOWNER.equals(localName)){
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_GENRE.equals(localName)){
 				chars.delete(0, chars.length());
 			}
 			else if (TAG_CMD.equals(localName)){
 				annotateSNode(getSDocument(), null, ATT_CMDVERSION, attributes.getValue(ATT_CMDVERSION), false, true);
 			}
-			else if (TAG_RESOURCECLASS.equals(localName)){
+			else if (TAG_VERSION.equals(localName)){
+				chars.delete(0, chars.length());
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_VERSION).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
 			}
-			else if (TAG_HEADER.equals(localName)){
+			else if (TAG_LIFECYCLESTATUS.equals(localName)){				
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_STARTYEAR.equals(localName)){
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_COMPLETIONYEAR.equals(localName)){
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_PUBLICATIONDATE.equals(localName)){
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_LASTUPDATE.equals(localName)){
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_LOCATION.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_LOCATION).append(CLN).append(ATT_COMPONENTID).toString(), attributes.getValue(ATT_COMPONENTID), false, true);
+			}
+			else if (TAG_ADDRESS.equals(localName)){
+				chars.delete(0, chars.length());
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_ADDRESS).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
+			}
+			else if (TAG_REGION.equals(localName)){
+				chars.delete(0, chars.length());
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_REGION).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
+			}
+			else if (TAG_CONTINENTNAME.equals(localName)){
+				chars.delete(0, chars.length());
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_CONTINENTNAME).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
+			}
+			else if (TAG_COUNTRYNAME.equals(localName)){
+				chars.delete(0, chars.length());
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_COUNTRY).append(CLN).append(TAG_COUNTRYNAME).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
+			}
+			else if (TAG_COUNTRYCODING.equals(localName)){
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_COUNTRY.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_COUNTRY).append(CLN).append(ATT_COMPONENTID).toString(), attributes.getValue(ATT_COMPONENTID), false, true);
+			}
+			else if (TAG_TAGS.equals(localName)){
+				metaId = 0;
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAGS).append(CLN).append(ATT_COMPONENTID).toString(), attributes.getValue(ATT_COMPONENTID), false, true);						
+			}
+			else if (TAG_TAG.equals(localName)){
+				metaId++;
+				chars.delete(0, chars.length());
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAG).append(metaId).append(CLN).append(ATT_LANG).toString(), attributes.getValue(ATT_LANG), false, true);
 			}
 			else if (TAG_TC_CONSTITUENT.equals(localName)){
 				String constID = attributes.getValue(ATT_ID);
@@ -215,8 +322,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 						idPath.push(tokenIDs);
 					}
 					else{
-						/* single token */						
-						/*TODO ask yourself, if a single token can be the direct root not governed by a phrase*/						
+						/* single token */					
 						if(shrinkTokenAnnotations){
 							sNode = (SToken)sNodes.get(tokenIDs);
 						}
@@ -261,16 +367,13 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_TC_SENTENCES.equals(localName)){
 				buildLayer(LAYER_SENTENCES);
 			}
-			else if (TAG_PARAMETER.equals(localName)){
-			}
 			else if (TAG_MD_METADATA.equals(localName)){
-			}
-			else if (TAG_DESCRIPTION.equals(localName)){
 			}
 			else if (TAG_TC_TEXTCORPUS.equals(localName)){				
 				annotateSNode(getSDocument(), null, ATT_LANG, attributes.getValue(ATT_LANG), false, true);
 				/* work-around to get document name: */
-				annotateSNode(getSDocument(), null, "document", getSDocument().getSName(), false, true);
+				Label anno = annotateSNode(getSDocument(), null, "document", getSDocument().getSName(), false, true);
+				System.out.println("document="+anno.getValue());
 			}
 			else if (TAG_TC_LEMMA.equals(localName)){
 				if(chars.length()>0){chars.delete(0, chars.length());}
@@ -279,8 +382,6 @@ public class TCFMapperImport extends PepperMapperImpl{
 				SNode sNode = getSNode(currentNodeID);			
 				sLayers.get(LAYER_LEMMA).getSNodes().add(sNode);
 				currentSNode = sNode;
-			}
-			else if (TAG_TOOLINCHAIN.equals(localName)){
 			}
 			else if (TAG_TC_TEXT.equals(localName)){
 				STextualDS primaryText = SaltFactory.eINSTANCE.createSTextualDS();
@@ -292,14 +393,21 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_RESOURCEPROXYLIST.equals(localName)){
 				chars.delete(0, chars.length());
+				metaId = 0;
+			}
+			else if (TAG_RESOURCEPROXY.equals(localName)){
+				metaId++;
+			}
+			else if (TAG_RESOURCETYPE.equals(localName)){
+				chars.delete(0, chars.length());
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_RESOURCEPROXY).append(metaId).append(TAG_RESOURCETYPE).append(":").append(ATT_MIMETYPE).toString(), attributes.getValue(ATT_MIMETYPE), false, true);
+			}
+			else if (TAG_RESOURCEREF.equals(localName)){
+				chars.delete(0, chars.length());
 			}
 			else if (TAG_TC_TOKEN.equals(localName)){
 				currentNodeID = attributes.getValue(TCFDictionary.ATT_ID);
 				if(chars.length()>0){chars.delete(0, chars.length());}
-			}
-			else if (TAG_COMPONENTS.equals(localName)){
-			}
-			else if (TAG_WEBSERVICETOOLCHAIN.equals(localName)){
 			}
 			else if (TAG_TC_LEMMAS.equals(localName)){
 				buildLayer(LAYER_LEMMA);
@@ -318,6 +426,22 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_MD_SERVICES.equals(localName)){
 			}
 			else if (TAG_TOOLCHAIN.equals(localName)){
+				metaId = 0;
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_TOOLCHAIN).append(CLN).append(ATT_COMPONENTID).toString(), attributes.getValue(ATT_COMPONENTID), false, true);
+			}
+			else if (TAG_TOOLINCHAIN.equals(localName)){
+				metaId++;
+				id = 0; //we use the reference id as parameter id since it is free for use at this point
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_TOOLCHAIN).append(CLN).append(TAG_TOOLINCHAIN).append(metaId).append(CLN).append(ATT_COMPONENTID).toString(), attributes.getValue(ATT_COMPONENTID), false, true);
+			}
+			else if (TAG_PID.equals(localName)){
+				chars.delete(0, chars.length());
+			}
+			else if (TAG_PARAMETER.equals(localName)){
+				chars.delete(0, chars.length());
+				id++;
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_TOOLCHAIN).append(CLN).append(TAG_TOOLINCHAIN).append(metaId).append(CLN).append(TAG_PARAMETER).append(id).append(CLN).append(ATT_NAME).toString(), attributes.getValue(ATT_NAME), false, true);
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_TOOLCHAIN).append(CLN).append(TAG_TOOLINCHAIN).append(metaId).append(CLN).append(TAG_PARAMETER).append(id).append(CLN).append(ATT_VALUE).toString(), attributes.getValue(ATT_VALUE), false, true);
 			}
 			else if (TAG_TC_TAG.equals(localName)){
 				/* first check, if we are really in postags 
@@ -361,6 +485,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				sLayers.put(LAYER_TCF_MORPHOLOGY, tcfMorphLayer);
 			}
 			else if (TAG_TC_REFERENCES.equals(localName)){
+				id = 0; //we might have used it in meta data (actually the start value doesn't matter here)
 				ignoreIds = false;
 				currentNodeID = null;
 				SLayer refLayer = buildLayer(LAYER_REFERENCES);				
@@ -615,11 +740,16 @@ public class TCFMapperImport extends PepperMapperImpl{
 				/* build token */				
 				String primaryData = currentSTDS.getSText();
 				String tok = chars.toString();
-				while(!primaryData.substring(p).startsWith(tok)){
-					p++;
+				System.out.println("tok= ["+tok+"]");
+				while(p<primaryData.length() && !primaryData.substring(p).startsWith(tok)){					
+					p++;					
 				}
-				
-				sNodes.put(currentNodeID, getSDocGraph().createSToken(currentSTDS, p, p+tok.length()));
+				if(p==primaryData.length()){
+					logger.error((new StringBuilder()).append(BAD_TOKENIZATION_ERROR_MESSAGE).append(" ").append(currentNodeID).toString());
+					//FAIL!
+				}else{
+					sNodes.put(currentNodeID, getSDocGraph().createSToken(currentSTDS, p, p+tok.length()));	
+				}				
 			}
 			else if(TAG_TC_SEGMENT.equals(localName)){
 				/* build annotation TODO */
@@ -641,11 +771,6 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_TC_SPLIT.equals(localName)){
 				currentSNode.createSAnnotation(LAYER_SPLITTINGS, TAG_TC_SPLIT, chars.toString());
-			}
-			else if (TAG_RESOURCEPROXYLIST.equals(localName)){				
-			}
-			else if (TAG_RESOURCEPROXY.equals(localName)){	
-				
 			}
 			else if (TAG_MDCREATOR.equals(localName)){
 				if(chars.length()>0){
@@ -670,6 +795,99 @@ public class TCFMapperImport extends PepperMapperImpl{
 				if(chars.length()>0){getSDocument().createSMetaAnnotation(null, TAG_MDCOLLECTIONDISPLAYNAME, chars.toString());}
 			}
 			else if (TAG_TC_TEXTCORPUS.equals(localName)){							
+			}
+			else if (TAG_RESOURCETYPE.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_RESOURCEPROXY).append(metaId).append(TAG_RESOURCETYPE).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_RESOURCEREF.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_RESOURCEPROXY).append(metaId).append(TAG_RESOURCEREF).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_JOURNALFILEREF.equals(localName)){
+				annotateSNode(getSDocument(), null, TAG_JOURNALFILEPROXY+metaId, chars.toString(), false, true);
+			}
+			else if (TAG_RELATIONTYPE.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_RESOURCERELATION).append(metaId).append(":").append(TAG_RELATIONTYPE).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_RES1.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_RESOURCERELATION).append(metaId).append(":").append(TAG_RES1).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_RES2.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_RESOURCERELATION).append(metaId).append(":").append(TAG_RES2).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_ISPARTOF.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_ISPARTOFLIST).append(":").append(TAG_ISPARTOF).append(metaId).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_RESOURCENAME.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_RESOURCENAME).append(metaId).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_RESOURCETITLE.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_RESOURCETITLE).append(metaId).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_RESOURCETITLE.equals(localName)){
+				String qN = (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_RESOURCECLASS).toString();
+				annotateSNode(getSDocument(), null, qN, (getSDocument().getSMetaAnnotation(qN)==null ? chars.toString() : getSDocument().getSMetaAnnotation(qN).getValue()+"; "+chars.toString()), false, true);
+			}
+			else if (TAG_VERSION.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_VERSION).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_LIFECYCLESTATUS.equals(localName)){				
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_LIFECYCLESTATUS).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_STARTYEAR.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_STARTYEAR).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_COMPLETIONYEAR.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_COMPLETIONYEAR).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_PUBLICATIONDATE.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_PUBLICATIONDATE).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_LASTUPDATE.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_LASTUPDATE).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_TIMECOVERAGE.equals(localName)){
+				String qN = (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TIMECOVERAGE).toString();
+				annotateSNode(getSDocument(), null, qN, (getSDocument().getSMetaAnnotation(qN)==null ? chars.toString() : getSDocument().getSMetaAnnotation(qN).getValue()+"; "+chars.toString()), false, true);
+			}
+			else if (TAG_LEGALOWNER.equals(localName)){
+				String qN = (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_LEGALOWNER).toString();
+				annotateSNode(getSDocument(), null, qN, (getSDocument().getSMetaAnnotation(qN)==null ? chars.toString() : getSDocument().getSMetaAnnotation(qN).getValue()+"; "+chars.toString()), false, true);
+			}
+			else if (TAG_GENRE.equals(localName)){
+				String qN = (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_GENRE).toString();
+				annotateSNode(getSDocument(), null, qN, (getSDocument().getSMetaAnnotation(qN)==null ? chars.toString() : getSDocument().getSMetaAnnotation(qN).getValue()+"; "+chars.toString()), false, true);
+			}
+			else if (TAG_ADDRESS.equals(localName)){
+				String qN = (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_LOCATION).append(CLN).append(TAG_ADDRESS).toString();
+				annotateSNode(getSDocument(), null, qN, (getSDocument().getSMetaAnnotation(qN)==null ? chars.toString() : getSDocument().getSMetaAnnotation(qN).getValue()+"; "+chars.toString()), false, true);
+			}
+			else if (TAG_REGION.equals(localName)){
+				String qN = (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_LOCATION).append(CLN).append(TAG_REGION).toString();
+				annotateSNode(getSDocument(), null, qN, (getSDocument().getSMetaAnnotation(qN)==null ? chars.toString() : getSDocument().getSMetaAnnotation(qN).getValue()+"; "+chars.toString()), false, true);
+			}
+			else if (TAG_CONTINENTNAME.equals(localName)){
+				String qN = (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_LOCATION).append(CLN).append(TAG_CONTINENTNAME).toString();
+				annotateSNode(getSDocument(), null, qN, (getSDocument().getSMetaAnnotation(qN)==null ? chars.toString() : getSDocument().getSMetaAnnotation(qN).getValue()+"; "+chars.toString()), false, true);
+			}
+			else if (TAG_COUNTRYNAME.equals(localName)){
+				String qN = (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_LOCATION).append(CLN).append(TAG_COUNTRY).append(CLN).append(TAG_COUNTRYNAME).toString();
+				annotateSNode(getSDocument(), null, qN, (getSDocument().getSMetaAnnotation(qN)==null ? chars.toString() : getSDocument().getSMetaAnnotation(qN).getValue()+"; "+chars.toString()), false, true);
+			}
+			else if (TAG_COUNTRYCODING.equals(localName)){
+				String qN = (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_LOCATION).append(CLN).append(TAG_COUNTRY).append(CLN).append(TAG_COUNTRYCODING).toString();
+				annotateSNode(getSDocument(), null, qN, (getSDocument().getSMetaAnnotation(qN)==null ? chars.toString() : getSDocument().getSMetaAnnotation(qN).getValue()+"; "+chars.toString()), false, true);
+			}
+			else if (TAG_DESCRIPTION.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_DESCRIPTION).append(metaId).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_TAG.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_GENERALINFO).append(CLN).append(TAG_TAG).append(metaId).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_PID.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_TOOLCHAIN).append(CLN).append(TAG_TOOLINCHAIN).append(metaId).append(CLN).append(TAG_PID).toString(), chars.toString(), false, true);
+			}
+			else if (TAG_PARAMETER.equals(localName)){
+				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_WEBSERVICETOOLCHAIN).append(CLN).append(TAG_TOOLCHAIN).append(CLN).append(TAG_TOOLINCHAIN).append(metaId).append(CLN).append(TAG_PARAMETER).append(id).toString(), chars.toString(), false, true);
 			}
 		}
 		
@@ -738,7 +956,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				anno = isMetaAnnotation ? sNode.createSMetaAnnotation(namespace, name, value) : sNode.createSAnnotation(namespace, name, value);
 			}
 			return anno;
-		}
-}
+		}		
+	}
 
 }

@@ -151,8 +151,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 		{
 			localName = qName.substring(qName.lastIndexOf(":")+1);
 			path.push(localName);
-			logger.debug((new StringBuilder()).append(localName).append(REF_SEPERATOR).append(attributes.getLength()).toString());
-			System.out.println((new StringBuilder()).append(localName).append(REF_SEPERATOR).append(attributes.getLength()>0 ? attributes.getValue(0) : "-").toString());
+			logger.debug((new StringBuilder()).append(localName).append(REF_SEPERATOR).append(attributes.getLength()).toString());			
 			if (TAG_TC_TOKENS.equals(localName)){				
 			}
 			else if (TAG_MDCREATOR.equals(localName)){
@@ -760,7 +759,6 @@ public class TCFMapperImport extends PepperMapperImpl{
 				/* build token */				
 				String primaryData = currentSTDS.getSText();
 				String tok = chars.toString();
-				System.out.println("tok= ["+tok+"]");
 				while(p<primaryData.length() && !primaryData.substring(p).startsWith(tok)){					
 					p++;					
 				}

@@ -30,6 +30,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleDataException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
@@ -69,7 +70,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 	public static final String STYPE_REFERENCE = "reference";
 	public static final String STYPE_DEPENDENCY = "dependency";
 	
-	private static final String BAD_TOKENIZATION_ERROR_MESSAGE = "Bad tokenization: Full text not matching token text! Conversion can produce errors!";
+	private static final String BAD_TOKENIZATION_ERROR_MESSAGE = "Bad tokenization: Full text not matching token text!";
 		
 	private static final String REF_SEPERATOR = "%%%";
 	public static final String ANNO_NAME_CONSTITUENT = "const";
@@ -766,7 +767,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				}
 				if(p==primaryData.length()){
 					logger.error((new StringBuilder()).append(BAD_TOKENIZATION_ERROR_MESSAGE).append(" ").append(currentNodeID).toString());
-					//FAIL!
+					throw new PepperModuleDataException(TCFMapperImport.this, BAD_TOKENIZATION_ERROR_MESSAGE);
 				}else{
 					sNodes.put(currentNodeID, getSDocGraph().createSToken(currentSTDS, p, p+tok.length()));	
 				}				

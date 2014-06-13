@@ -345,8 +345,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 								sNode = getSDocGraph().createSSpan((SToken)sNodes.get(tokenIDs));
 								if(useCommonAnnotatedElement){sNodes.put(tokenIDs+SPAN, sNode);}// store node, if spans should be reused
 							}							
-						}
-//						if(sNode==null){sNode = getSDocGraph().createSSpan((SToken)sNodes.get(tokenIDs));} //when should this ever get null?!						
+						}					
 						annotateSNode(sNode, LAYER_CONSTITUENTS, ATT_CAT, attributes.getValue(ATT_CAT), false, false);
 						getSDocGraph().addSNode(sNodes.get(idPath.peek()), sNode, STYPE_NAME.SDOMINANCE_RELATION);
 						/*we HAVE TO push also tokens onto the stack to avoid that at the end of their xml-element the wrong constituent is popped off the stack*/

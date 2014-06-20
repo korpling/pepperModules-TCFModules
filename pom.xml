@@ -31,7 +31,7 @@
     </repository>
   </repositories>
   <!-- 	Declares this project to be an extension of the project pepper-parentModule. The parent project for instance contains all dependencies 
-		necessary for using the SaltNPepper environment (all Pepper projects and all Salt projects).-->
+		necessary for using the SaltNPepper environment (all Pepper projects and all Salt projects).--> 
   <parent>
     <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
     <artifactId>pepper-parentModule</artifactId>
@@ -52,7 +52,8 @@
   	<name>Humboldt Univerity of Berlin, INRIA</name>
   </organization>
   <scm>
-    <developerConnection>https://github.com/korpling/pepperModules-TCFModules</developerConnection>
+  	<connection>scm:git:git://github.com/korpling/pepperModules-TCFModules.git</connection>
+    <developerConnection>scm:git:git@github.com:korpling/pepperModules-TCFModules.git</developerConnection>
     <url>https://github.com/korpling/pepperModules-TCFModules</url>
   </scm>
    <build>
@@ -65,7 +66,7 @@
         	<execution>
         		<id>default</id>
         		<goals>
-        			<goal>perform</goal>
+        			<goal>perform</goal>        			
         		</goals>
         		<configuration>
         			<pomFileName>pepperModules-TCFModules/pom.xml</pomFileName>

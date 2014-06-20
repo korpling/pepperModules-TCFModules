@@ -52,8 +52,8 @@
   	<name>Humboldt Univerity of Berlin, INRIA</name>
   </organization>
   <scm>
-    <developerConnection>https://github.com/MartinKl/pepperModules-TCFModules</developerConnection>
-    <url>https://github.com/MartinKl/pepperModules-TCFModules</url>
+    <developerConnection>https://github.com/korpling/pepperModules-TCFModules</developerConnection>
+    <url>https://github.com/korpling/pepperModules-TCFModules</url>
   </scm>
    <build>
     <plugins>

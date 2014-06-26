@@ -1,13 +1,12 @@
 <?xml version='1.0'?>
-<book xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
-      version="5.0">
+<book xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
 	<info>
-		<title>SampleModules</title>
+		<title>TCFModules</title>
 		<subtitle>User&apos;s Guide</subtitle>
 		<authorgroup>
 			<author>
 				<personname><firstname>Martin</firstname>
-					<surname> Klotz</surname></personname>
+					<surname>Klotz</surname></personname>
 			</author>
 		</authorgroup>
 		<copyright>
@@ -73,51 +72,193 @@
 	</chapter>
 	<chapter xml:id="changes">
 		<title>Changes</title>
-		<para>This chapter contains the changes in version ${project.version} 
-		compared to the previous version.</para>
-		<section>
-			<title><xref linkend="sample_importer_name"/></title>
-			<itemizedlist spacing="compact">
-				<listitem>
-					<para>Change 1</para>
-					<para>Change 2</para>
-				</listitem>
-			</itemizedlist>
-		</section>
-		<section>
-			<title><xref linkend="sample_manipulator_name"/></title>
-			<itemizedlist spacing="compact">
-				<listitem>
-					<para>Change 1</para>
-					<para>Change 2</para>
-				</listitem>
-			</itemizedlist>
-		</section>
-		<section>
-			<title><xref linkend="sample_exporter_name"/></title>
-			<itemizedlist spacing="compact">
-				<listitem>
-					<para>Change 1</para>
-					<para>Change 2</para>
-				</listitem>
-			</itemizedlist>
-		</section>
+		<para>Since this is the first version to be released, there are no changes.</para>
 	</chapter>
 	<chapter xml:id="sample_importer">
-		<title xml:id="sample_importer_name">SampleImporter</title>
+		<title xml:id="sample_importer_name">TCFImporter</title>
 		<para>General information about this importer.</para>
 		<sect1>
 			<title>Mapping to Salt</title>
-			<para>This section shall describe the mapping from the original 
-			format to a Salt model.</para>
+			<para>The importer maps each TCF layer to an SLayer object in Salt. Attributes refering
+				to the TCF layer are stored as meta annotations on the SLayer itself without using a
+				namespace. All annotations contained in the TCF layer are imported as annotations on
+				SToken and/or SSpan objects where the annotation's namespace is (in most cases, cf.
+				table below) the SLayer's name and the annotation's name is the tag's name without
+				the xml namespace. Here's a list of all TCF layer's and their according
+					SLayers:<table frame="all">
+					<title>layer list</title>
+					<tgroup cols="6">
+						<colspec colname="c1" colnum="1" colwidth="1.12*"/>
+						<colspec colname="c2" colnum="2" colwidth="1.42*"/>
+						<colspec colname="newCol4" colnum="3" colwidth="1.43*"/>
+						<colspec colname="newCol5" colnum="4" colwidth="1*"/>
+						<colspec colname="newCol6" colnum="5" colwidth="1.02*"/>
+						<colspec colname="newCol3" colnum="6" colwidth="1.86*"/>
+						<thead>
+							<row>
+								<entry>TCF layer</entry>
+								<entry>SLayer's name</entry>
+								<entry>namespace of annotation</entry>
+								<entry>node annotations</entry>
+								<entry>edge annotations</entry>
+								<entry>meta annotations on SLayer</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>POSTags</entry>
+								<entry>pos</entry>
+								<entry>saltSemantics</entry>
+								<entry>POS</entry>
+								<entry>-</entry>
+								<entry>tagset</entry>
+							</row>
+							<row>
+								<entry>lemmas</entry>
+								<entry>lemma</entry>
+								<entry>saltSemantics</entry>
+								<entry>LEMMA</entry>
+								<entry>-</entry>
+								<entry>-</entry>
+							</row>
+							<row>
+								<entry>parsing</entry>
+								<entry>syntax</entry>
+								<entry>syntax</entry>
+								<entry>cat</entry>
+								<entry>-</entry>
+								<entry>tagset</entry>
+							</row>
+							<row>
+								<entry>depparsing</entry>
+								<entry>dependencies</entry>
+								<entry>dependencies</entry>
+								<entry>-</entry>
+								<entry>func</entry>
+								<entry>tagset</entry>
+							</row>
+							<row>
+								<entry>morphology</entry>
+								<entry>morphology</entry>
+								<entry>morphology</entry>
+								<entry>*</entry>
+								<entry>-</entry>
+								<entry>-</entry>
+							</row>
+							<row>
+								<entry>namedEntities</entry>
+								<entry>named entities</entry>
+								<entry>named entities</entry>
+								<entry>class</entry>
+								<entry>-</entry>
+								<entry>type</entry>
+							</row>
+							<row>
+								<entry>references</entry>
+								<entry>references</entry>
+								<entry>references</entry>
+								<entry>type</entry>
+								<entry>rel</entry>
+								<entry>typetagset, reltagset</entry>
+							</row>
+							<row>
+								<entry>synonymy</entry>
+								<entry>lexical-semantics</entry>
+								<entry>lexical-semantics</entry>
+								<entry>-</entry>
+								<entry>-</entry>
+								<entry>synonymy (on lemma annotation)</entry>
+							</row>
+							<row>
+								<entry>antonymy</entry>
+								<entry>lexical-semantics</entry>
+								<entry>lexical-semantics</entry>
+								<entry>-</entry>
+								<entry>-</entry>
+								<entry>antonymy (on lemma annotation)</entry>
+							</row>
+							<row>
+								<entry>hyponymy</entry>
+								<entry>lexical-semantics</entry>
+								<entry>lexical-semantics</entry>
+								<entry>-</entry>
+								<entry>-</entry>
+								<entry>hyponymy (on lemma annotation)</entry>
+							</row>
+							<row>
+								<entry>hyperonymy</entry>
+								<entry>lexical-semantics</entry>
+								<entry>lexical-semantics</entry>
+								<entry>-</entry>
+								<entry>-</entry>
+								<entry>hyperonymy (on lemma annotation)</entry>
+							</row>
+							<row>
+								<entry>wsd</entry>
+								<entry>wordSenseDisambiguation</entry>
+								<entry>wordSenseDisambiguation</entry>
+								<entry>lexunits, comment</entry>
+								<entry>-</entry>
+								<entry>src</entry>
+							</row>
+							<row>
+								<entry>WordSplittings</entry>
+								<entry>wordSplittings</entry>
+								<entry>wordSplittings</entry>
+								<entry>split</entry>
+								<entry>-</entry>
+								<entry>type</entry>
+							</row>
+							<row>
+								<entry>geo</entry>
+								<entry>geography</entry>
+								<entry>geography</entry>
+								<entry>alt, lat, lon, continent, country, capital</entry>
+								<entry>-</entry>
+								<entry>src</entry>
+							</row>
+							<row>
+								<entry>discourseconnectives</entry>
+								<entry>discourseConnectives</entry>
+								<entry>discourseConnectives</entry>
+								<entry>type</entry>
+								<entry>-</entry>
+								<entry>tagset</entry>
+							</row>
+							<row>
+								<entry>phonetics</entry>
+								<entry>phonetics</entry>
+								<entry>phonetics</entry>
+								<entry>pron</entry>
+								<entry>-</entry>
+								<entry>transcription</entry>
+							</row>
+							<row>
+								<entry>textstructure</entry>
+								<entry>textstructure</entry>
+								<entry>textstructure</entry>
+								<entry>type</entry>
+								<entry>-</entry>
+								<entry>-</entry>
+							</row>
+							<row>
+								<entry>orthography</entry>
+								<entry>orthography</entry>
+								<entry>orthography</entry>
+								<entry>correction</entry>
+								<entry>-</entry>
+								<entry>-</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table></para>
 		</sect1>
 		<sect1>
 			<title>Properties</title>
-			<para>The table <xref linkend="importer_prop_overview"/> contains an 
-			overview of all usable properties to customize the behaviour of this 
-			Pepper module. The following section contains a close description to 
-			each single property and describes the resulting differences in the 
-			mapping to the Salt model.</para>
+			<para>The table <xref linkend="importer_prop_overview"/> contains an overview of all
+				usable properties to customize the behaviour of this Pepper module. The following
+				section contains a close description to each single property and describes the
+				resulting differences in the mapping to the Salt model.</para>
 			<table frame="all" xml:id="importer_prop_overview">
 				<title>properties to customize importer behaviour</title>
 				<tgroup align="left" cols="4" colsep="1" rowsep="1">
@@ -132,121 +273,23 @@
 					<tbody>
 						<row>
 							<entry>
-							<xref endterm="importer_prop1_title" linkend="prop_prop1"/>
+								<xref endterm="importer_prop1_title" linkend="prop_prop1"/>
 							</entry>
-							<entry>data type (e.g. Boolean) or a list of possible values 
-							(e.g. value1|value2)</entry>
-							<entry>optional|mandatory</entry>
-							<entry>default value</entry>
+							<entry>Boolean</entry>
+							<entry>optional</entry>
+							<entry>true</entry>
 						</row>
 					</tbody>
 				</tgroup>
 			</table>
 			<sect2 xml:id="prop_prop1">
-				<title xml:id="importer_prop1_title">
-				sampleImporter.property1</title>
-				<para><code>sampleImporter.property1=SYNOPSIS (e.g. &apos;value1, 
-				value2&apos; for lsits)</code></para>
-				<para>A detailed description of the property and resulting 
-				differences in the mapping to the Salt model.</para>
-			</sect2>
-		</sect1>
-	</chapter>
-	<chapter xml:id="sample_manipulator">
-		<title xml:id="sample_manipulator_name">SampleManipulator</title>
-		<para>General information about this manipulator.</para>
-		<sect1>
-			<title>Mapping to Salt</title>
-			<para>This section shall describe the mapping from the source Salt 
-			model and the target Salt model.</para>
-		</sect1>
-		<sect1>
-			<title>Properties</title>
-			<para>The table <xref linkend="manipulator_prop_overview"/> contains 
-			an overview of all usable properties to customize the behaviour of 
-			this Pepper module. The following section contains a close 
-			description to each single property and describes the resulting 
-			differences in the mapping to the Salt model.</para>
-			<table frame="all" xml:id="manipulator_prop_overview">
-				<title>properties to customize manipulator behaviour</title>
-				<tgroup align="left" cols="4" colsep="1" rowsep="1">
-					<thead>
-						<row>
-							<entry>Name of property</entry>
-							<entry>Type of property</entry>
-							<entry>optional/ mandatory</entry>
-							<entry>default value</entry>
-						</row>
-					</thead>
-					<tbody>
-						<row>
-							<entry>
-							<xref endterm="manipulator_prop1_title" linkend="manipulator_prop_prop1"/>
-							</entry>
-							<entry>data type (e.g. Boolean) or a list of possible values 
-							(e.g. value1|value2)</entry>
-							<entry>optional|mandatory</entry>
-							<entry>default value</entry>
-						</row>
-					</tbody>
-				</tgroup>
-			</table>
-			<sect2 xml:id="manipulator_prop_prop1">
-				<title xml:id="manipulator_prop1_title">
-				sampleManipulator.property1</title>
-				<para><code>sampleManipulator.property1=SYNOPSIS (e.g. 
-				&apos;value1, value2&apos; for lsits)</code></para>
-				<para>A detailed description of the property and resulting 
-				differences in the mapping to the Salt model.</para>
-			</sect2>
-		</sect1>
-	</chapter>
-	<chapter xml:id="sample_exporter">
-		<title xml:id="sample_exporter_name">SampleExporter</title>
-		<para>General information about this exporter.</para>
-		<sect1>
-			<title>Mapping to Salt</title>
-			<para>This section shall describe the mapping from the Salt model to 
-			the target format.</para>
-		</sect1>
-		<sect1>
-			<title>Properties</title>
-			<para>The table <xref linkend="exporter_prop_overview"/> contains an 
-			overview of all usable properties to customize the behaviour of this 
-			Pepper module. The following section contains a close description to 
-			each single property and describes the resulting differences in the 
-			mapping to the Salt model.</para>
-			<table frame="all" xml:id="exporter_prop_overview">
-				<title>properties to customize exporter behaviour</title>
-				<tgroup align="left" cols="4" colsep="1" rowsep="1">
-					<thead>
-						<row>
-							<entry>Name of property</entry>
-							<entry>Type of property</entry>
-							<entry>optional/ mandatory</entry>
-							<entry>default value</entry>
-						</row>
-					</thead>
-					<tbody>
-						<row>
-							<entry>
-							<xref endterm="exporter_prop_prop1_title" linkend="exporter_prop_prop1"/>
-							</entry>
-							<entry>data type (e.g. Boolean) or a list of possible values 
-							(e.g. value1|value2)</entry>
-							<entry>optional|mandatory</entry>
-							<entry>default value</entry>
-						</row>
-					</tbody>
-				</tgroup>
-			</table>
-			<sect2 xml:id="exporter_prop_prop1">
-				<title xml:id="exporter_prop_prop1_title">
-				sampleExporter.property1</title>
-				<para><code>sampleexporter.property1=SYNOPSIS (e.g. &apos;value1, 
-				value2&apos; for lsits)</code></para>
-				<para>A detailed description of the property and resulting 
-				differences in the mapping to the Salt model.</para>
+				<title xml:id="importer_prop1_title"> TCFImporter.shrinkTokenAnnotations</title>
+				<para><code>TCFImporter.shrinkTokenAnnotations=true (or false)</code></para>
+				<para>This property influences the import of annotations on single tokens. If it is
+					set true, annotations on single tokens are stored as annotations directly at the
+					token object, whereas a span is build over all tokens for multiple token
+					annotations. If shrinkTokenAnnotations is set false, also annotations of single
+					tokens are created at a span built over the token.</para>
 			</sect2>
 		</sect1>
 	</chapter>

@@ -721,11 +721,8 @@ public class TCFMapperImportTest {
 		EList<SToken> docSpanTokens = docGraph.getOverlappedSTokens(docSpan, typeList);
 		EList<SToken> fixSpanTokens = fixGraph.getOverlappedSTokens(fixSpan, typeList);
 		for(int i=0; i<docSpanTokens.size(); i++){
-			if(DEBUG){}
 			assertEquals(docGraph.getSText(docSpanTokens.get(i)), fixGraph.getSText(fixSpanTokens.get(i)));
 		}
-		if(DEBUG){
-			}
 	}
 		
 	/**

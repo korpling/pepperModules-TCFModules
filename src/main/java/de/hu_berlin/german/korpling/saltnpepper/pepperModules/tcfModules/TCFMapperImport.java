@@ -53,7 +53,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 	public static final String LAYER_POS = "pos";
 	public static final String LAYER_DEPENDENCIES = "dependencies";
 	public static final String LEVEL_DEPENDENCY = "dependency";
-	public static final String LAYER_TCF_MORPHOLOGY = "tcfMorphology";
+	public static final String LAYER_TCF_MORPHOLOGY = "morphology";
 	public static final String LAYER_CONSTITUENTS = "syntax";
 	public static final String LAYER_LEMMA = "lemma";
 	public static final String LAYER_REFERENCES = "references";
@@ -216,7 +216,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				currentNodeID = null;
 				ignoreIds = false;
 				SLayer syntaxLayer = buildLayer(LAYER_CONSTITUENTS);
-				syntaxLayer.createSAnnotation(null, ATT_TAGSET, attributes.getValue(ATT_TAGSET));
+				syntaxLayer.createSMetaAnnotation(null, ATT_TAGSET, attributes.getValue(ATT_TAGSET));
 			}
 			else if (TAG_GENERALINFO.equals(localName)){
 				metaId = 0;
@@ -359,8 +359,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 				/* TODO the same has to be done in SaltSample, still undone */
 				/* TODO the same has to be done for POS both in SaltSample(CHECK) and here */
 				depLayer.createSMetaAnnotation(null, TCFDictionary.ATT_TAGSET, attributes.getValue(TCFDictionary.ATT_TAGSET));
-				depLayer.createSMetaAnnotation(null, TCFDictionary.ATT_EMPTYTOKS, attributes.getValue(TCFDictionary.ATT_EMPTYTOKS));
-				depLayer.createSMetaAnnotation(null, TCFDictionary.ATT_MULTIGOVS, attributes.getValue(TCFDictionary.ATT_MULTIGOVS));
+//				depLayer.createSMetaAnnotation(null, TCFDictionary.ATT_EMPTYTOKS, attributes.getValue(TCFDictionary.ATT_EMPTYTOKS));
+//				depLayer.createSMetaAnnotation(null, TCFDictionary.ATT_MULTIGOVS, attributes.getValue(TCFDictionary.ATT_MULTIGOVS));
 			}
 			else if(TAG_TC_PARSE.equals(localName)){
 				idPath.clear(); //relevant for constituent parsing	
@@ -745,8 +745,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if(TAG_TC_F.equals(localName)){
 				/* build annotation */
-				currentSNode.createSAnnotation(null, currentAnnoKey, chars.toString());
-				annotateSNode(currentSNode, null, currentAnnoKey, chars.toString(), false, false);
+				annotateSNode(currentSNode, LAYER_TCF_MORPHOLOGY, currentAnnoKey, chars.toString(), false, false);
 			}
 			else if(TAG_TC_LEMMA.equals(localName)){
 				/* build annotation */

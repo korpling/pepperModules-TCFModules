@@ -2275,11 +2275,11 @@ public class TCFMapperImportTest {
 		EList<SNode> docMorph = docMorphLayer.getSNodes();
 
 		SSpan sSpan = docGraph.createSSpan(docTokens.get(0));//Is
-		sSpan.createSAnnotation(null, "cat", "verb");
-		sSpan.createSAnnotation(null, "person", "3");
-		sSpan.createSAnnotation(null, "number", "singular");
-		sSpan.createSAnnotation(null, "tense", "present");
-		sSpan.createSAnnotation(null, "indicative", "true");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "verb");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "person", "3");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "number", "singular");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "tense", "present");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "indicative", "true");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		//in this last annotation (storage of segment.type) we use a namespace to avoid ambiguities
 		//with potential morphological properties used in <analysis>...</analysis> (therefore namespace = TAG_TC_SEGMENT)
@@ -2289,17 +2289,17 @@ public class TCFMapperImportTest {
 		docMorph.add(sSpan);
 		
 		sSpan = docGraph.createSSpan(docTokens.get(1));//this
-		sSpan.createSAnnotation(null, "cat", "determiner");
-		sSpan.createSAnnotation(null, "number", "singular");
-		sSpan.createSAnnotation(null, "definiteness", "true");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "determiner");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "number", "singular");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "definiteness", "true");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		docMorph.add(sSpan);
 		
 		sSpan = docGraph.createSSpan(docTokens.get(2));//example
-		sSpan.createSAnnotation(null, "cat", "noun");
-		sSpan.createSAnnotation(null, "number", "singular");
-		sSpan.createSAnnotation(null, "gender", "neuter");
-		sSpan.createSAnnotation(null, "case", "nominative");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "noun");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "number", "singular");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "gender", "neuter");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "case", "nominative");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "example");
 		docMorph.add(sSpan);
@@ -2309,8 +2309,8 @@ public class TCFMapperImportTest {
 		spanTokens.add(docTokens.get(4));
 		
 		sSpan = docGraph.createSSpan(spanTokens);//more complicated		
-		sSpan.createSAnnotation(null, "cat", "adjective");
-		sSpan.createSAnnotation(null, "comparative", "true");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "adjective");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "comparative", "true");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "complicated");
 		docMorph.add(sSpan);
@@ -2318,27 +2318,27 @@ public class TCFMapperImportTest {
 		spanTokens.clear();
 		
 		sSpan = docGraph.createSSpan(docTokens.get(5));//than
-		sSpan.createSAnnotation(null, "cat", "conjunction");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "conjunction");
 		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "than");
 		docMorph.add(sSpan);		
 		
 		sSpan = docGraph.createSSpan(docTokens.get(6));//it
-		sSpan.createSAnnotation(null, "cat", "personal pronoun");
-		sSpan.createSAnnotation(null, "number", "singular");
-		sSpan.createSAnnotation(null, "person", "3");
-		sSpan.createSAnnotation(null, "gender", "neuter");
-		sSpan.createSAnnotation(null, "case", "nominative");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "personal pronoun");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "number", "singular");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "person", "3");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "gender", "neuter");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "case", "nominative");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "it");
 		docMorph.add(sSpan);
 		
 		sSpan = docGraph.createSSpan(docTokens.get(7));//appears
-		sSpan.createSAnnotation(null, "cat", "verb");
-		sSpan.createSAnnotation(null, "person", "3");
-		sSpan.createSAnnotation(null, "number", "singular");
-		sSpan.createSAnnotation(null, "tense", "present");
-		sSpan.createSAnnotation(null, "indicative", "true");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "verb");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "person", "3");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "number", "singular");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "tense", "present");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "indicative", "true");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "appear");
 		docMorph.add(sSpan);
@@ -2347,8 +2347,8 @@ public class TCFMapperImportTest {
 		spanTokens.add(docTokens.get(9));
 		
 		sSpan = docGraph.createSSpan(spanTokens);//to be
-		sSpan.createSAnnotation(null, "cat", "verb");
-		sSpan.createSAnnotation(null, "infinitive", "true");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "verb");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "infinitive", "true");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
 		docMorph.add(sSpan);
@@ -2356,7 +2356,7 @@ public class TCFMapperImportTest {
 		spanTokens.clear();
 		
 		sSpan = docGraph.createSSpan(docTokens.get(10));//?
-		sSpan.createSAnnotation(null, "cat", "punctuation");
+		sSpan.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "punctuation");
 		/*TODO*/
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sSpan.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, ".");
@@ -2756,11 +2756,11 @@ public class TCFMapperImportTest {
 		
 		SNode sNode = docTokens.get(0);
 		
-		sNode.createSAnnotation(null, "cat", "verb");//Is
-		sNode.createSAnnotation(null, "person", "3");
-		sNode.createSAnnotation(null, "number", "singular");
-		sNode.createSAnnotation(null, "tense", "present");
-		sNode.createSAnnotation(null, "indicative", "true");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "verb");//Is
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "person", "3");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "number", "singular");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "tense", "present");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "indicative", "true");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		//in this last annotation (storage of segment.type) we use a namespace to avoid ambiguities
 		//with potential morphological properties used in <analysis>...</analysis> (therefore namespace = TAG_TC_SEGMENT)
@@ -2770,17 +2770,17 @@ public class TCFMapperImportTest {
 		docMorph.add(sNode);
 		
 		sNode = docTokens.get(1);//this
-		sNode.createSAnnotation(null, "cat", "determiner");
-		sNode.createSAnnotation(null, "number", "singular");
-		sNode.createSAnnotation(null, "definiteness", "true");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "determiner");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "number", "singular");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "definiteness", "true");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 		docMorph.add(sNode);
 		
 		sNode = docTokens.get(2);//example
-		sNode.createSAnnotation(null, "cat", "noun");
-		sNode.createSAnnotation(null, "number", "singular");
-		sNode.createSAnnotation(null, "gender", "neuter");
-		sNode.createSAnnotation(null, "case", "nominative");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "noun");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "number", "singular");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "gender", "neuter");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "case", "nominative");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "example");
 		docMorph.add(sNode);
@@ -2790,8 +2790,8 @@ public class TCFMapperImportTest {
 		spanTokens.add(docTokens.get(4));
 		
 		sNode = docGraph.createSSpan(spanTokens);//more complicated		
-		sNode.createSAnnotation(null, "cat", "adjective");
-		sNode.createSAnnotation(null, "comparative", "true");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "adjective");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "comparative", "true");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "complicated");
 		docMorph.add(sNode);
@@ -2799,27 +2799,27 @@ public class TCFMapperImportTest {
 		spanTokens.clear();
 		
 		sNode = docTokens.get(5);//than
-		sNode.createSAnnotation(null, "cat", "conjunction");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "conjunction");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "than");
 		docMorph.add(sNode);		
 		
 		sNode = docTokens.get(6);//it
-		sNode.createSAnnotation(null, "cat", "personal pronoun");
-		sNode.createSAnnotation(null, "number", "singular");
-		sNode.createSAnnotation(null, "person", "3");
-		sNode.createSAnnotation(null, "gender", "neuter");
-		sNode.createSAnnotation(null, "case", "nominative");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "personal pronoun");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "number", "singular");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "person", "3");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "gender", "neuter");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "case", "nominative");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "it");
 		docMorph.add(sNode);
 		
 		sNode = docTokens.get(7);//appears
-		sNode.createSAnnotation(null, "cat", "verb");
-		sNode.createSAnnotation(null, "person", "3");
-		sNode.createSAnnotation(null, "number", "singular");
-		sNode.createSAnnotation(null, "tense", "present");
-		sNode.createSAnnotation(null, "indicative", "true");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "verb");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "person", "3");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "number", "singular");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "tense", "present");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "indicative", "true");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "appear");
 		docMorph.add(sNode);
@@ -2828,8 +2828,8 @@ public class TCFMapperImportTest {
 		spanTokens.add(docTokens.get(9));
 		
 		sNode = docGraph.createSSpan(spanTokens);//to be
-		sNode.createSAnnotation(null, "cat", "verb");
-		sNode.createSAnnotation(null, "infinitive", "true");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "verb");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "infinitive", "true");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, "be");
 		docMorph.add(sNode);
@@ -2837,7 +2837,7 @@ public class TCFMapperImportTest {
 		spanTokens.clear();
 		
 		sNode = docTokens.get(10);//?
-		sNode.createSAnnotation(null, "cat", "punctuation");
+		sNode.createSAnnotation(TCFMapperImport.LAYER_TCF_MORPHOLOGY, "cat", "punctuation");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.ATT_TYPE, "stem");
 //		sNode.createSAnnotation(TCFDictionary.TAG_TC_SEGMENT, TCFDictionary.TAG_TC_SEGMENT, ".");
 		docMorph.add(sNode);

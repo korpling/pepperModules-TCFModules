@@ -70,3 +70,7 @@
 /target
 /META-INF
 /OSGI-INF
+/pom.xml.releaseBackup
+/release.properties
+/src/main/docbkx/manual.pdf
+

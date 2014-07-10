@@ -50,21 +50,7 @@
 						<xref endterm="sample_importer_name" linkend="sample_importer"/>
 						</entry>
 						<entry>importer</entry>
-						<entry>version</entry>
-					</row>
-					<row>
-						<entry>
-						<xref endterm="sample_manipulator_name" linkend="sample_manipulator"/>
-						</entry>
-						<entry>manipulator</entry>
-						<entry>--</entry>
-					</row>
-					<row>
-						<entry>
-						<xref endterm="sample_exporter_name" linkend="sample_exporter"/>
-						</entry>
-						<entry>exporter</entry>
-						<entry>version</entry>
+						<entry>${project.version}</entry>
 					</row>
 				</tbody>
 			</tgroup>
@@ -89,10 +75,17 @@
 					<title>layer list</title>
 					<tgroup cols="5">
 						<colspec colname="c1" colnum="1" colwidth="1.12*"/>
+<<<<<<< HEAD
 						<colspec colname="newCol4" colnum="2" colwidth="1.37*"/>
 						<colspec colname="newCol5" colnum="3" colwidth="1.04*"/>
 						<colspec colname="newCol6" colnum="4" colwidth="1*"/>
 						<colspec colname="newCol3" colnum="5" colwidth="1.89*"/>
+=======
+						<colspec colname="newCol4" colnum="2" colwidth="1.54*"/>
+						<colspec colname="newCol5" colnum="3" colwidth="1*"/>
+						<colspec colname="newCol6" colnum="4" colwidth="1.09*"/>
+						<colspec colname="newCol3" colnum="5" colwidth="1.66*"/>
+>>>>>>> c83b1789e6b8c1f429fa609f63d67ebadc2b2dc3
 						<thead>
 							<row>
 								<entry>TCF layer</entry>

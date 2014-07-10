@@ -62,7 +62,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 	public static final String LAYER_ORTHOGRAPHY = "orthography";
 	public static final String LAYER_GEO = "geography";
 	public static final String LAYER_LS = "lexical-semantics";
-	public static final String LAYER_WORDSENSE = "wordSenseDisambiguation";
+	public static final String LAYER_WORDSENSE = "wordSense";
 	public static final String LAYER_SPLITTINGS = "wordSplittings";
 	public static final String LAYER_DISCOURSE = "discourseConnectives";
 	public static final String LAYER_TEXTSTRUCTURE = "textstructure";

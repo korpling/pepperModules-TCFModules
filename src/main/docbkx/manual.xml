@@ -65,13 +65,15 @@
 		<para>General information about this importer.</para>
 		<sect1>
 			<title>Mapping to Salt</title>
-			<para>The importer maps each TCF layer to an SLayer object in Salt. Attributes refering
-				to the TCF layer are stored as meta annotations on the SLayer itself without using a
+			<para>The importer maps each TCF layer to an SLayer object in Salt. Attributes refering to the
+				TCF layer are stored as meta annotations on the SLayer itself without using a
 				namespace. All annotations contained in the TCF layer are imported as annotations on
 				SToken and/or SSpan objects where the annotation's namespace is (in most cases, cf.
 				table below) the SLayer's name and the annotation's name is the tag's name without
-				the xml namespace. Here's a list of all TCF layer's and their according
-					SLayers:<table frame="all">
+				the xml namespace or the attributes name. E.g.: &lt;constituent cat="VVFIN" ID="c_1"
+				tokenIDs="t_1"/>, in this case the token is annotated with syntax::cat="VVFIN" in
+				the salt model.</para>
+			<para>Here's a list of all TCF layer's and their according SLayers:<table frame="all">
 					<title>layer list</title>
 					<tgroup cols="5">
 						<colspec colname="c1" colnum="1" colwidth="1.12*"/>

@@ -75,23 +75,20 @@
 					<title>layer list</title>
 					<tgroup cols="5">
 						<colspec colname="c1" colnum="1" colwidth="1.12*"/>
-<<<<<<< HEAD
 						<colspec colname="newCol4" colnum="2" colwidth="1.37*"/>
 						<colspec colname="newCol5" colnum="3" colwidth="1.04*"/>
 						<colspec colname="newCol6" colnum="4" colwidth="1*"/>
 						<colspec colname="newCol3" colnum="5" colwidth="1.89*"/>
-=======
 						<colspec colname="newCol4" colnum="2" colwidth="1.54*"/>
 						<colspec colname="newCol5" colnum="3" colwidth="1*"/>
 						<colspec colname="newCol6" colnum="4" colwidth="1.09*"/>
 						<colspec colname="newCol3" colnum="5" colwidth="1.66*"/>
->>>>>>> c83b1789e6b8c1f429fa609f63d67ebadc2b2dc3
 						<thead>
 							<row>
 								<entry>TCF layer</entry>
 								<entry>namespace of annotation</entry>
-								<entry>node annotations</entry>
-								<entry>edge annotations</entry>
+								<entry>node annotation names</entry>
+								<entry>edge annotation names</entry>
 								<entry>meta annotations on SLayer</entry>
 							</row>
 						</thead>

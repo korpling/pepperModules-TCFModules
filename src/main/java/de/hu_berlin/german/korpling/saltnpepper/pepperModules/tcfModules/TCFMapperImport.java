@@ -40,6 +40,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructure;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
@@ -714,7 +715,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 					logger.error((new StringBuilder()).append(BAD_TOKENIZATION_ERROR_MESSAGE).append(" ").append(currentNodeID).toString());
 					throw new PepperModuleDataException(TCFMapperImport.this, BAD_TOKENIZATION_ERROR_MESSAGE);
 				}else{
-					sNodes.put(currentNodeID, getSDocGraph().createSToken(currentSTDS, p, p+tok.length()));	
+					{sNodes.put(currentNodeID, getSDocGraph().createSToken(currentSTDS, p, p+tok.length()));}
+					p=p+tok.length();
 				}				
 			}
 			else if(TAG_TC_SEGMENT.equals(localName)){
@@ -760,7 +762,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_MDCOLLECTIONDISPLAYNAME.equals(localName)){
 				if(chars.length()>0){getSDocument().createSMetaAnnotation(null, TAG_MDCOLLECTIONDISPLAYNAME, chars.toString());}
 			}
-			else if (TAG_TC_TEXTCORPUS.equals(localName)){							
+			else if (TAG_TC_TEXTCORPUS.equals(localName)){
 			}
 			else if (TAG_RESOURCETYPE.equals(localName)){
 				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_RESOURCEPROXY).append(metaId).append(TAG_RESOURCETYPE).toString(), chars.toString(), false, true);

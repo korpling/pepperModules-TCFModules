@@ -712,7 +712,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 					p++;					
 				}
 				if(p==primaryData.length()){
-					logger.error((new StringBuilder()).append(BAD_TOKENIZATION_ERROR_MESSAGE).append(" ").append(currentNodeID).toString());
+					logger.error((new StringBuilder()).append(BAD_TOKENIZATION_ERROR_MESSAGE).append(" Error around token ").append(currentNodeID).toString());
 					throw new PepperModuleDataException(TCFMapperImport.this, BAD_TOKENIZATION_ERROR_MESSAGE);
 				}else{
 					{sNodes.put(currentNodeID, getSDocGraph().createSToken(currentSTDS, p, p+tok.length()));}

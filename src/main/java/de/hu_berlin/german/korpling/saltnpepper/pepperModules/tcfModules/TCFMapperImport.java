@@ -717,7 +717,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				}else{
 					{sNodes.put(currentNodeID, getSDocGraph().createSToken(currentSTDS, p, p+tok.length()));}
 					p=p+tok.length();
-				}				
+				}
 			}
 			else if(TAG_TC_SEGMENT.equals(localName)){
 				/* build annotation TODO */

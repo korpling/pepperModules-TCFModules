@@ -27,7 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.Iterator;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -47,7 +46,6 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFDict
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFImporterProperties;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFMapperImport;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
@@ -61,11 +59,11 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltSample.SaltSample;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SALT_SEMANTIC_NAMES;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SLemmaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SPOSAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SaltSemanticsPackage;
+import de.hu_berlin.german.korpling.saltnpepper.salt.samples.SampleGenerator;
 
 public class TCFMapperImportTest {
 
@@ -255,8 +253,8 @@ public class TCFMapperImportTest {
 		/* generating salt sample */
 		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
 		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
-		SaltSample.createPrimaryData(doc);
-		SaltSample.createTokens2(doc);
+		SampleGenerator.createPrimaryData(doc);
+		SampleGenerator.createTokens(doc);
 		SDocumentGraph docGraph = doc.getSDocumentGraph();
 		
 		/* setting variables */		
@@ -683,8 +681,8 @@ public class TCFMapperImportTest {
 		/* generating salt sample */
 		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
 		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
-		SaltSample.createPrimaryData(doc);
-		SaltSample.createTokens2(doc);	
+		SampleGenerator.createPrimaryData(doc);
+		SampleGenerator.createTokens(doc);	
 		SDocumentGraph docGraph = doc.getSDocumentGraph();
 
 		/* adding sentence span */
@@ -1188,9 +1186,9 @@ public class TCFMapperImportTest {
 		/* generating salt sample */
 		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
 		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
-		SaltSample.createPrimaryData(doc);
-		SaltSample.createTokens2(doc);
-		SaltSample.createDependencies(doc);
+		SampleGenerator.createPrimaryData(doc);
+		SampleGenerator.createTokens(doc);
+		SampleGenerator.createDependencies(doc);
 		
 		/* setting variables */		
 		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_DEPENDENCIES_NO_MULTIGOVS);
@@ -1477,12 +1475,12 @@ public class TCFMapperImportTest {
 		/* generating salt sample */
 		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
 		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
-		SaltSample.createPrimaryData(doc);
-		SaltSample.createTokens2(doc);
+		SampleGenerator.createPrimaryData(doc);
+		SampleGenerator.createTokens(doc);
 		/* TODO create Version 2 of both the following methods --> Root node necessary to include punctuation */
 		/* think about some kind of flag to include/exclude the question mark */
-		SaltSample.createSyntaxStructure2(doc);
-		SaltSample.createSyntaxAnnotations2(doc);
+		SampleGenerator.createSyntaxStructure(doc);
+		SampleGenerator.createSyntaxAnnotations(doc);
 		
 		/* setting variables */		
 		File tmpOut = new File(System.getProperty("java.io.tmpdir")+LOCATION_TEST_CONSTITUENT_PARSING);
@@ -2260,8 +2258,8 @@ public class TCFMapperImportTest {
 		/* generating salt sample */
 		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
 		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
-		SaltSample.createPrimaryData(doc);
-		SaltSample.createTokens2(doc);
+		SampleGenerator.createPrimaryData(doc);
+		SampleGenerator.createTokens(doc);
 		
 		/* adding morphological annotation manually to salt sample */
 		/* TODO add to salt sample (Florian okay)*/
@@ -2740,8 +2738,8 @@ public class TCFMapperImportTest {
 		/* generating salt sample */
 		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
 		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
-		SaltSample.createPrimaryData(doc);
-		SaltSample.createTokens2(doc);
+		SampleGenerator.createPrimaryData(doc);
+		SampleGenerator.createTokens(doc);
 		
 		/* adding morphological annotation manually to salt sample */
 		/* TODO add to salt sample (Florian okay)*/
@@ -6139,8 +6137,8 @@ public class TCFMapperImportTest {
 		/* generating salt sample */
 		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
 		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
-		SaltSample.createPrimaryData(doc);
-		SaltSample.createTokens2(doc);
+		SampleGenerator.createPrimaryData(doc);
+		SampleGenerator.createTokens(doc);
 		SDocumentGraph docGraph = doc.getSDocumentGraph();
 		EList<SToken> docTokens = docGraph.getSTokens();
 		SLayer docSplitLayer = SaltFactory.eINSTANCE.createSLayer();
@@ -6289,8 +6287,8 @@ public class TCFMapperImportTest {
 		/* generating salt sample */
 		SDocument doc = SaltFactory.eINSTANCE.createSDocument();
 		doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
-		SaltSample.createPrimaryData(doc);
-		SaltSample.createTokens2(doc);
+		SampleGenerator.createPrimaryData(doc);
+		SampleGenerator.createTokens(doc);
 		SDocumentGraph docGraph = doc.getSDocumentGraph();
 		EList<SToken> docTokens = docGraph.getSTokens();
 		SLayer docSplitLayer = SaltFactory.eINSTANCE.createSLayer();

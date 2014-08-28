@@ -49,7 +49,12 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SLemmaAnnotation;
 
 public class TCFMapperImport extends PepperMapperImpl{	
-		
+	
+	/*
+	 * TODO:
+	 * remove unnecessary layers
+	 */
+	
 	public static final String LEVEL_SENTENCE = "sentence";
 	public static final String LAYER_POS = "pos";
 	public static final String LAYER_DEPENDENCIES = "dependencies";

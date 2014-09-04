@@ -46,6 +46,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SLemmaAnnotation;
 
 public class TCFMapperImport extends PepperMapperImpl{	
@@ -660,20 +661,23 @@ public class TCFMapperImport extends PepperMapperImpl{
 								target = getSDocGraph().getSNode(seq[0]);
 							}else{//ATTENTION target is supposed to be !=null (!!!)
 								if(target==null){logger.info("!--------------------------- WARNING: target of reference not set!");}
-								assert(target!=null) : "target of reference not set! (null)";
-								SPointingRelation ref = (SPointingRelation)getSDocGraph().addSNode(getSDocGraph().getSNode(seq[0]), target, STYPE_NAME.SPOINTING_RELATION);
-								ref.addSType(STYPE_REFERENCE);
-								ref.createSAnnotation(LAYER_REFERENCES, ATT_REL, seq[2]);
-								sLayers.get(LAYER_REFERENCES).getSRelations().add(ref);
+								if(!referenceExists(getSDocGraph().getSNode(seq[0]), target)){
+									SPointingRelation ref = (SPointingRelation)getSDocGraph().addSNode(getSDocGraph().getSNode(seq[0]), target, STYPE_NAME.SPOINTING_RELATION);
+									ref.addSType(STYPE_REFERENCE);
+									ref.createSAnnotation(LAYER_REFERENCES, ATT_REL, seq[2]);
+									sLayers.get(LAYER_REFERENCES).getSRelations().add(ref);
+								}
 							}
 						}else{						
 							if(seq.length!=1){//CHECK isn't that always true?!
 								/* relation on antecedent */
 								if(!(seq[0].equals(seq[1]))){
-									SPointingRelation ref = (SPointingRelation)getSDocGraph().addSNode(getSDocGraph().getSNode(seq[0]), sNodes.get(seq[1]), STYPE_NAME.SPOINTING_RELATION);							
-									ref.createSAnnotation(LAYER_REFERENCES, ATT_REL, seq[2]);
-									ref.addSType(STYPE_REFERENCE);
-									sLayers.get(LAYER_REFERENCES).getSRelations().add(ref);	
+									if(!referenceExists(getSDocGraph().getSNode(seq[0]), sNodes.get(seq[1]))){
+										SPointingRelation ref = (SPointingRelation)getSDocGraph().addSNode(getSDocGraph().getSNode(seq[0]), sNodes.get(seq[1]), STYPE_NAME.SPOINTING_RELATION);							
+										ref.createSAnnotation(LAYER_REFERENCES, ATT_REL, seq[2]);
+										ref.addSType(STYPE_REFERENCE);
+										sLayers.get(LAYER_REFERENCES).getSRelations().add(ref);	
+									}
 								}							
 							}
 						}
@@ -926,7 +930,18 @@ public class TCFMapperImport extends PepperMapperImpl{
 				anno = isMetaAnnotation ? sNode.createSMetaAnnotation(namespace, name, value) : sNode.createSAnnotation(namespace, name, value);
 			}
 			return anno;
-		}		
+		}
+		
+		private boolean referenceExists(SNode sSource, SNode sTarget){
+			for(SRelation sRel : sSource.getOutgoingSRelations()){
+				if(sRel instanceof SPointingRelation){
+					if((sRel.getSTarget()==sTarget)&&(sRel.getSTypes().contains(STYPE_REFERENCE))){
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 	}
 
 }

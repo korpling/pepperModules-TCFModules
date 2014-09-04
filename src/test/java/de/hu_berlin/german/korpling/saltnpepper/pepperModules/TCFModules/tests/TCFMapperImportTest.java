@@ -3310,11 +3310,6 @@ public class TCFMapperImportTest {
 		docGraph.tokenize();
 		EList<SToken> docTokens = docGraph.getSTokens();
 		
-		//head marker:
-		SAnnotation refHead = SaltFactory.eINSTANCE.createSAnnotation();
-		refHead.setName(TCFMapperImport.HEAD_MARKER);
-		refHead.setValue(TCFMapperImport.HEAD_MARKER);
-		
 		//reference layer:
 		SLayer docRefLayer = SaltFactory.eINSTANCE.createSLayer();
 		docRefLayer.setSName(TCFMapperImport.LAYER_REFERENCES);
@@ -3329,24 +3324,20 @@ public class TCFMapperImportTest {
 		SSpan newYork = docGraph.createSSpan(docTokens.get(2));
 		docGraph.addSNode(newYork, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
 		newYork.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "name");
-		docTokens.get(2).addSAnnotation(refHead);
-		docTokens.get(3).addSAnnotation(refHead);
 		docRefLayer.getSNodes().add(newYork);		
 		///"the most beautiful place"
 		SSpan theMostBeautifulPlace = docGraph.createSSpan(docTokens.get(7));
 		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(8), STYPE_NAME.SSPANNING_RELATION);
 		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(9), STYPE_NAME.SSPANNING_RELATION);
 		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(10), STYPE_NAME.SSPANNING_RELATION);		
-		theMostBeautifulPlace.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "noun");		
-		docTokens.get(10).addSAnnotation(refHead);		
+		theMostBeautifulPlace.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "noun");
 		reference.setSSource(theMostBeautifulPlace);
 		reference.setSTarget(newYork);
 		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "non-anaphoric");
 		docRefLayer.getSNodes().add(theMostBeautifulPlace);
 		docRefLayer.getSRelations().add(reference);
 		///"it"
-		docTokens.get(5).createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");		
-		docTokens.get(5).addSAnnotation(refHead);
+		docTokens.get(5).createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");
 		reference = SaltFactory.eINSTANCE.createSPointingRelation();
 		reference.setSSource(docTokens.get(5));
 		reference.setSTarget(newYork);
@@ -3404,7 +3395,6 @@ public class TCFMapperImportTest {
 			assertEquals(docRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());
 			assertEquals(docRef.getSTarget().getClass(), fixRef.getSTarget().getClass());
 		}
-		/*TODO compare head markings*/
 	}
 	
 	/**This method tests if a valid TCF-XML-structure containing reference
@@ -3539,11 +3529,6 @@ public class TCFMapperImportTest {
 		docGraph.tokenize();
 		EList<SToken> docTokens = docGraph.getSTokens();
 		
-		//head marker:
-		SAnnotation refHead = SaltFactory.eINSTANCE.createSAnnotation();
-		refHead.setName(TCFMapperImport.HEAD_MARKER);
-		refHead.setValue(TCFMapperImport.HEAD_MARKER);
-		
 		//reference layer:
 		SLayer docRefLayer = SaltFactory.eINSTANCE.createSLayer();
 		docRefLayer.setSName(TCFMapperImport.LAYER_REFERENCES);
@@ -3558,23 +3543,19 @@ public class TCFMapperImportTest {
 		SSpan newYork = docGraph.createSSpan(docTokens.get(2));
 		docGraph.addSNode(newYork, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
 		newYork.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "name");
-		docTokens.get(2).addSAnnotation(refHead);
-		docTokens.get(3).addSAnnotation(refHead);
 		docRefLayer.getSNodes().add(newYork);		
 		///"the most beautiful place"
 		SSpan theMostBeautifulPlace = docGraph.createSSpan(docTokens.get(7));
 		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(8), STYPE_NAME.SSPANNING_RELATION);
 		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(9), STYPE_NAME.SSPANNING_RELATION);
 		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(10), STYPE_NAME.SSPANNING_RELATION);		
-		theMostBeautifulPlace.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "noun");		
-		docTokens.get(10).addSAnnotation(refHead);
+		theMostBeautifulPlace.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "noun");	
 		reference = (SPointingRelation)docGraph.addSNode(theMostBeautifulPlace, newYork, STYPE_NAME.SPOINTING_RELATION);
 		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "non-anaphoric");
 		docRefLayer.getSNodes().add(theMostBeautifulPlace);
 		docRefLayer.getSRelations().add(reference);
 		///"it"
-		docTokens.get(5).createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");		
-		docTokens.get(5).addSAnnotation(refHead);
+		docTokens.get(5).createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");
 		reference = (SPointingRelation)docGraph.addSNode(docTokens.get(5), newYork, STYPE_NAME.SPOINTING_RELATION);
 		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "anaphoric");
 		docRefLayer.getSNodes().add(docTokens.get(5));
@@ -3800,11 +3781,6 @@ public class TCFMapperImportTest {
 		docGraph.tokenize();
 		EList<SToken> docTokens = docGraph.getSTokens();
 		
-		//head marker:
-		SAnnotation refHead = SaltFactory.eINSTANCE.createSAnnotation();
-		refHead.setName(TCFMapperImport.HEAD_MARKER);
-		refHead.setValue(TCFMapperImport.HEAD_MARKER);
-		
 		//reference layer:
 		SLayer docRefLayer = SaltFactory.eINSTANCE.createSLayer();
 		docRefLayer.setSName(TCFMapperImport.LAYER_REFERENCES);
@@ -3819,8 +3795,6 @@ public class TCFMapperImportTest {
 		SSpan newYork = docGraph.createSSpan(docTokens.get(2));
 		docGraph.addSNode(newYork, docTokens.get(3), STYPE_NAME.SSPANNING_RELATION);
 		newYork.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "name");
-		docTokens.get(2).addSAnnotation(refHead);
-		docTokens.get(3).addSAnnotation(refHead);
 		docRefLayer.getSNodes().add(newYork);		
 		///"the most beautiful place"
 		SSpan theMostBeautifulPlace = docGraph.createSSpan(docTokens.get(7));
@@ -3828,7 +3802,6 @@ public class TCFMapperImportTest {
 		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(9), STYPE_NAME.SSPANNING_RELATION);
 		docGraph.addSNode(theMostBeautifulPlace, docTokens.get(10), STYPE_NAME.SSPANNING_RELATION);		
 		theMostBeautifulPlace.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "noun");		
-		docTokens.get(10).addSAnnotation(refHead);		
 		reference.setSSource(theMostBeautifulPlace);
 		reference.setSTarget(newYork);
 		reference.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_REL, "non-anaphoric");
@@ -3836,8 +3809,7 @@ public class TCFMapperImportTest {
 		docRefLayer.getSRelations().add(reference);
 		///"it"
 		SSpan it = docGraph.createSSpan(docTokens.get(5));
-		it.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");		
-		it.addSAnnotation(refHead);
+		it.createSAnnotation(TCFMapperImport.LAYER_REFERENCES, TCFDictionary.ATT_TYPE, "pronoun");
 		reference = SaltFactory.eINSTANCE.createSPointingRelation();
 		reference.setSSource(it);
 		reference.setSTarget(newYork);
@@ -3897,7 +3869,6 @@ public class TCFMapperImportTest {
 			assertNotNull(fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
 			assertEquals(docRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getSTarget().getSAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());			
 		}
-		/*TODO compare head markings*/
 	}
 	
 //	/**This method tests if a valid TCF-XML-structure containing reference

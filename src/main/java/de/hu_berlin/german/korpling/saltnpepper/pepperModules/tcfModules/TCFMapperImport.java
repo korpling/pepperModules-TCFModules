@@ -45,6 +45,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNamedElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SLemmaAnnotation;
@@ -80,10 +81,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 	private static final String BAD_TOKENIZATION_ERROR_MESSAGE = "Bad tokenization: Full text not matching token text!";
 		
 	private static final String REF_SEPERATOR = "%%%";
-	public static final String ANNO_NAME_CONSTITUENT = "const";
-	
-	public static final String HEAD_MARKER = "refHead";//is annotation key and value for head annotation (online one instance for all necessary)
-	public static final String SPAN = "span";//marking element for span ids over single tokens	
+	public static final String ANNO_NAME_CONSTITUENT = "const";		
 	
 	private static Logger logger = LoggerFactory.getLogger(TCFMapperImport.class);
 	
@@ -101,29 +99,48 @@ public class TCFMapperImport extends PepperMapperImpl{
 	
 	private class TCFReader extends DefaultHandler2 implements TCFDictionary {
 		
+		/**contains all {@link SNode}s created during the conversion process*/
 		private EMap<String, SNode> sNodes;
+		/**contains all {@link SLabel}s created during the conversion process*/
 		private EMap<String, Label> labels;
+		/**contains all {@link SLayer}s created during the conversion process*/
 		private EMap<String, SLayer> sLayers;
+		/**contains the currently used {@link STextualDS}*/
 		private STextualDS currentSTDS;
+		/**This is the pointer used for the tokenization process.*/
 		private int p;
-		private Stack<String> path;	
+		/**contains the path through the xml-document. When a new xml-element starts it's local name is put on top.*/
+		private Stack<String> path;
+		/**contains the path through the constituent tree.*/
 		private Stack<String> idPath;
+		/**is used to store characters written between tags.*/
 		private StringBuilder chars;
-		private String currentNodeID;		
+		/**points on the currently used / annotated / imported {@link SNode}. It refers to the id used in sNodes*/
+		private String currentNodeID;
+		/**points on the currently edited annotation.*/
 		private String currentAnnoID;
+		/**points on the currently relevant annotation key.*/
 		private String currentAnnoKey;
+		/**points on the currently relevant sNode.*/
 		private SNode currentSNode;
-		/* head annotation */
-		private SAnnotation head;
 		/* internal ids */
+		/**is mainly used for the import of references when ignoreIds is true. It is also used for some meta data imports.*/
 		private int id;
+		/**is the Id for meta data imports.*/
 		private int metaId;
+		/**is used as id prefix when ignoreIds is false.*/
 		private static final String REF_PREFIX = "reference-";
+		/**is used as separator between the levels of the meta annotation keys.*/
 		private static final String CLN = ":";
+		/**is the marking element for span Ids over single tokens to store them in sNodes without overwriting the {@link SToken}s.*/
+		private static final String SPAN = "span";
 		/* properties */
+		/**contains the value of the property SHRINK_TOKEN_ANNOTATIONS.*/
 		private boolean shrinkTokenAnnotations;
+		/**contains the value of the property USE_COMMON_ANNOTATED_ELEMENT.*/
 		private boolean useCommonAnnotatedElement;
 		/* other booleans */
+		/**is set true as soon as the reader finds a duplicated reference Id and then it ignores the Ids.*/
 		private boolean ignoreIds;
 		
 		public TCFReader(){
@@ -138,9 +155,6 @@ public class TCFMapperImport extends PepperMapperImpl{
 			currentSNode = null;
 			currentAnnoID = null;
 			currentAnnoKey = null;
-			head = SaltFactory.eINSTANCE.createSAnnotation();
-			head.setSName(TCFMapperImport.HEAD_MARKER);
-			head.setSValue(TCFMapperImport.HEAD_MARKER);
 			p = 0;			
 			shrinkTokenAnnotations = ((TCFImporterProperties)getProperties()).isShrinkTokenAnnotation();
 			useCommonAnnotatedElement = ((TCFImporterProperties)getProperties()).isUseCommonAnnotatedElement();
@@ -865,6 +879,12 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 		}
 		
+		/**
+		 * This method identifies cosmetic characters used to format the document
+		 * which are not relevant for import.
+		 * @param s is the {@link String} to be examined
+		 * @return true, if s is empty or only contains formatting characters; else false
+		 */
 		private boolean isPrettyPrint(String s){
 			return s.replace(" ", "").replace("\t", "").replace("\n", "").replace("\r", "").isEmpty();			
 		}
@@ -881,6 +901,13 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 		}
 		
+		/**
+		 * This method returns the correct {@link SNode} from sNodes or builds it
+		 * according to the properties SHRINK_TOKEN_ANNOTATIONS and USE_COMMON_ANNOTATED_ELEMENT
+		 * all depending on its Id in TCF.
+		 * @param id is the sNodes id 
+		 * @return
+		 */
 		private SNode getSNode(String id){
 			if(id==null){return null;}			
 			SNode sNode = sNodes.get(id);			
@@ -907,10 +934,19 @@ public class TCFMapperImport extends PepperMapperImpl{
 			return sNode;
 		}
 		
+		/**		 * 
+		 * @return the {@link SDocumentGraph}
+		 */
 		private SDocumentGraph getSDocGraph(){
 			return getSDocument().getSDocumentGraph();
 		}
 		
+		/**
+		 * This method creates and {@link SLayer} and adds it to
+		 * the {@link SDocumentGraph}.
+		 * @param name is the {@link SLayer}s SName.
+		 * @return the built {@link SLayer}
+		 */
 		private SLayer buildLayer(String name){
 			SLayer newLayer = SaltFactory.eINSTANCE.createSLayer();
 			newLayer.setSName(name);
@@ -919,6 +955,16 @@ public class TCFMapperImport extends PepperMapperImpl{
 			return newLayer;
 		}
 		
+		/**
+		 * This method annotates the given {@link SNode}.
+		 * @param sNode to be annotated.
+		 * @param namespace 
+		 * @param name
+		 * @param value
+		 * @param acceptEmptyOrNullValues
+		 * @param isMetaAnnotation if true, an {@link SMetaAnnotation} object is created or edited instead of an {@link SAnnotation} object.
+		 * @return the created {@link Label}
+		 */
 		private Label annotateSNode(SNode sNode, String namespace, String name, String value, boolean acceptEmptyOrNullValues, boolean isMetaAnnotation){			
 			if(sNode==null || name==null){return null;}
 			if((value==null || value.isEmpty()) && !acceptEmptyOrNullValues){return null;}
@@ -932,6 +978,13 @@ public class TCFMapperImport extends PepperMapperImpl{
 			return anno;
 		}
 		
+		/**
+		 * This method checks, if an {@link SPointingRelation} with the sType "reference"
+		 * already exists or has to be created. 
+		 * @param sSource
+		 * @param sTarget
+		 * @return true, if the {@link SPointingRelation} exists.
+		 */
 		private boolean referenceExists(SNode sSource, SNode sTarget){
 			for(SRelation sRel : sSource.getOutgoingSRelations()){
 				if(sRel instanceof SPointingRelation){

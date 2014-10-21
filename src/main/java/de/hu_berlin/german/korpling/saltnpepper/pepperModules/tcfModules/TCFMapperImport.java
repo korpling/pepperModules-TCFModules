@@ -23,6 +23,7 @@ import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
+import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -786,6 +787,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 				if(chars.length()>0){getSDocument().createSMetaAnnotation(null, TAG_MDCOLLECTIONDISPLAYNAME, chars.toString());}
 			}
 			else if (TAG_TC_TEXTCORPUS.equals(localName)){
+				//debug
+				SaltFactory.eINSTANCE.save_DOT(getSDocGraph(), URI.createFileURI("/home/klotzmaz/salt_MMAX2/")); System.out.println("used this!");
 			}
 			else if (TAG_RESOURCETYPE.equals(localName)){
 				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_RESOURCEPROXY).append(metaId).append(TAG_RESOURCETYPE).toString(), chars.toString(), false, true);

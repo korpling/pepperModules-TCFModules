@@ -765,7 +765,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				if(chars.length()>0){
 					SMetaAnnotation meta = getSDocument().getSMetaAnnotation(TAG_MDCREATOR);
 					if(meta!=null){
-						meta.setValueString(meta.getValueString()+"; "+chars.toString());
+						meta.setValue(meta.getValue().toString()+"; "+chars.toString());
 					}else{
 						getSDocument().createSMetaAnnotation(null, TAG_MDCREATOR, chars.toString());
 					}

@@ -17,8 +17,106 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 
-public class TCFMapperExport extends PepperMapperImpl{
-
+public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
+	/** the SDocument to be mapped */
+	private SDocument document = null;
+	private Stack<XMLStreamWriter> TCFs = null;
+	private HashMap<String, String> meta = null;
+	private HashMap<SNode, String> sNodes = null;
+	
+	public TCFMapperExport(SDocument sDocument){
+		this.document = sDocument;
+		TCFs = new Stack<XMLStreamWriter>();
+		sNodes = new HashMap<SNode, String>();
+		initMeta();		
+	}
+	
+	private void initMeta(){
+		meta = new HashMap<String, String>();
+		meta.put(ATT_LANG, document.getSMetaAnnotation(ATT_LANG).getValue().toString()); //FIXME --> by properties we will find out where this meta attribute is
+		//lang can be multiple value: parallel corpora		
+	}
+	
+	/** this method maps an SDocument to TCF */
+	public void mapDocument(){
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory factory = XMLOutputFactory.newFactory();
+		for (STextualDS sTextualDS : document.getSDocumentGraph().getSTextualDSs()){
+			//for each tokenization do:			
+			XMLStreamWriter w;
+			try {
+				w = TCFs.push(factory.createXMLStreamWriter(outStream));
+				w.writeStartDocument();
+				w.writeNamespace(NS_ED, NS_VALUE_ED);
+				w.writeNamespace(NS_LX, NS_VALUE_LX);
+				w.writeNamespace(NS_MD, NS_VALUE_MD);
+				w.writeNamespace(NS_TC, NS_VALUE_TC);
+				w.writeNamespace(NS_WL, NS_VALUE_WL);
+				w.writeNamespace(NS_XSI, NS_VALUE_XSI);
+				w.writeStartElement(NS_TC, TAG_TC_TEXTCORPUS, NS_VALUE_TC);
+				w.writeAttribute(ATT_LANG, meta.get(ATT_LANG));//TODO see above
+				mapSTextualDS(sTextualDS);
+//				mapTokenization();
+				w.writeEndElement();
+				w.writeEndDocument();
+			} catch (XMLStreamException e) {}
+			while(TCFs.peek()!=null){
+				w = TCFs.pop();
+				// ... write file
+			}
+			w = null;
+		}
+	}
+	
+	private void mapSTextualDS(STextualDS ds){
+		XMLStreamWriter w = TCFs.peek();
+		try {
+			w.writeStartElement(NS_TC, TAG_TC_TEXT, NS_VALUE_TC);
+			w.writeCharacters(ds.getSText());
+			w.writeEndElement();
+		} catch (XMLStreamException e) {}
+		w = null;
+	}
+	
+	private void mapTokenization(List<SToken> sTokens){		
+		//TODO sTokens supposed to be ordered!
+		XMLStreamWriter w = TCFs.peek();
+		try {
+			w.writeStartElement(NS_TC, TAG_TC_TOKENS, NS_VALUE_TC);
+			SDocumentGraph sDocGraph = document.getSDocumentGraph();
+			int i = 0;
+			String id = null;
+			for (SToken sTok : sTokens){				
+				i++;
+				id = "t_"+i;
+				sNodes.put(sTok, id);
+				w.writeStartElement(NS_TC, TAG_TC_TOKEN, NS_VALUE_TC);
+				w.writeAttribute(ATT_ID, id);
+				w.writeCharacters(sDocGraph.getSText(sTok));
+				w.writeEndElement();//end of token
+			}
+			w.writeEndElement();//end of tokens
+		} catch (XMLStreamException e) {}
+		
+	}
+	
+	private void mapLayoutAnnotations(){
+		/*in TCF:Textstructure*/
+	}
 }

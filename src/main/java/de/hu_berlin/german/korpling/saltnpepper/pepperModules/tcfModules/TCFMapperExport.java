@@ -18,6 +18,9 @@
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -26,8 +29,10 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
@@ -41,7 +46,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	private HashMap<SNode, String> sNodes = null;
 	
 	public TCFMapperExport(SDocument sDocument){
-		this.document = sDocument;
+		this.document = sDocument;//FIXME I guess I should better use getSDocument(), but I did not really get into the data flow yet
 		TCFs = new Stack<XMLStreamWriter>();
 		sNodes = new HashMap<SNode, String>();
 		initMeta();		
@@ -54,7 +59,8 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	}
 	
 	/** this method maps an SDocument to TCF */
-	public void mapDocument(){
+	@Override
+	public DOCUMENT_STATUS mapSDocument(){
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		XMLOutputFactory factory = XMLOutputFactory.newFactory();
 		for (STextualDS sTextualDS : document.getSDocumentGraph().getSTextualDSs()){
@@ -72,16 +78,26 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				w.writeStartElement(NS_TC, TAG_TC_TEXTCORPUS, NS_VALUE_TC);
 				w.writeAttribute(ATT_LANG, meta.get(ATT_LANG));//TODO see above
 				mapSTextualDS(sTextualDS);
-//				mapTokenization();
+				mapTokenization(document.getSDocumentGraph().getSTokensBySequence((SDataSourceSequence)sTextualDS));//TODO --> Tokens in order?
 				w.writeEndElement();
 				w.writeEndDocument();
 			} catch (XMLStreamException e) {}
+			File file = null;			
 			while(TCFs.peek()!=null){
 				w = TCFs.pop();
-				// ... write file
+				file = new File(getResourceURI().toFileString()+"_"+meta.get(ATT_LANG));//FIXME we need a language stack, too, in case of parallel corpora
+				PrintWriter p;
+				try {
+					p = new PrintWriter(file);
+					p.println(outStream.toString());
+					p.close();
+				} catch (FileNotFoundException e) {
+					//TODO
+				}		
 			}
 			w = null;
 		}
+		return DOCUMENT_STATUS.COMPLETED;
 	}
 	
 	private void mapSTextualDS(STextualDS ds){

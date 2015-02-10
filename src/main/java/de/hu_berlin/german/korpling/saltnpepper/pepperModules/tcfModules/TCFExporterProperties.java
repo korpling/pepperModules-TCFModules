@@ -18,7 +18,38 @@
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModuleProperties;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModuleProperty;
 
 public class TCFExporterProperties extends PepperModuleProperties{
-
+	/** this property says which annotation key is used for spans over tokens that mark a line of text */
+	public static final String PROP_TEXTSTRUCTURE_LINE_QNAME = "textstructure.line.qname";
+	/** this property says which annotation value is used for spans over tokens that mark a line of text */
+	public static final String PROP_TEXTSTRUCTURE_LINE_VALUE = "textstructure.line.value";
+	/** this property says which annotation key is used for spans over tokens that mark a page */
+	public static final String PROP_TEXTSTRUCTURE_PAGE_QNAME = "textstructure.page.qname";
+	/** this property says which annotation value is used for spans over tokens that mark a line */
+	public static final String PROP_TEXTSTRUCTURE_PAGE_VALUE = "textstructure.page.value";
+	
+	public TCFExporterProperties(){
+		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_LINE_QNAME, String.class, "This property says which annotation key is used for spans over tokens that mark a line of text.", "textstructure", false));
+		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_LINE_VALUE, String.class, "This property says which annotation value is used for spans over tokens that mark a line of text.", "line", false));
+		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_PAGE_QNAME, String.class, "This property says which annotation key is used for spans over tokens that mark a page of text.", "textstructure", false));
+		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_PAGE_VALUE, String.class, "This property says which annotation value is used for spans over tokens that mark a page of text.", "page", false));
+	}
+	
+	public String getTextstructureLineName(){		
+		return getProperty(PROP_TEXTSTRUCTURE_LINE_QNAME).getValue().toString();		
+	}
+	
+	public String getTextstructureLineValue(){		
+		return getProperty(PROP_TEXTSTRUCTURE_LINE_VALUE).getValue().toString();		
+	}
+	
+	public String getTextstructurePageName(){		
+		return getProperty(PROP_TEXTSTRUCTURE_PAGE_QNAME).getValue().toString();		
+	}
+	
+	public String getTextstructurePageValue(){		
+		return getProperty(PROP_TEXTSTRUCTURE_PAGE_VALUE).getValue().toString();		
+	}
 }

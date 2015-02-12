@@ -20,7 +20,7 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 import org.osgi.service.component.annotations.Component;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperExporter;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperExporterImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
@@ -29,6 +29,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 public class TCFExporter extends PepperExporterImpl implements PepperExporter{
 	public TCFExporter(){
 		super();
+		this.setExportMode(EXPORT_MODE.DOCUMENTS_IN_FILES);
 		this.setName("TCFExporter");
 		this.setVersion("0.0.1");
 		this.addSupportedFormat("TCF", "0.4", null);
@@ -36,11 +37,20 @@ public class TCFExporter extends PepperExporterImpl implements PepperExporter{
 	}
 	
 	@Override
-	public void start(SElementId sElementId) throws PepperModuleException{
-		if (sElementId.getSIdentifiableElement() instanceof SDocument){
-			TCFMapperExport mapper = new TCFMapperExport();
-			mapper.setSDocument((SDocument)sElementId.getSIdentifiableElement());
-			mapper.mapSDocument();
-		}
+	public PepperMapper createPepperMapper(SElementId sElementId) {
+		TCFMapperExport mapper = new TCFMapperExport();		
+		if (sElementId.getSIdentifiableElement() instanceof SDocument) {
+			mapper.setResourceURI(getSElementId2ResourceTable().get(sElementId));
+		}		
+		return mapper;
 	}
+	
+//	@Override
+//	public void start(SElementId sElementId) throws PepperModuleException{
+//		if (sElementId.getSIdentifiableElement() instanceof SDocument){
+//			TCFMapperExport mapper = new TCFMapperExport();
+//			mapper.setSDocument((SDocument)sElementId.getSIdentifiableElement());
+//			mapper.mapSDocument();
+//		}
+//	}
 }

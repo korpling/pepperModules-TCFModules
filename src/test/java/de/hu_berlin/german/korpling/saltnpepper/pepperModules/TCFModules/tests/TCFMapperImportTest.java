@@ -6702,8 +6702,7 @@ public class TCFMapperImportTest {
 					xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t1");
 					xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t1");
 					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
-					xmlWriter.writeEndElement();
-					xmlWriter.writeEndElement();
+					xmlWriter.writeEndElement();					
 					xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);					
 					xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");					
 					xmlWriter.writeEndElement();

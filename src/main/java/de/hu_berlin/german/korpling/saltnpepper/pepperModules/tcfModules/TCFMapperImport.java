@@ -170,7 +170,6 @@ public class TCFMapperImport extends PepperMapperImpl{
 		{
 			localName = qName.substring(qName.lastIndexOf(":")+1);
 			path.push(localName);
-			logger.debug((new StringBuilder()).append(localName).append(REF_SEPERATOR).append(attributes.getLength()).toString());
 			
 			if (TAG_TC_CONSTITUENT.equals(localName)){
 				String constID = attributes.getValue(ATT_ID);
@@ -658,7 +657,6 @@ public class TCFMapperImport extends PepperMapperImpl{
                 String localName,
                 String qName) throws SAXException{
 			localName = qName.substring(qName.lastIndexOf(":")+1);
-			logger.debug("/"+localName);
 			if(TAG_TC_CONSTITUENT.equals(localName)){
 				idPath.pop();			
 			}

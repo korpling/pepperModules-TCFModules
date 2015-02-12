@@ -73,9 +73,9 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	
 	private void initMeta(){
 		meta = new HashMap<String, String>();
-		if (getSDocument()!=null){//FIXME I think this is always false
-			meta.put(ATT_LANG, getSDocument().getSMetaAnnotation(ATT_LANG).getValue().toString()); //FIXME --> by properties we will find out where this meta attribute is
-		}
+//		if (getSDocument()!=null){//FIXME I think this is always false
+//			meta.put(ATT_LANG, getSDocument().getSMetaAnnotation(ATT_LANG).getValue().toString()); //FIXME --> by properties we will find out where this meta attribute is
+//		}
 		//lang can be multiple value: parallel corpora		
 	}
 	
@@ -104,7 +104,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				w.writeStartElement(NS_MD, TAG_MD_METADATA, NS_VALUE_MD);
 				w.writeEndElement();
 				w.writeStartElement(NS_TC, TAG_TC_TEXTCORPUS, NS_VALUE_TC);
-				w.writeAttribute(ATT_LANG, getSDocument().getSMetaAnnotation(ATT_LANG).getSValueSTEXT());//TODO see above (meta)
+				w.writeAttribute(ATT_LANG, getLanguage());//TODO see also above (meta)
 				mapSTextualDS(sTextualDS);
 				mapTokenization(getSDocument().getSDocumentGraph().getSortedSTokenByText());
 				mapLayoutAnnotations();
@@ -129,6 +129,11 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 			w = null;
 		}
 		return DOCUMENT_STATUS.COMPLETED;
+	}
+	
+	private String getLanguage(){
+		//TODO
+		return "en";
 	}
 	
 	private void mapSTextualDS(STextualDS ds){
@@ -166,34 +171,35 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	
 	private void mapLayoutAnnotations(){
 		/* collect all relevant spans */
-		List<SSpan> sSpans = new ArrayList<SSpan>(); 
+		List<SNode> layoutNodes = new ArrayList<SNode>(); 
 		SAnnotation anno = null;
-		for (SSpan sSpan : getSDocument().getSDocumentGraph().getSSpans()){
-			anno = sSpan.getSAnnotation(qNameLine);
+		for (SNode sNode : getSDocument().getSDocumentGraph().getSNodes()){
+			anno = sNode.getSAnnotation(qNameLine);
 			if (anno!=null && anno.getSValueSTEXT().equals(valueLine)){
-				sSpans.add(sSpan);				
+				layoutNodes.add(sNode);				
 			}
-			anno = sSpan.getSAnnotation(qNamePage);
+			anno = sNode.getSAnnotation(qNamePage);
 			if (anno!=null && anno.getSValueSTEXT().equals(valuePage)){
-				sSpans.add(sSpan);
+				layoutNodes.add(sNode);
 			}			
 		}
 		//TODO Spans are maybe not sorted by Text
-		if (!sSpans.isEmpty()){
+		if (!layoutNodes.isEmpty()){
 			XMLStreamWriter w = TCFs.peek();
 			try {
 				w.writeStartElement(NS_TC, TAG_TC_TEXTSTRUCTURE, NS_VALUE_TC);
 				EList<STYPE_NAME> sTypes = new BasicEList<STYPE_NAME>();
 				sTypes.add(STYPE_NAME.SSPANNING_RELATION);
+				sTypes.add(STYPE_NAME.SDOMINANCE_RELATION);
 				List<SToken> sTokens = null;
 				String type = null;
-				for (SSpan sSpan : sSpans){
+				for (SNode sNode : layoutNodes){
 					w.writeStartElement(NS_TC, TAG_TC_TEXTSPAN, NS_VALUE_TC);
-					sTokens = getSDocument().getSDocumentGraph().getSortedSTokenByText(getSDocument().getSDocumentGraph().getOverlappedSTokens(sSpan, sTypes));					
+					sTokens = getSDocument().getSDocumentGraph().getSortedSTokenByText(getSDocument().getSDocumentGraph().getOverlappedSTokens(sNode, sTypes));					
 					w.writeAttribute(ATT_START, sNodes.get(sTokens.get(0)));
 					w.writeAttribute(ATT_END, sNodes.get(sTokens.get(sTokens.size()-1)));
-					type = sSpan.getSAnnotation(qNamePage)!=null? sSpan.getSAnnotation(qNamePage).getValue().toString() : 
-						(sSpan.getSAnnotation(qNameLine)!=null? sSpan.getSAnnotation(qNameLine).getValue().toString() : "IMPOSSIBLE RIGHT NOW"/*to be continued*/); 
+					type = sNode.getSAnnotation(qNamePage)!=null? sNode.getSAnnotation(qNamePage).getValue().toString() : 
+						(sNode.getSAnnotation(qNameLine)!=null? sNode.getSAnnotation(qNameLine).getValue().toString() : "IMPOSSIBLE RIGHT NOW"/*to be continued*/); 
 					w.writeAttribute(ATT_TYPE, type);
 					w.writeEndElement();
 				}

@@ -17,12 +17,15 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 
+import org.osgi.service.component.annotations.Component;
+
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperExporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperExporterImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 
+@Component(name="TCFExporterComponent", factory="PepperExporterComponentFactory")
 public class TCFExporter extends PepperExporterImpl implements PepperExporter{
 	public TCFExporter(){
 		super();

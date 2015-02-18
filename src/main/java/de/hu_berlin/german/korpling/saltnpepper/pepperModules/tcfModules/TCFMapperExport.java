@@ -181,17 +181,22 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		/* write */
 		XMLStreamWriter w = TCFs.peek();
 		SDocumentGraph sDocGraph = getSDocument().getSDocumentGraph();
-		EList<SSpan> sSpans = getSDocument().getSDocumentGraph().getSSpans();
+		List<SSpan> sSpans = new ArrayList<SSpan>();
+		for (SSpan sSpan : getSDocument().getSDocumentGraph().getSSpans()){
+			if (sSpan.getSAnnotation("sentence")!=null){
+				sSpans.add(sSpan);
+			}
+		}
 		EList<SToken> sTokens = null;
 		EList<STYPE_NAME> sTypes = new BasicEList<STYPE_NAME>();
 		sTypes.add(STYPE_NAME.SSPANNING_RELATION);
 		String value = null;
 		try {
-			w.writeStartElement(NS_TC, TAG_TC_SENTENCES, NS_VALUE_TC);
-			SSpan sSpan = null;
-			for (int j=0; j<sSpans.size(); j++){
-				sSpan = sSpans.get(j);
-				if (sSpan.getSAnnotation("sentence")!=null){
+			if (!sSpans.isEmpty()){			
+				w.writeStartElement(NS_TC, TAG_TC_SENTENCES, NS_VALUE_TC);
+				SSpan sSpan = null;
+				for (int j=0; j<sSpans.size(); j++){
+					sSpan = sSpans.get(j);			
 					sTokens = sDocGraph.getOverlappedSTokens(sSpan, sTypes);
 					sTokens = sDocGraph.getSortedSTokenByText(sTokens);					
 					w.writeStartElement(NS_TC, TAG_TC_SENTENCE, NS_VALUE_TC);
@@ -202,10 +207,10 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 					}
 					w.writeAttribute(ATT_TOKENIDS, value);
 					w.writeEndElement();
-					value = null;
+					value = null;			
 				}
+				w.writeEndElement();//end of sentences				
 			}
-			w.writeEndElement();//end of sentences
 		} catch (XMLStreamException e) {
 		}
 	}

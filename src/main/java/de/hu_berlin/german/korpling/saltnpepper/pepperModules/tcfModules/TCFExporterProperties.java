@@ -37,7 +37,7 @@ public class TCFExporterProperties extends PepperModuleProperties{
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_LINE_VALUE, String.class, "This property says which annotation value is used for spans over tokens that mark a line of text.", "line", false));
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_PAGE_QNAME, String.class, "This property says which annotation key is used for spans over tokens that mark a page of text.", "textstructure", false));
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_PAGE_VALUE, String.class, "This property says which annotation value is used for spans over tokens that mark a page of text.", "page", false));
-		addProperty(new PepperModuleProperty<Boolean>(PROP_EMPTY_TOKENS_ALLOWED, Boolean.class, "this property says whether empty tokens are allowed or not", false, false));
+		addProperty(new PepperModuleProperty<Boolean>(PROP_EMPTY_TOKENS_ALLOWED, Boolean.class, "this property says whether empty tokens are allowed or not", true, false));
 	}
 	
 	public String getTextstructureLineName(){		

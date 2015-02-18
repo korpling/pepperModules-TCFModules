@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
@@ -35,6 +36,7 @@ public class TCFMapperExportTest {
 	private static final String SNAME_TEST_PRIMARY_TEXT = "ExporterTestPrimaryData.tcf";
 	private static final String SNAME_TEST_TOKENS = "ExporterTestPrimaryData.tcf";
 	private static final String SNAME_TEST_TEXTSTRUCTURE = "ExporterTestTextstructure.tcf";
+	private static final String SNAME_TEST_SENTENCES = "ExporterTestSentences.tcf";
 	
 	public TCFMapperExport getFixture(){
 		return fixture;
@@ -62,7 +64,7 @@ public class TCFMapperExportTest {
 		xmlWriter.writeStartElement(TCFDictionary.NS_MD, TCFDictionary.TAG_MD_METADATA, TCFDictionary.NS_VALUE_MD);
 		xmlWriter.writeEndElement();
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTCORPUS, TCFDictionary.NS_VALUE_TC);
-		xmlWriter.writeAttribute(TCFDictionary.ATT_LANG, "en");
+		xmlWriter.writeAttribute(TCFDictionary.ATT_LANG, "x-unspecified");
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXT, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeCharacters(SampleGenerator.PRIMARY_TEXT_EN);
 		xmlWriter.writeEndElement();
@@ -249,6 +251,63 @@ public class TCFMapperExportTest {
 		/* setting variables*/		
 		this.getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_TEXTSTRUCTURE));
 		this.getFixture().setProperties(properties);
+		
+		/* start mapper */
+		this.getFixture().setSDocument(sDocument);
+		this.getFixture().mapSDocument();
+		
+		/* tests */
+		File fixFile = new File(getFixture().getResourceURI().toFileString());
+		BufferedReader reader = new BufferedReader(new FileReader(fixFile));
+		assertEquals(outStream.toString(), reader.readLine());
+		reader.close();
+	}
+	
+	@Test
+	public void testSentences() throws XMLStreamException, IOException{
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		XMLOutputFactory o= XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
+		
+		/* creating TCF */		
+		writeStartAndPrimaryText(xmlWriter);
+		writeTokens(xmlWriter);		
+		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SENTENCES, TCFDictionary.NS_VALUE_TC);
+		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SENTENCE, TCFDictionary.NS_VALUE_TC);
+		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "s_1");
+		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_1 t_2 t_3 t_4 t_5");
+		xmlWriter.writeEndElement();
+		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SENTENCE, TCFDictionary.NS_VALUE_TC);
+		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "s_2");
+		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_6 t_7 t_8 t_9 t_10 t_11");
+		xmlWriter.writeEndElement();
+		
+		xmlWriter.writeEndElement();//end of senctences
+		xmlWriter.writeEndElement();//end of textcorpus
+		xmlWriter.writeEndDocument();		
+		
+		/* creating SDocument */
+		SDocument sDocument = SaltFactory.eINSTANCE.createSDocument();
+		sDocument.setSName(SNAME_TEST_PRIMARY_TEXT);
+		sDocument.createSMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
+		SampleGenerator.createPrimaryData(sDocument, SampleGenerator.LANG_EN);
+		SampleGenerator.createTokens(sDocument);
+		SDocumentGraph sDocGraph = sDocument.getSDocumentGraph();
+		List<SToken> sTokens = sDocGraph.getSortedSTokenByText();
+		SSpan sSpan = sDocGraph.createSSpan(sTokens.get(0));
+		for (int i=1; i<5; i++){
+			sDocGraph.createSRelation(sSpan, sTokens.get(i), STYPE_NAME.SSPANNING_RELATION, null);
+		}
+		sSpan.createSAnnotation(null, "sentence", "sentence");
+		sSpan = sDocGraph.createSSpan(sTokens.get(5));
+		for (int i=6; i<sTokens.size(); i++){
+			sDocGraph.createSRelation(sSpan, sTokens.get(i), STYPE_NAME.SSPANNING_RELATION, null);
+		}
+		sSpan.createSAnnotation(null, "sentence", "sentence");
+		
+		/* setting variables*/		
+		this.getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_SENTENCES));
+		this.getFixture().setProperties(new TCFExporterProperties());
 		
 		/* start mapper */
 		this.getFixture().setSDocument(sDocument);

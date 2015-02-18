@@ -110,6 +110,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				w.writeAttribute(ATT_LANG, getLanguage());//TODO see also above (meta)
 				mapSTextualDS(sTextualDS);
 				mapTokenization(getSDocument().getSDocumentGraph().getSortedSTokenByText());
+				mapSentences();
 				mapLayoutAnnotations();
 				w.writeEndElement();
 				w.writeEndDocument();
@@ -136,7 +137,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	
 	private String getLanguage(){
 		//TODO
-		return "en";
+		return "x-unspecified";
 	}
 	
 	private void mapSTextualDS(STextualDS ds){
@@ -176,12 +177,35 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		}
 	}
 	
-	private void mapSentences(){
-		/* collect */
-		
+	private void mapSentences(){		
+		/* write */
 		XMLStreamWriter w = TCFs.peek();
+		SDocumentGraph sDocGraph = getSDocument().getSDocumentGraph();
+		EList<SSpan> sSpans = getSDocument().getSDocumentGraph().getSSpans();
+		EList<SToken> sTokens = null;
+		EList<STYPE_NAME> sTypes = new BasicEList<STYPE_NAME>();
+		sTypes.add(STYPE_NAME.SSPANNING_RELATION);
+		String value = null;
 		try {
-			w.writeStartElement(NS_TC, TAG_TC_SENTENCES, NS_VALUE_TC);			
+			w.writeStartElement(NS_TC, TAG_TC_SENTENCES, NS_VALUE_TC);
+			SSpan sSpan = null;
+			for (int j=0; j<sSpans.size(); j++){
+				sSpan = sSpans.get(j);
+				if (sSpan.getSAnnotation("sentence")!=null){
+					sTokens = sDocGraph.getOverlappedSTokens(sSpan, sTypes);
+					sTokens = sDocGraph.getSortedSTokenByText(sTokens);					
+					w.writeStartElement(NS_TC, TAG_TC_SENTENCE, NS_VALUE_TC);
+					w.writeAttribute(ATT_ID, "s_"+(j+1));
+					value = sNodes.get(sTokens.get(0));
+					for (int i=1; i<sTokens.size(); i++){
+						value+= " "+sNodes.get(sTokens.get(i));
+					}
+					w.writeAttribute(ATT_TOKENIDS, value);
+					w.writeEndElement();
+					value = null;
+				}
+			}
+			w.writeEndElement();//end of sentences
 		} catch (XMLStreamException e) {
 		}
 	}

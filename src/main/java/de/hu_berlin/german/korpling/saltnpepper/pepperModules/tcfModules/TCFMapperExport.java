@@ -198,8 +198,8 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 					sTokens = getSDocument().getSDocumentGraph().getSortedSTokenByText(getSDocument().getSDocumentGraph().getOverlappedSTokens(sNode, sTypes));					
 					w.writeAttribute(ATT_START, sNodes.get(sTokens.get(0)));
 					w.writeAttribute(ATT_END, sNodes.get(sTokens.get(sTokens.size()-1)));
-					type = sNode.getSAnnotation(qNamePage)!=null? sNode.getSAnnotation(qNamePage).getValue().toString() : 
-						(sNode.getSAnnotation(qNameLine)!=null? sNode.getSAnnotation(qNameLine).getValue().toString() : "IMPOSSIBLE RIGHT NOW"/*to be continued*/); 
+					type = sNode.getSAnnotation(qNamePage)!=null && sNode.getSAnnotation(qNamePage).getValue().equals(valuePage)? "page" : 
+						(sNode.getSAnnotation(qNameLine)!=null && sNode.getSAnnotation(qNameLine).getValue().equals(valueLine)? "line" : "IMPOSSIBLE RIGHT NOW"/*to be continued*/); 
 					w.writeAttribute(ATT_TYPE, type);
 					w.writeEndElement();
 				}

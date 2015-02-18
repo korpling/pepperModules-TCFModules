@@ -30,14 +30,14 @@ public class TCFExporterProperties extends PepperModuleProperties{
 	/** this property says which annotation value is used for spans over tokens that mark a line */
 	public static final String PROP_TEXTSTRUCTURE_PAGE_VALUE = "textstructure.page.value";
 	/** this property says whether empty tokens are allowed or not */
-	public static final String PROP_EMPTY_TOKENS_ALLOWED = "empty.tokens.allow";
+	public static final String PROP_EMPTY_TOKENS_ALLOWED = "allow.emptyTokens";
 	
 	public TCFExporterProperties(){
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_LINE_QNAME, String.class, "This property says which annotation key is used for spans over tokens that mark a line of text.", "textstructure", false));
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_LINE_VALUE, String.class, "This property says which annotation value is used for spans over tokens that mark a line of text.", "line", false));
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_PAGE_QNAME, String.class, "This property says which annotation key is used for spans over tokens that mark a page of text.", "textstructure", false));
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_PAGE_VALUE, String.class, "This property says which annotation value is used for spans over tokens that mark a page of text.", "page", false));
-		addProperty(new PepperModuleProperty<Boolean>(PROP_EMPTY_TOKENS_ALLOWED, Boolean.class, "this property says whether empty tokens are allowed or not", true, false));
+		addProperty(new PepperModuleProperty<Boolean>(PROP_EMPTY_TOKENS_ALLOWED, Boolean.class, "this property says whether empty tokens are allowed or not", false, false));
 	}
 	
 	public String getTextstructureLineName(){		
@@ -57,7 +57,11 @@ public class TCFExporterProperties extends PepperModuleProperties{
 	}
 	
 	public Boolean isEmptyTokensAllowed(){
-		/*TODO*/
-		return true;
+		boolean retVal = false;
+		String prop = getProperty(PROP_EMPTY_TOKENS_ALLOWED).getValue().toString();
+		if((prop!=null)&&(!prop.isEmpty())){
+			retVal = Boolean.valueOf(prop);
+		}
+		return retVal;
 	}
 }

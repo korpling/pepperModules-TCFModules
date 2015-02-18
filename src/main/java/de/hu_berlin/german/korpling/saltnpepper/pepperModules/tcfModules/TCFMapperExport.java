@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.security.AllPermission;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +58,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	private String valueLine = null;
 	private String qNamePage = null;
 	private String valuePage = null;
+	private boolean emptyTokensAllowed = false;
 		
 	public TCFMapperExport(){
 	}
@@ -68,6 +70,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		valueLine = ((TCFExporterProperties)getProperties()).getTextstructureLineValue();
 		qNamePage = ((TCFExporterProperties)getProperties()).getTextstructurePageName();
 		valuePage = ((TCFExporterProperties)getProperties()).getTextstructurePageValue();
+		emptyTokensAllowed = ((TCFExporterProperties)getProperties()).isEmptyTokensAllowed();
 		initMeta();
 	}
 	
@@ -155,17 +158,31 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				SDocumentGraph sDocGraph = getSDocument().getSDocumentGraph();
 				int i = 0;
 				String id = null;
-				for (SToken sTok : sTokens){				
-					i++;
-					id = "t_"+i;
-					sNodes.put(sTok, id);
-					w.writeStartElement(NS_TC, TAG_TC_TOKEN, NS_VALUE_TC);
-					w.writeAttribute(ATT_ID, id);
-					w.writeCharacters(sDocGraph.getSText(sTok));
-					w.writeEndElement();//end of token
+				String sText = null;				
+				for (SToken sTok : sTokens){
+					sText = sDocGraph.getSText(sTok);
+					if (emptyTokensAllowed || !sText.replace(" ","").replace(System.getProperty("line.separator"),"").replace("\t", "").isEmpty()){
+						i++;
+						id = "t_"+i;
+						sNodes.put(sTok, id);
+						w.writeStartElement(NS_TC, TAG_TC_TOKEN, NS_VALUE_TC);
+						w.writeAttribute(ATT_ID, id);
+						w.writeCharacters(sText);
+						w.writeEndElement();//end of token
+					}
 				}
 				w.writeEndElement();//end of tokens
 			} catch (XMLStreamException e) {}
+		}
+	}
+	
+	private void mapSentences(){
+		/* collect */
+		
+		XMLStreamWriter w = TCFs.peek();
+		try {
+			w.writeStartElement(NS_TC, TAG_TC_SENTENCES, NS_VALUE_TC);			
+		} catch (XMLStreamException e) {
 		}
 	}
 	

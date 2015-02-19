@@ -242,27 +242,24 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				sTypes.add(STYPE_NAME.SSPANNING_RELATION);
 				sTypes.add(STYPE_NAME.SDOMINANCE_RELATION);
 				List<SToken> sTokens = null;
-				SToken limitToken = null;
 				String type = null;
-				for (SNode sNode : layoutNodes){
-					w.writeStartElement(NS_TC, TAG_TC_TEXTSPAN, NS_VALUE_TC);
+				for (SNode sNode : layoutNodes){					
 					sTokens = getSDocument().getSDocumentGraph().getSortedSTokenByText(getSDocument().getSDocumentGraph().getOverlappedSTokens(sNode, sTypes));
-					Iterator<SToken> itSTokens = sTokens.iterator();
-					limitToken = itSTokens.next();
-					while (itSTokens.hasNext() && emptyTokens.contains(limitToken)){
-						limitToken = itSTokens.next();
+					List<SToken> realTokens = new ArrayList<SToken>();
+					for (SToken sTok : sTokens){
+						if (!emptyTokens.contains(sTok)){
+							realTokens.add(sTok);
+						}
 					}
-					w.writeAttribute(ATT_START, sNodes.get(limitToken));
-					int l = sTokens.indexOf(limitToken);
-					limitToken = sTokens.get(sTokens.size()-1);
-					for (int i=sTokens.size()-2; i>l && emptyTokens.contains(limitToken); i--){
-						limitToken = sTokens.get(i);
-					}
-					w.writeAttribute(ATT_END, sNodes.get(limitToken));
-					type = sNode.getSAnnotation(qNamePage)!=null && sNode.getSAnnotation(qNamePage).getValue().equals(valuePage)? "page" : 
-						(sNode.getSAnnotation(qNameLine)!=null && sNode.getSAnnotation(qNameLine).getValue().equals(valueLine)? "line" : "IMPOSSIBLE RIGHT NOW"/*to be continued*/); 
-					w.writeAttribute(ATT_TYPE, type);
-					w.writeEndElement();
+					if (!realTokens.isEmpty()){
+						w.writeStartElement(NS_TC, TAG_TC_TEXTSPAN, NS_VALUE_TC);
+						w.writeAttribute(ATT_START, sNodes.get(realTokens.get(0)));
+						w.writeAttribute(ATT_END, sNodes.get(realTokens.get(realTokens.size()-1)));
+						type = sNode.getSAnnotation(qNamePage)!=null && sNode.getSAnnotation(qNamePage).getValue().equals(valuePage)? "page" : 
+							(sNode.getSAnnotation(qNameLine)!=null && sNode.getSAnnotation(qNameLine).getValue().equals(valueLine)? "line" : "IMPOSSIBLE RIGHT NOW"/*to be continued*/); 
+						w.writeAttribute(ATT_TYPE, type);
+						w.writeEndElement();
+					}					
 				}
 				w.writeEndElement();
 			} catch (XMLStreamException e) {}

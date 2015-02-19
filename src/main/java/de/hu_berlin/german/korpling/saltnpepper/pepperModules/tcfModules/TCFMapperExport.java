@@ -21,9 +21,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.security.AllPermission;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -54,6 +55,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	private Stack<XMLStreamWriter> TCFs = null;
 	private HashMap<String, String> meta = null;
 	private HashMap<SNode, String> sNodes = null;
+	private HashSet<SToken> emptyTokens = null;
 	private String qNameLine = null;
 	private String valueLine = null;
 	private String qNamePage = null;
@@ -66,6 +68,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	public void init(){
 		TCFs = new Stack<XMLStreamWriter>();
 		sNodes = new HashMap<SNode, String>();
+		emptyTokens = new HashSet<SToken>();
 		qNameLine = ((TCFExporterProperties)getProperties()).getTextstructureLineName();
 		valueLine = ((TCFExporterProperties)getProperties()).getTextstructureLineValue();
 		qNamePage = ((TCFExporterProperties)getProperties()).getTextstructurePageName();
@@ -170,6 +173,8 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 						w.writeAttribute(ATT_ID, id);
 						w.writeCharacters(sText);
 						w.writeEndElement();//end of token
+					}else{
+						emptyTokens.add(sTok);
 					}
 				}
 				w.writeEndElement();//end of tokens
@@ -190,7 +195,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		EList<SToken> sTokens = null;
 		EList<STYPE_NAME> sTypes = new BasicEList<STYPE_NAME>();
 		sTypes.add(STYPE_NAME.SSPANNING_RELATION);
-		String value = null;
+		String value = "";
 		try {
 			if (!sSpans.isEmpty()){			
 				w.writeStartElement(NS_TC, TAG_TC_SENTENCES, NS_VALUE_TC);
@@ -200,14 +205,13 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 					sTokens = sDocGraph.getOverlappedSTokens(sSpan, sTypes);
 					sTokens = sDocGraph.getSortedSTokenByText(sTokens);					
 					w.writeStartElement(NS_TC, TAG_TC_SENTENCE, NS_VALUE_TC);
-					w.writeAttribute(ATT_ID, "s_"+(j+1));
-					value = sNodes.get(sTokens.get(0));
-					for (int i=1; i<sTokens.size(); i++){
-						value+= " "+sNodes.get(sTokens.get(i));
-					}
-					w.writeAttribute(ATT_TOKENIDS, value);
+					w.writeAttribute(ATT_ID, "s_"+(j+1));					
+					for (SToken sTok : sTokens){
+						value+= emptyTokens.contains(sTok)? "" : " "+sNodes.get(sTok);
+					}					
+					w.writeAttribute(ATT_TOKENIDS, value.trim());
 					w.writeEndElement();
-					value = null;			
+					value = "";			
 				}
 				w.writeEndElement();//end of sentences				
 			}
@@ -238,12 +242,23 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				sTypes.add(STYPE_NAME.SSPANNING_RELATION);
 				sTypes.add(STYPE_NAME.SDOMINANCE_RELATION);
 				List<SToken> sTokens = null;
+				SToken limitToken = null;
 				String type = null;
 				for (SNode sNode : layoutNodes){
 					w.writeStartElement(NS_TC, TAG_TC_TEXTSPAN, NS_VALUE_TC);
-					sTokens = getSDocument().getSDocumentGraph().getSortedSTokenByText(getSDocument().getSDocumentGraph().getOverlappedSTokens(sNode, sTypes));					
-					w.writeAttribute(ATT_START, sNodes.get(sTokens.get(0)));
-					w.writeAttribute(ATT_END, sNodes.get(sTokens.get(sTokens.size()-1)));
+					sTokens = getSDocument().getSDocumentGraph().getSortedSTokenByText(getSDocument().getSDocumentGraph().getOverlappedSTokens(sNode, sTypes));
+					Iterator<SToken> itSTokens = sTokens.iterator();
+					limitToken = itSTokens.next();
+					while (itSTokens.hasNext() && emptyTokens.contains(limitToken)){
+						limitToken = itSTokens.next();
+					}
+					w.writeAttribute(ATT_START, sNodes.get(limitToken));
+					int l = sTokens.indexOf(limitToken);
+					limitToken = sTokens.get(sTokens.size()-1);
+					for (int i=sTokens.size()-2; i>l && emptyTokens.contains(limitToken); i--){
+						limitToken = sTokens.get(i);
+					}
+					w.writeAttribute(ATT_END, sNodes.get(limitToken));
 					type = sNode.getSAnnotation(qNamePage)!=null && sNode.getSAnnotation(qNamePage).getValue().equals(valuePage)? "page" : 
 						(sNode.getSAnnotation(qNameLine)!=null && sNode.getSAnnotation(qNameLine).getValue().equals(valueLine)? "line" : "IMPOSSIBLE RIGHT NOW"/*to be continued*/); 
 					w.writeAttribute(ATT_TYPE, type);

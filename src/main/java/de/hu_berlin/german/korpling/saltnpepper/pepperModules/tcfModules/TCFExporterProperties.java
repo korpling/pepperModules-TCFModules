@@ -19,6 +19,8 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModuleProperties;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModuleProperty;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SALT_SEMANTIC_NAMES;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SaltSemanticsPackage;
 
 public class TCFExporterProperties extends PepperModuleProperties{
 	/** this property says which annotation key is used for spans over tokens that mark a line of text */
@@ -31,6 +33,14 @@ public class TCFExporterProperties extends PepperModuleProperties{
 	public static final String PROP_TEXTSTRUCTURE_PAGE_VALUE = "textstructure.page.value";
 	/** this property says whether empty tokens are allowed or not */
 	public static final String PROP_EMPTY_TOKENS_ALLOWED = "allow.emptyTokens";
+	/** this property says which annotation key is used for spans over tokens that mark a sentence */
+	public static final String PROP_SENTENCE_QNAME = "sentence.qname";
+	/** this property says which annotation value is used for spans over tokens that mark a sentence */
+	public static final String PROP_SENTENCE_VALUE = "sentence.value";
+	/** this property says which annotation key is used for POS annotations */
+	public static final String PROP_POS_QNAME = "pos.qname";
+	/** this property says which annotation annotation key is used for lemma annotations */
+	public static final String PROP_LEMMA_QNAME = "lemma.qname";
 	
 	public TCFExporterProperties(){
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_LINE_QNAME, String.class, "This property says which annotation key is used for spans over tokens that mark a line of text.", "textstructure", false));
@@ -38,6 +48,10 @@ public class TCFExporterProperties extends PepperModuleProperties{
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_PAGE_QNAME, String.class, "This property says which annotation key is used for spans over tokens that mark a page of text.", "textstructure", false));
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_PAGE_VALUE, String.class, "This property says which annotation value is used for spans over tokens that mark a page of text.", "page", false));
 		addProperty(new PepperModuleProperty<Boolean>(PROP_EMPTY_TOKENS_ALLOWED, Boolean.class, "this property says whether empty tokens are allowed or not", true, false));
+		addProperty(new PepperModuleProperty<String>(PROP_SENTENCE_QNAME, String.class, "This property says which annotation key is used for spans over tokens that mark a sentence.", "sentence", false));
+		addProperty(new PepperModuleProperty<String>(PROP_SENTENCE_VALUE, String.class, "This property says which annotation key is used for POS annotations.", "sentence", false));
+		addProperty(new PepperModuleProperty<String>(PROP_POS_QNAME, String.class, "This property says which annotation key is used for POS annotations.", "POS", false));
+		addProperty(new PepperModuleProperty<String>(PROP_LEMMA_QNAME, String.class, "This property says which annotation annotation key is used for lemma annotations.", "LEMMA", false));
 	}
 	
 	public String getTextstructureLineName(){		
@@ -63,5 +77,21 @@ public class TCFExporterProperties extends PepperModuleProperties{
 			retVal = Boolean.valueOf(prop);
 		}
 		return retVal;
+	}
+	
+	public String getSentenceQName(){
+		return getProperty(PROP_SENTENCE_QNAME).getValue().toString();
+	}
+	
+	public String getSentenceValue(){
+		return getProperty(PROP_SENTENCE_VALUE).getValue().toString();
+	}
+	
+	public String getPOSQName(){
+		return getProperty(PROP_POS_QNAME).getValue().toString();
+	}
+	
+	public String getLemmaQName(){
+		return getProperty(PROP_LEMMA_QNAME).getValue().toString();
 	}
 }

@@ -61,6 +61,10 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	private String qNamePage = null;
 	private String valuePage = null;
 	private boolean emptyTokensAllowed = false;
+	private String qNameSentence = null;
+	private String valueSentence = null;
+	private String qNamePOS = null;
+	private String qNameLemma = null;
 		
 	public TCFMapperExport(){
 	}
@@ -74,6 +78,10 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		qNamePage = ((TCFExporterProperties)getProperties()).getTextstructurePageName();
 		valuePage = ((TCFExporterProperties)getProperties()).getTextstructurePageValue();
 		emptyTokensAllowed = ((TCFExporterProperties)getProperties()).isEmptyTokensAllowed();
+		qNameSentence = ((TCFExporterProperties)getProperties()).getSentenceQName();
+		valueSentence = ((TCFExporterProperties)getProperties()).getSentenceValue();
+		qNamePOS = ((TCFExporterProperties)getProperties()).getPOSQName();
+		qNameLemma = ((TCFExporterProperties)getProperties()).getLemmaQName();
 		initMeta();
 	}
 	
@@ -114,6 +122,8 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				mapSTextualDS(sTextualDS);
 				mapTokenization(getSDocument().getSDocumentGraph().getSortedSTokenByText());
 				mapSentences();
+				mapPOSAnnotations();
+				mapLemmaAnnotations();
 				mapLayoutAnnotations();
 				w.writeEndElement();
 				w.writeEndDocument();
@@ -188,7 +198,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		SDocumentGraph sDocGraph = getSDocument().getSDocumentGraph();
 		List<SSpan> sSpans = new ArrayList<SSpan>();
 		for (SSpan sSpan : getSDocument().getSDocumentGraph().getSSpans()){
-			if (sSpan.getSAnnotation("sentence")!=null){
+			if (sSpan.getSAnnotation(qNameSentence)!=null && sSpan.getSAnnotation(qNameSentence).equals(valueSentence)){
 				sSpans.add(sSpan);
 			}
 		}
@@ -216,6 +226,63 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				w.writeEndElement();//end of sentences				
 			}
 		} catch (XMLStreamException e) {
+		}
+	}
+	
+	private void mapPOSAnnotations(){
+		XMLStreamWriter w = TCFs.peek();
+		List<SAnnotation> sAnnos = new ArrayList<SAnnotation>();
+		SAnnotation anno = null;
+		for (SToken sTok : getSDocument().getSDocumentGraph().getSortedSTokenByText()){
+			anno = sTok.getSAnnotation(qNamePOS);
+			if (anno!=null){
+				sAnnos.add(anno);
+			}
+		}
+		try{
+			if (!sAnnos.isEmpty()){
+				w.writeStartElement(NS_TC, TAG_TC_POSTAGS, NS_VALUE_TC);
+				w.writeAttribute(ATT_TAGSET, "STTS"/*TODO*/);
+				int k=1;
+				for (SAnnotation sAnno : sAnnos){
+					w.writeStartElement(NS_TC, TAG_TC_TAG, NS_VALUE_TC);
+					w.writeAttribute(ATT_ID, "pt_"+k++);
+					w.writeAttribute(ATT_TOKENIDS, sNodes.get(sAnno.getSAnnotatableElement()));
+					w.writeCharacters(sAnno.getValue().toString());
+					w.writeEndElement();
+				}
+				w.writeEndElement();
+			}
+		}catch (XMLStreamException e){
+			logger.warn("Failed to write POS-Annotations.");
+		}
+	}
+	
+	private void mapLemmaAnnotations(){
+		XMLStreamWriter w = TCFs.peek();
+		List<SAnnotation> sAnnos = new ArrayList<SAnnotation>();
+		SAnnotation anno = null;
+		for (SToken sTok : getSDocument().getSDocumentGraph().getSortedSTokenByText()){
+			anno = sTok.getSAnnotation(qNameLemma);
+			if (anno!=null){
+				sAnnos.add(anno);
+			}
+		}
+		try{
+			if (!sAnnos.isEmpty()){
+				w.writeStartElement(NS_TC, TAG_TC_LEMMAS, NS_VALUE_TC);
+				int k=1;
+				for (SAnnotation sAnno : sAnnos){
+					w.writeStartElement(NS_TC, TAG_TC_LEMMA, NS_VALUE_TC);
+					w.writeAttribute(ATT_ID, "le_"+k++);
+					w.writeAttribute(ATT_TOKENIDS, sNodes.get(sAnno.getSAnnotatableElement()));
+					w.writeCharacters(sAnno.getValue().toString());
+					w.writeEndElement();
+				}
+				w.writeEndElement();
+			}
+		}catch (XMLStreamException e){
+			logger.warn("Failed to write lemma annotations.");
 		}
 	}
 	

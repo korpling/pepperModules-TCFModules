@@ -103,7 +103,6 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		XMLOutputFactory factory = XMLOutputFactory.newFactory();
 		for (STextualDS sTextualDS : getSDocument().getSDocumentGraph().getSTextualDSs()){
-			//for each tokenization do:			
 			XMLStreamWriter w;
 			try {
 				w = TCFs.push(factory.createXMLStreamWriter(outStream));
@@ -242,7 +241,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		try{
 			if (!sAnnos.isEmpty()){
 				w.writeStartElement(NS_TC, TAG_TC_POSTAGS, NS_VALUE_TC);
-				w.writeAttribute(ATT_TAGSET, "STTS"/*TODO*/);
+				w.writeAttribute(ATT_TAGSET, "stts"/*TODO*/);
 				int k=1;
 				for (SAnnotation sAnno : sAnnos){
 					w.writeStartElement(NS_TC, TAG_TC_TAG, NS_VALUE_TC);

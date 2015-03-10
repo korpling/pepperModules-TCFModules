@@ -125,8 +125,8 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				mapPOSAnnotations();
 				mapLemmaAnnotations();
 				mapLayoutAnnotations();
-				w.writeEndElement();
-				w.writeEndDocument();
+				w.writeEndElement();//end of textcorpus
+				w.writeEndElement();//end of d-spin
 				w.writeEndDocument();
 			} catch (XMLStreamException e) {}
 			File file = null;			
@@ -198,7 +198,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		SDocumentGraph sDocGraph = getSDocument().getSDocumentGraph();
 		List<SSpan> sSpans = new ArrayList<SSpan>();
 		for (SSpan sSpan : getSDocument().getSDocumentGraph().getSSpans()){
-			if (sSpan.getSAnnotation(qNameSentence)!=null && sSpan.getSAnnotation(qNameSentence).equals(valueSentence)){
+			if (sSpan.getSAnnotation(qNameSentence)!=null && sSpan.getSAnnotation(qNameSentence).getValue().toString().equals(valueSentence)){
 				sSpans.add(sSpan);
 			}
 		}

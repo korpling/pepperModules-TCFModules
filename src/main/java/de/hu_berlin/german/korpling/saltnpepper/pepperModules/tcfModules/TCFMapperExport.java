@@ -131,12 +131,12 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				w.writeEndDocument();
 			} catch (XMLStreamException e) {throw new PepperModuleException();}
 		}
-		File file = null;			
+		File file = null;
+		PrintWriter p;
 		while(!TCFs.isEmpty()){
 			w = TCFs.pop();
 			file = new File(getResourceURI().toFileString());//FIXME we need a language stack, too, in case of parallel corpora
 			file.getParentFile().mkdirs();
-			PrintWriter p;
 			try {
 				p = new PrintWriter(file);
 				p.println(outStream.toString());

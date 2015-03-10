@@ -44,13 +44,4 @@ public class TCFExporter extends PepperExporterImpl implements PepperExporter{
 		}		
 		return mapper;
 	}
-	
-//	@Override
-//	public void start(SElementId sElementId) throws PepperModuleException{
-//		if (sElementId.getSIdentifiableElement() instanceof SDocument){
-//			TCFMapperExport mapper = new TCFMapperExport();
-//			mapper.setSDocument((SDocument)sElementId.getSIdentifiableElement());
-//			mapper.mapSDocument();
-//		}
-//	}
 }

@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleDataException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
@@ -102,11 +103,12 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		}
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		XMLOutputFactory factory = XMLOutputFactory.newFactory();
-		for (STextualDS sTextualDS : getSDocument().getSDocumentGraph().getSTextualDSs()){
-			XMLStreamWriter w;
+		XMLStreamWriter w;
+		for (STextualDS sTextualDS : getSDocument().getSDocumentGraph().getSTextualDSs()){			
 			try {
 				w = TCFs.push(factory.createXMLStreamWriter(outStream));
 				w.writeStartDocument();
+				w.writeProcessingInstruction(TCF_PI);
 				w.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
 				w.writeNamespace(NS_ED, NS_VALUE_ED);
 				w.writeNamespace(NS_LX, NS_VALUE_LX);
@@ -127,23 +129,23 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				w.writeEndElement();//end of textcorpus
 				w.writeEndElement();//end of d-spin
 				w.writeEndDocument();
-			} catch (XMLStreamException e) {}
-			File file = null;			
-			while(!TCFs.isEmpty()){
-				w = TCFs.pop();
-				file = new File(getResourceURI().toFileString());//FIXME we need a language stack, too, in case of parallel corpora
-				file.getParentFile().mkdirs();
-				PrintWriter p;
-				try {
-					p = new PrintWriter(file);
-					p.println(outStream.toString());
-					p.close();
-				} catch (FileNotFoundException e) {	
-					logger.error("Could not write TCF "+getResourceURI(), e);
-				}		
-			}
-			w = null;
+			} catch (XMLStreamException e) {throw new PepperModuleException();}
 		}
+		File file = null;			
+		while(!TCFs.isEmpty()){
+			w = TCFs.pop();
+			file = new File(getResourceURI().toFileString());//FIXME we need a language stack, too, in case of parallel corpora
+			file.getParentFile().mkdirs();
+			PrintWriter p;
+			try {
+				p = new PrintWriter(file);
+				p.println(outStream.toString());
+				p.close();
+			} catch (FileNotFoundException e) {	
+				logger.error("Could not write TCF "+getResourceURI(), e);
+			}		
+		}
+		w = null;		
 		return DOCUMENT_STATUS.COMPLETED;
 	}
 	
@@ -248,12 +250,12 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 					w.writeAttribute(ATT_ID, "pt_"+k++);
 					w.writeAttribute(ATT_TOKENIDS, sNodes.get(sAnno.getSAnnotatableElement()));
 					w.writeCharacters(sAnno.getValue().toString());
-					w.writeEndElement();
+					w.writeEndElement();//end of tag
 				}
-				w.writeEndElement();
+				w.writeEndElement();//end of POSTags
 			}
 		}catch (XMLStreamException e){
-			logger.warn("Failed to write POS-Annotations.");
+			throw new PepperModuleDataException(this, "Failed to write POS-Annotations.");
 		}
 	}
 	

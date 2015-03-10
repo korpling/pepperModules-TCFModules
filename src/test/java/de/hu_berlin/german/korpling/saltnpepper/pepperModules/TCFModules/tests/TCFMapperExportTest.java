@@ -75,6 +75,7 @@ public class TCFMapperExportTest {
 	
 	private void writeStartAndPrimaryText(XMLStreamWriter xmlWriter) throws XMLStreamException{
 		xmlWriter.writeStartDocument();
+		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
 		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);				
 		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
 		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
@@ -446,7 +447,6 @@ public class TCFMapperExportTest {
 		File fixFile = new File(getFixture().getResourceURI().toFileString());
 		BufferedReader reader = new BufferedReader(new FileReader(fixFile));
 		assertEquals(outStream.toString(), reader.readLine());
-		System.out.println("TEST");
 		reader.close();
 	}
 }

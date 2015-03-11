@@ -255,7 +255,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				w.writeEndElement();//end of POSTags
 			}
 		}catch (XMLStreamException e){
-			throw new PepperModuleDataException(this, "Failed to write POS-Annotations.");
+			throw new PepperModuleDataException(this, "Failed to write POS-annotations.");
 		}
 	}
 	

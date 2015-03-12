@@ -53,7 +53,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	
 	private static final Logger logger = LoggerFactory.getLogger(TCFMapperExport.class);
 	
-	private Stack<XMLStreamWriter> TCFs = null;
+	private XMLStreamWriter currentTCF = null;
 	private HashMap<String, String> meta = null;
 	private HashMap<SNode, String> sNodes = null;
 	private HashSet<SToken> emptyTokens = null;
@@ -71,7 +71,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	}
 	
 	public void init(){
-		TCFs = new Stack<XMLStreamWriter>();
+		currentTCF = null;
 		sNodes = new HashMap<SNode, String>();
 		emptyTokens = new HashSet<SToken>();
 		qNameLine = ((TCFExporterProperties)getProperties()).getTextstructureLineName();
@@ -101,12 +101,19 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		if (getSDocument()==null){
 			throw new PepperModuleDataException(this, "No document delivered to be converted.");
 		}
-		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		ByteArrayOutputStream outStream = null;
 		XMLOutputFactory factory = XMLOutputFactory.newFactory();
 		XMLStreamWriter w;
-		for (STextualDS sTextualDS : getSDocument().getSDocumentGraph().getSTextualDSs()){			
+		File file = null;
+		PrintWriter p;
+		boolean multipleFiles = getSDocument().getSDocumentGraph().getSTextualDSs().size()>1;
+		List<STextualDS> sTextualDSs = getSDocument().getSDocumentGraph().getSTextualDSs();
+		STextualDS sTextualDS = null;
+		for (int i=0; i<sTextualDSs.size(); i++){			
 			try {
-				w = TCFs.push(factory.createXMLStreamWriter(outStream));
+				sTextualDS = sTextualDSs.get(i);
+				outStream = new ByteArrayOutputStream();
+				w = currentTCF = factory.createXMLStreamWriter(outStream);
 				w.writeStartDocument();
 				w.writeProcessingInstruction(TCF_PI);
 				w.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
@@ -129,23 +136,19 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				w.writeEndElement();//end of textcorpus
 				w.writeEndElement();//end of d-spin
 				w.writeEndDocument();
+				
+				/*write File*/
+				file = new File(getResourceURI().toFileString()+(multipleFiles? +i+".tcf" : ""));//FIXME A) File ending missing B)we need a language stack, too, in case of parallel corpora			
+				file.getParentFile().mkdirs();
+				try {
+					p = new PrintWriter(file);
+					p.println(outStream.toString());
+					p.close();
+				} catch (FileNotFoundException e) {	
+					logger.error("Could not write TCF "+getResourceURI(), e);
+				}
 			} catch (XMLStreamException e) {throw new PepperModuleException();}
-		}
-		File file = null;
-		PrintWriter p;
-		while(!TCFs.isEmpty()){
-			w = TCFs.pop();
-			file = new File(getResourceURI().toFileString());//FIXME we need a language stack, too, in case of parallel corpora
-			file.getParentFile().mkdirs();
-			try {
-				p = new PrintWriter(file);
-				p.println(outStream.toString());
-				p.close();
-			} catch (FileNotFoundException e) {	
-				logger.error("Could not write TCF "+getResourceURI(), e);
-			}		
-		}
-		w = null;		
+		}		
 		return DOCUMENT_STATUS.COMPLETED;
 	}
 	
@@ -155,7 +158,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	}
 	
 	private void mapSTextualDS(STextualDS ds){
-		XMLStreamWriter w = TCFs.peek();
+		XMLStreamWriter w = currentTCF;
 		try {
 			w.writeStartElement(NS_TC, TAG_TC_TEXT, NS_VALUE_TC);
 			w.writeCharacters(ds.getSText());
@@ -167,7 +170,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	private void mapTokenization(List<SToken> sTokens){		
 		//TODO sTokens supposed to be ordered!
 		if (!sTokens.isEmpty()){
-			XMLStreamWriter w = TCFs.peek();
+			XMLStreamWriter w = currentTCF;
 			try {
 				w.writeStartElement(NS_TC, TAG_TC_TOKENS, NS_VALUE_TC);
 				SDocumentGraph sDocGraph = getSDocument().getSDocumentGraph();
@@ -195,7 +198,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	
 	private void mapSentences(){		
 		/* write */
-		XMLStreamWriter w = TCFs.peek();
+		XMLStreamWriter w = currentTCF;
 		SDocumentGraph sDocGraph = getSDocument().getSDocumentGraph();
 		List<SSpan> sSpans = new ArrayList<SSpan>();
 		for (SSpan sSpan : getSDocument().getSDocumentGraph().getSSpans()){
@@ -231,7 +234,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	}
 	
 	private void mapPOSAnnotations(){
-		XMLStreamWriter w = TCFs.peek();
+		XMLStreamWriter w = currentTCF;
 		List<SAnnotation> sAnnos = new ArrayList<SAnnotation>();
 		SAnnotation anno = null;
 		for (SToken sTok : getSDocument().getSDocumentGraph().getSortedSTokenByText()){
@@ -260,7 +263,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	}
 	
 	private void mapLemmaAnnotations(){
-		XMLStreamWriter w = TCFs.peek();
+		XMLStreamWriter w = currentTCF;
 		List<SAnnotation> sAnnos = new ArrayList<SAnnotation>();
 		SAnnotation anno = null;
 		for (SToken sTok : getSDocument().getSDocumentGraph().getSortedSTokenByText()){
@@ -303,7 +306,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		}
 		//TODO Spans are maybe not sorted by Text
 		if (!layoutNodes.isEmpty()){
-			XMLStreamWriter w = TCFs.peek();
+			XMLStreamWriter w = currentTCF;
 			try {
 				w.writeStartElement(NS_TC, TAG_TC_TEXTSTRUCTURE, NS_VALUE_TC);
 				EList<STYPE_NAME> sTypes = new BasicEList<STYPE_NAME>();

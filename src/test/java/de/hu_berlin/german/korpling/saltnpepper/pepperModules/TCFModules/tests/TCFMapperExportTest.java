@@ -53,7 +53,7 @@ public class TCFMapperExportTest {
 	private TCFMapperExport fixture = null;
 	private static final String FOLDER_PEPPER_TEST = "/pepper-test/";
 	private static final String SNAME_TEST_PRIMARY_TEXT = "ExporterTestPrimaryData.tcf";
-	private static final String SNAME_TEST_TOKENS = "ExporterTestPrimaryData.tcf";
+	private static final String SNAME_TEST_TOKENS = "ExporterTestTokens.tcf";
 	private static final String SNAME_TEST_TEXTSTRUCTURE = "ExporterTestTextstructure.tcf";
 	private static final String SNAME_TEST_SENTENCES = "ExporterTestSentences.tcf";
 	private static final String SNAME_TEST_POS = "ExporterTestPOS.tcf";

@@ -98,12 +98,81 @@ SToken and/or SSpan objects where the annotation's namespace is (in most cases, 
 table below) the SLayer's name and the annotation's name is the tag's name without
 the xml namespace or the attributes name. E.g.:
 ```xml
-&lt;constituent cat="VVFIN" ID="c_1" tokenIDs="t_1"/>
+<constituent cat="VVFIN" ID="c_1" tokenIDs="t_1"/>
 ``` 
 In this case the token is annotated with syntax::cat="VVFIN" in the salt model. An overview of all TCF-Layers and according SLayers can be found in the following table:
 |TCF layer|namespace of annotation|node annotation names|edge annotation names|meta annotations on SLayer|
 |---------|-----------------------|---------------------|---------------------|--------------------------|
+| POSTags | saltSemantics         | POS                 |                     | tagset                   |
+| lemmas  | saltSemantics | LEMMA | | | 
+| parsing | syntax | cat | | tagset | 
+| depparsing | dependencies | | func | tagset | 
+| morphology | morphology | * | | | 
+| namedEntities | named entities | class | | type | 
+| references | references | type | rel | typetagset, reltagset | 
+| synonymy | lexical-semantics | | | synonymy (on lemma annotation) | 
+| antonymy             | lexical-semantics | | | antonymy (on lemma annotation) | 
+| hyponymy             | lexical-semantics | | | hyponymy (on lemma annotation) | 
+| hyperonymy           | lexical-semantics | | | hyperonymy (on lemma annotation) | 
+| wsd                  | wordSense | lexunits, comment | | src | 
+| WordSplittings       | wordSplittings | split | | type | 
+| geo                  | geography | alt, lat, lon, continent, country, capital | | src | 
+| discourseconnectives | discourseConnectives | type | | tagset | 
+| phonetics            | phonetics | pron | | transcription | 
+| textstructure        | textstructure | type | | | 
+| orthography          | orthography   | correction | | |
 
+## Properties
+The table below contains an overview of all usable properties to customize the behaviour of this Pepper module. The following section contains a close description to each single property and describes the resulting differences in the mapping to the Salt model.
+| Name of property | Type of property | optional/mandatory | default value |
+|------------------|------------------|--------------------|---------------|
+| shrinkTokenAnnotations | Boolean | optional | true |
 
+### shrinkTokenAnnotations
+This property influences the import of annotations on single tokens. If it is set true, annotations on single tokens are stored as annotations directly at the token object, whereas a span is build over all tokens for multiple token annotations. If shrinkTokenAnnotations is set false, also annotations of single tokens are created at a span built over the token.
 
 # TCFExporter
+
+## Mapping from Salt
+Each STextualDS in an SDocument is mapped to a single TCF file. In case of multiple STextualDSs the files names will be $DocumentName.[0–9]+.tcf.
+In the current state the exporter is capable of mapping primary text, tokens, sentences, POS and lemma annotations, which are the basic features
+for further processing in WebLicht, which TCF was also made for. To enable the exporter to do this, default assumptions about annotations QNames
+and values are made, which can be overriden by properties.
+
+## Properties
+The table below contains an overview of all usable properties to customize the behaviour of this Pepper module. The following section contains a close description to each single property and describes the resulting differences in the mapping to TCF.
+| Name of property | Type of property | optional/mandatory | default value |
+|------------------|------------------|--------------------|---------------|
+| allow.emptyTokens | Boolean | optional | true |
+| pos.qname | String | optional | "POS" |
+| lemma.qname | String | optional | "LEMMA" |
+| sentence.qname | String | optional | "sentence" |
+| sentence.value | String | optional | "sentence" |
+| textstructure.line.qname | String | optional | "textstructure" |
+| textstructure.line.value | String | optional | "line" |
+| textstructure.page.qname | String | optional | "textstructure" |
+| textstructure.page.value | String | optional | "page" |
+
+### allow.emptyTokens
+Some importers create SToken objects without any textual content. By setting this property to false, these tokens will be ignored in the export process.
+
+### pos.qname
+This property contains the QName of part of speech annotations (namespace+"::"+name or simply name if namespace==null).
+
+### lemma.qname
+This property contains the QName of lemma annotations.
+
+### sentence.qname
+This property contains the QName of SAnnotations marking sentence spans.
+
+### sentence.value
+This property contains the value of SAnnotations marking sentence spans.
+
+### textstructure.line.qname
+This property contains the QName of SAnnotations marking spans containing tokens that form a line.
+### textstructure.line.value
+This property contains the value of SAnnotations marking spans containing tokens that form a line.
+### textstructure.page.qname
+This property contains the QName of SAnnotations marking spans containing tokens that form a page.
+### textstructure.page.value
+This property contains the value of SAnnotations marking spans containing tokens that form a page.

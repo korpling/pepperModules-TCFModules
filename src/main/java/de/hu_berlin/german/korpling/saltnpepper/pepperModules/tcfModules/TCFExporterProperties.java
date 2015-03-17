@@ -41,6 +41,9 @@ public class TCFExporterProperties extends PepperModuleProperties{
 	public static final String PROP_POS_QNAME = "pos.qname";
 	/** this property says which annotation annotation key is used for lemma annotations */
 	public static final String PROP_LEMMA_QNAME = "lemma.qname";
+	/** property description */
+	public static final String PROP_NE_QNAME = "";
+	
 	
 	public TCFExporterProperties(){
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_LINE_QNAME, String.class, "This property says which annotation key is used for spans over tokens that mark a line of text.", "textstructure", false));

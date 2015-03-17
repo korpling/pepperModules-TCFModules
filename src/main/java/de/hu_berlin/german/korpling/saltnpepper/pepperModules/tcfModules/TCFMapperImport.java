@@ -155,8 +155,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			currentAnnoKey = null;
 			p = 0;			
 			shrinkTokenAnnotations = ((TCFImporterProperties)getProperties()).isShrinkTokenAnnotation();
-			useCommonAnnotatedElement = ((TCFImporterProperties)getProperties()).isUseCommonAnnotatedElement();
-			logger.info(shrinkTokenAnnotations ? "shrinkTokenAnnotations=true" : "shrinkTokenAnnotations=false - export might take longer");
+			useCommonAnnotatedElement = ((TCFImporterProperties)getProperties()).isUseCommonAnnotatedElement();			
 			ignoreIds = false;
 			id = 0;	
 			metaId = 0;

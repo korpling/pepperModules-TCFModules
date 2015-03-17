@@ -101,6 +101,7 @@ the xml namespace or the attributes name. E.g.:
 <constituent cat="VVFIN" ID="c_1" tokenIDs="t_1"/>
 ``` 
 In this case the token is annotated with syntax::cat="VVFIN" in the salt model. An overview of all TCF-Layers and according SLayers can be found in the following table:
+
 |TCF layer|namespace of annotation|node annotation names|edge annotation names|meta annotations on SLayer|
 |---------|-----------------------|---------------------|---------------------|--------------------------|
 | POSTags | saltSemantics         | POS                 |                     | tagset                   |
@@ -124,6 +125,7 @@ In this case the token is annotated with syntax::cat="VVFIN" in the salt model. 
 
 ## Properties
 The table below contains an overview of all usable properties to customize the behaviour of this Pepper module. The following section contains a close description to each single property and describes the resulting differences in the mapping to the Salt model.
+
 | Name of property | Type of property | optional/mandatory | default value |
 |------------------|------------------|--------------------|---------------|
 | shrinkTokenAnnotations | Boolean | optional | true |
@@ -141,6 +143,7 @@ and values are made, which can be overriden by properties.
 
 ## Properties
 The table below contains an overview of all usable properties to customize the behaviour of this Pepper module. The following section contains a close description to each single property and describes the resulting differences in the mapping to TCF.
+
 | Name of property | Type of property | optional/mandatory | default value |
 |------------------|------------------|--------------------|---------------|
 | allow.emptyTokens | Boolean | optional | true |

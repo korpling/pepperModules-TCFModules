@@ -56,7 +56,7 @@ update de.hu_berlin.german.korpling.saltnpepper::pepperModules-TCFModules::https
 Note, that the update is performed directly after typing that. From then on you will be able to start updates of pepperModules-TCFModules with `update pepperModules-TCFModules`.
 
 ## Usage
-To use this module in your Pepper workflow, put the following lines into the workflow description file. Note the fixed order of xml elements in the workflow description file: &lt;importer/&gt, &lt;manipulator/&gt, &lt;exporter/&gt.
+To use this module in your Pepper workflow, put the following lines into the workflow description file. Note the fixed order of xml elements in the workflow description file: &lt;importer/&gt;, &lt;manipulator/&gt;, &lt;exporter/&gt;.
 A detailed description of the Pepper workflow can be found on the [Pepper project site](https://github.com/korpling/pepper). 
 
 ### a) Identify the module by name

@@ -136,6 +136,7 @@ The table below contains an overview of all usable properties to customize the b
 This property influences the import of annotations on single tokens. If it is set true, annotations on single tokens are stored as annotations directly at the token object, whereas a span is build over all tokens for multiple token annotations. If shrinkTokenAnnotations is set false, also annotations of single tokens are created at a span built over the token.
 
 # TCFExporter
+The TCFExporter exports data from a Salt model to the TCF format decribed by the schema http://weblicht.sfs.uni-tuebingen.de/weblichtwiki/index.php/The_TCF_Format.
 
 ## Mapping from Salt
 Each STextualDS in an SDocument is mapped to a single TCF file. In case of multiple STextualDSs the files names will be $DocumentName.[0–9]+.tcf.

@@ -89,6 +89,8 @@ This project was funded by the [Clarin-D project](http://www.clarin-d.de/) and r
 
 # TCFImporter
 
+The TCFImporter imports data following the TCF format decribed by the schema http://weblicht.sfs.uni-tuebingen.de/weblichtwiki/index.php/The_TCF_Format into a Salt model.
+
 ## Mapping to Salt
 
 The importer maps each TCF layer to an SLayer object in Salt. Attributes refering to the

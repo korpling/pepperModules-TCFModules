@@ -96,13 +96,12 @@ The TCFImporter imports data following the TCF format decribed by the schema htt
 The importer maps each TCF layer to an SLayer object in Salt. Attributes refering to the
 TCF layer are stored as meta annotations on the SLayer itself without using a
 namespace. All annotations contained in the TCF layer are imported as annotations on
-SToken and/or SSpan objects where the annotation's namespace is (in most cases, cf.
-table below) the SLayer's name and the annotation's name is the tag's name without
-the xml namespace or the attributes name. E.g.:
+SToken, SSpan and SStructure objects where the annotation's namespace is (in most cases, cf.
+table below) the tag's name without the xml namespace and the annotation's name is the attribute's name. E.g.:
 ```xml
 <constituent cat="VVFIN" ID="c_1" tokenIDs="t_1"/>
 ``` 
-In this case the token is annotated with syntax::cat="VVFIN" in the salt model. An overview of all TCF-Layers and according SLayers can be found in the following table:
+In this case the token is annotated with syntax::cat="VVFIN" in the Salt model. An overview of all TCF-Layers and according SLayers can be found in the following table:
 
 |TCF layer|namespace of annotation|node annotation names|edge annotation names|meta annotations on SLayer|
 |---------|-----------------------|---------------------|---------------------|--------------------------|
@@ -133,16 +132,16 @@ The table below contains an overview of all usable properties to customize the b
 | shrinkTokenAnnotations | Boolean | optional | true |
 
 ### shrinkTokenAnnotations
-This property influences the import of annotations on single tokens. If it is set true, annotations on single tokens are stored as annotations directly at the token object, whereas a span is build over all tokens for multiple token annotations. If shrinkTokenAnnotations is set false, also annotations of single tokens are created at a span built over the token.
+This property influences the import of annotations on single tokens. If it is set true, annotations on single tokens are stored as annotations directly at the token object, whereas a span is build over all tokens for annotations on multiple token . If shrinkTokenAnnotations is set false, also annotations of single tokens are created at a span built over the token.
 
 # TCFExporter
 The TCFExporter exports data from a Salt model to the TCF format decribed by the schema http://weblicht.sfs.uni-tuebingen.de/weblichtwiki/index.php/The_TCF_Format.
 
 ## Mapping from Salt
-Each STextualDS in an SDocument is mapped to a single TCF file. In case of multiple STextualDSs the files names will be $DocumentName.[0–9]+.tcf.
+Each STextualDS in an SDocument is mapped to a single TCF file. In case of an SDocument containing multiple STextualDSs, the files' names will be $DocumentName.[0–9]+.tcf.
 In the current state the exporter is capable of mapping primary text, tokens, sentences, POS and lemma annotations, which are the basic features
-for further processing in WebLicht, which TCF was also made for. To enable the exporter to do this, default assumptions about annotations QNames
-and values are made, which can be overriden by properties.
+for further processing in WebLicht, which TCF was also made for. To enable the exporter to do this, default assumptions about annotations qualified names
+and values in the provided Salt graph are made, which can be overriden by properties.
 
 ## Properties
 The table below contains an overview of all usable properties to customize the behaviour of this Pepper module. The following section contains a close description to each single property and describes the resulting differences in the mapping to TCF.
@@ -163,22 +162,22 @@ The table below contains an overview of all usable properties to customize the b
 Some importers create SToken objects without any textual content. By setting this property to false, these tokens will be ignored in the export process.
 
 ### pos.qname
-This property contains the QName of part of speech annotations (namespace+"::"+name or simply name if namespace==null).
+This property contains the qualified name (namespace+"::"+name or simply name if namespace==null) of part of speech annotations.
 
 ### lemma.qname
-This property contains the QName of lemma annotations.
+This property contains the qualified name (namespace+"::"+name or simply name if namespace==null) of lemma annotations.
 
 ### sentence.qname
-This property contains the QName of SAnnotations marking sentence spans.
+This property contains the qualified name (namespace+"::"+name or simply name if namespace==null) of SAnnotations marking sentence spans.
 
 ### sentence.value
 This property contains the value of SAnnotations marking sentence spans.
 
 ### textstructure.line.qname
-This property contains the QName of SAnnotations marking spans containing tokens that form a line.
+This property contains the qualified name (namespace+"::"+name or simply name if namespace==null) of SAnnotations marking spans containing tokens that form a line.
 ### textstructure.line.value
 This property contains the value of SAnnotations marking spans containing tokens that form a line.
 ### textstructure.page.qname
-This property contains the QName of SAnnotations marking spans containing tokens that form a page.
+This property contains the qualified name (namespace+"::"+name or simply name if namespace==null) of SAnnotations marking spans containing tokens that form a page.
 ### textstructure.page.value
 This property contains the value of SAnnotations marking spans containing tokens that form a page.

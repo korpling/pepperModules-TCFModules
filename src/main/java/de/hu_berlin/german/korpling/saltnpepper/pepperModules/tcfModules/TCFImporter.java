@@ -85,7 +85,6 @@ public class TCFImporter extends PepperImporterImpl implements PepperImporter
 	 */
 	public PepperMapper createPepperMapper(SElementId sElementId){
 		TCFMapperImport mapper=new TCFMapperImport();
-		System.out.println("getSElementId2ResourceTable(): "+getSElementId2ResourceTable());
 		mapper.setResourceURI(getSElementId2ResourceTable().get(sElementId));
 		return(mapper);
 	}

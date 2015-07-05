@@ -59,7 +59,7 @@
         			<goal>perform</goal>        			
         		</goals>
         		<configuration>
-        			<pomFileName>pepperModules-TCF/pom.xml</pomFileName>
+        			<pomFileName>pepperModules-TCFModules/pom.xml</pomFileName>
         		</configuration>
         	</execution>
         </executions>

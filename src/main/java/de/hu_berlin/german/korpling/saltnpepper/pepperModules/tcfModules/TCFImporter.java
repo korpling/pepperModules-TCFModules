@@ -64,12 +64,10 @@ public class TCFImporter extends PepperImporterImpl implements PepperImporter
 	{
 		super();
 		this.setName("TCFImporter");
-		this.setVersion("0.0.1");
 		this.addSupportedFormat("TCF", "0.4", null);
 		this.setProperties(new TCFImporterProperties());
 		this.getSDocumentEndings().add("xml");
 		this.getSDocumentEndings().add("tcf");
-//		this.getSDocumentEndings().add(PepperImporter.ENDING_LEAF_FOLDER); //CHECK: does this always work? If not, p.17 (2) and (3) propose solutions 
 	}
 	
 	/**
@@ -87,7 +85,6 @@ public class TCFImporter extends PepperImporterImpl implements PepperImporter
 	 */
 	public PepperMapper createPepperMapper(SElementId sElementId){
 		TCFMapperImport mapper=new TCFMapperImport();
-		System.out.println("getSElementId2ResourceTable(): "+getSElementId2ResourceTable());
 		mapper.setResourceURI(getSElementId2ResourceTable().get(sElementId));
 		return(mapper);
 	}

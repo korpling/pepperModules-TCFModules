@@ -17,6 +17,7 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 
+import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperExporter;
@@ -31,6 +32,9 @@ public class TCFExporter extends PepperExporterImpl implements PepperExporter{
 		super();
 		this.setExportMode(EXPORT_MODE.DOCUMENTS_IN_FILES);
 		this.setName("TCFExporter");
+		setSupplierContact(URI.createURI("saltnpepper@lists.hu-berlin.de"));
+		setSupplierHomepage(URI.createURI("https://github.com/korpling/pepperModules-TCFModules"));
+		setDesc("This exporter transforms a Salt model into the TCF format produced for instance by WebLicht (see http://weblicht.sfs.uni-tuebingen.de/) or WebAnno (see https://www.ukp.tu-darmstadt.de/software/webanno/). ");
 		this.addSupportedFormat("TCF", "0.4", null);
 		this.setProperties(new TCFExporterProperties());
 	}

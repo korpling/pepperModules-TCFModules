@@ -64,6 +64,9 @@ public class TCFImporter extends PepperImporterImpl implements PepperImporter
 	{
 		super();
 		this.setName("TCFImporter");
+	    setSupplierContact(URI.createURI("saltnpepper@lists.hu-berlin.de"));
+		setSupplierHomepage(URI.createURI("https://github.com/korpling/pepperModules-TCFModules"));
+		setDesc("This importer transforms data in TCF format produced for instance by WebLicht (see http://weblicht.sfs.uni-tuebingen.de/) or WebAnno (see https://www.ukp.tu-darmstadt.de/software/webanno/) to a Salt model. ");
 		this.addSupportedFormat("TCF", "0.4", null);
 		this.setProperties(new TCFImporterProperties());
 		this.getSDocumentEndings().add("xml");

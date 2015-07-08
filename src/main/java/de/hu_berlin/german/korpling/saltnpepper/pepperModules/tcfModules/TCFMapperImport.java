@@ -141,6 +141,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 		/**is set true as soon as the reader finds a duplicated reference Id and then it ignores the Ids.*/
 		private boolean ignoreIds;
 		
+		private EList<SNode> trashList; 
+		
 		public TCFReader(){
 			super();			
 			sNodes = new BasicEMap<String, SNode>();
@@ -159,6 +161,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			ignoreIds = false;
 			id = 0;	
 			metaId = 0;
+			trashList = new BasicEList<SNode>();
 		}
 		
 		@Override
@@ -180,7 +183,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 					/* SStructure */					
 					SStructure sStruc = SaltFactory.eINSTANCE.createSStructure();
 					sStruc.createSAnnotation(LAYER_CONSTITUENTS, ATT_CAT, attributes.getValue(ATT_CAT));
-					sNodes.put(constID, sStruc);
+					store(constID, sStruc);
 					sStruc.getSLayers().add(sLayers.get(LAYER_CONSTITUENTS));
 					if(idPath.empty()){						
 						/* sStruc is root */
@@ -199,11 +202,11 @@ public class TCFMapperImport extends PepperMapperImpl{
 						if(sNode==null){
 							String[] seq = tokenIDs.split(" ");
 							EList<SToken> sTokensForSpan = new BasicEList<SToken>();
-							for(int i=0; i<seq.length; i++){
-								sTokensForSpan.add((SToken)sNodes.get(seq[i]));							
+							for(int i=0; i<seq.length; i++){								
+								sTokensForSpan.add((SToken)sNodes.get(seq[i]));
 							}
 							sNode = getSDocGraph().createSSpan(sTokensForSpan);
-							if(useCommonAnnotatedElement){sNodes.put(tokenIDs, sNode);}// store node, if spans should be reused
+							if(useCommonAnnotatedElement){store(tokenIDs, sNode);}// store node, if spans should be reused
 						}						
 						sNode.createSAnnotation(LAYER_CONSTITUENTS, ATT_CAT, attributes.getValue(ATT_CAT));
 						getSDocGraph().addSNode(sNodes.get(idPath.peek()), sNode, STYPE_NAME.SDOMINANCE_RELATION);
@@ -219,7 +222,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 							sNode = sNodes.get(tokenIDs+SPAN);
 							if(sNode==null){								
 								sNode = getSDocGraph().createSSpan((SToken)sNodes.get(tokenIDs));
-								if(useCommonAnnotatedElement){sNodes.put(tokenIDs+SPAN, sNode);}// store node, if spans should be reused
+								if(useCommonAnnotatedElement){store(tokenIDs+SPAN, sNode);}// store node, if spans should be reused
 							}							
 						}					
 						annotateSNode(sNode, LAYER_CONSTITUENTS, ATT_CAT, attributes.getValue(ATT_CAT), false, false);
@@ -293,8 +296,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 				}
 				SSpan sentenceSpan = getSDocGraph().createSSpan(sentenceTokens);
 				String att = attributes.getValue(ATT_ID);
-				sNodes.put(att, sentenceSpan);
-				sentenceSpan.getSLayers().add(sLayers.get(LAYER_SENTENCES));
+				store(att, sentenceSpan);
+				if (sentenceSpan!=null) {sentenceSpan.getSLayers().add(sLayers.get(LAYER_SENTENCES));}
 			}
 			else if (TAG_MD_SERVICES.equals(localName)){
 			}
@@ -383,7 +386,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 				/* annotate */
 				//references can be used in several entities, e.g. "them" with "her" and "him", therefore the annotation could already exist
 				annotateSNode(currentSNode, LAYER_REFERENCES, ATT_TYPE, attributes.getValue(ATT_TYPE), false, false);
-				sNodes.put(currentNodeID, currentSNode);//map with reference id -- only used with ignoreIds==false
+				store(currentNodeID, currentSNode);//map with reference id -- only used with ignoreIds==false
 				currentSNode.getSLayers().add(sLayers.get(LAYER_REFERENCES));
 				
 				/* put references on stack to build them later (if it is not the mentioning of the antecedent) */
@@ -412,7 +415,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 						(useCommonAnnotatedElement ? sNodes.get(currentNodeID+SPAN) : getSDocGraph().createSSpan((SToken)sNodes.get(currentNodeID)));
 				if(currentSNode==null){//only possible if useCommonAnnotatedElement==true
 					currentSNode = getSDocGraph().createSSpan((SToken)sNodes.get(currentNodeID));
-					sNodes.put(currentNodeID+SPAN, currentSNode);
+					store(currentNodeID+SPAN, currentSNode);
 				}
 				currentSNode.getSLayers().add(sLayers.get(LAYER_PHONETICS));
 			}
@@ -723,19 +726,27 @@ public class TCFMapperImport extends PepperMapperImpl{
 				labels.put(currentAnnoID, anno);
 			}
 			else if(TAG_TC_TOKEN.equals(localName)){
-				/* build token */				
+				/* build token */
+				int old_p = p;
 				String primaryData = currentSTDS.getSText();
 				String tok = chars.toString();
-				while(p<primaryData.length() && !primaryData.substring(p).startsWith(tok)){					
+				int lookAhead = (primaryData.substring(p).length()-primaryData.substring(p).trim().length())+1;
+				while(p<primaryData.length() && (p-old_p)<=lookAhead && !primaryData.substring(p).startsWith(tok)){					
 					p++;					
 				}
-				if(p==primaryData.length()){
-					logger.error((new StringBuilder()).append(BAD_TOKENIZATION_ERROR_MESSAGE).append(" Error around token ").append(currentNodeID).toString());
-					throw new PepperModuleDataException(TCFMapperImport.this, BAD_TOKENIZATION_ERROR_MESSAGE);
+				if(p==primaryData.length() || (p-old_p)>lookAhead){
+//					logger.error((new StringBuilder()).append(BAD_TOKENIZATION_ERROR_MESSAGE).append(" Error around token ").append(currentNodeID).toString());
+//					throw new PepperModuleDataException(TCFMapperImport.this, BAD_TOKENIZATION_ERROR_MESSAGE);
+					logger.warn("WARNING: Skipped token [".concat(tok).concat("] (ID=").concat(currentNodeID).concat("), it could not be found in the base text. This might lead to further errors in processing the document."));
+					p = old_p;
+					SToken emptyToken = SaltFactory.eINSTANCE.createSToken();//we'll need that for annotations
+					getSDocGraph().addSNode(emptyToken);
+					store(currentNodeID, emptyToken);
+					trashList.add(emptyToken);
 				}else{
-					{sNodes.put(currentNodeID, getSDocGraph().createSToken(currentSTDS, p, p+tok.length()));}
+					store(currentNodeID, getSDocGraph().createSToken(currentSTDS, p, p+tok.length()));
 					p=p+tok.length();
-				}
+				}				
 			}
 			else if(TAG_TC_SEGMENT.equals(localName)){
 				/* build annotation TODO */
@@ -781,7 +792,9 @@ public class TCFMapperImport extends PepperMapperImpl{
 				if(chars.length()>0){getSDocument().createSMetaAnnotation(null, TAG_MDCOLLECTIONDISPLAYNAME, chars.toString());}
 			}
 			else if (TAG_TC_TEXTCORPUS.equals(localName)){
-				
+				for (SNode sNode : trashList){
+					getSDocGraph().removeNode(sNode);
+				}
 			}
 			else if (TAG_RESOURCETYPE.equals(localName)){
 				annotateSNode(getSDocument(), null, (new StringBuilder()).append(TAG_RESOURCEPROXY).append(metaId).append(TAG_RESOURCETYPE).toString(), chars.toString(), false, true);
@@ -916,7 +929,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 					for(int i=1; i<seq.length; i++){
 						graph.addSNode(sNode, (SToken)sNodes.get(seq[i]), STYPE_NAME.SSPANNING_RELATION);
 					}
-					if(useCommonAnnotatedElement){sNodes.put(id, sNode);}
+					if(useCommonAnnotatedElement){store(id, sNode);}
 				}
 			}
 			else{//single token				
@@ -924,10 +937,17 @@ public class TCFMapperImport extends PepperMapperImpl{
 				if(sNode==null){//only if shrinkTokenAnnotations==false and useCommonAnnotatedElement==true
 					/* build span over single token */
 					sNode = graph.createSSpan((SToken)sNodes.get(id));
-					sNodes.put(id+SPAN, sNode);
+					store(id.concat(SPAN), sNode);				
 				}
 			}
 			return sNode;
+		}
+		
+		private void store(String key, SNode sNode){
+			if (sNodes.contains(key)){
+				throw new PepperModuleDataException(TCFMapperImport.this, "Multiple use of id ".concat(key).concat(". IDs are supposed to be unique."));
+			}
+			sNodes.put(key, sNode);
 		}
 		
 		/**		 * 

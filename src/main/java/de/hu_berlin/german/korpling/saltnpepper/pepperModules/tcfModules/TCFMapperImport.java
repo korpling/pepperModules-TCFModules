@@ -141,7 +141,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 		/**is set true as soon as the reader finds a duplicated reference Id and then it ignores the Ids.*/
 		private boolean ignoreIds;
 		
-		private EList<SNode> trashList; 
+		private EList<SNode> trashList;
 		
 		public TCFReader(){
 			super();			
@@ -297,7 +297,8 @@ public class TCFMapperImport extends PepperMapperImpl{
 				SSpan sentenceSpan = getSDocGraph().createSSpan(sentenceTokens);
 				String att = attributes.getValue(ATT_ID);
 				store(att, sentenceSpan);
-				if (sentenceSpan!=null) {sentenceSpan.getSLayers().add(sLayers.get(LAYER_SENTENCES));}
+				annotateSNode(sentenceSpan, null, TAG_TC_SENTENCE, TAG_TC_SENTENCE, false, false);
+				sentenceSpan.getSLayers().add(sLayers.get(LAYER_SENTENCES));
 			}
 			else if (TAG_MD_SERVICES.equals(localName)){
 			}
@@ -735,8 +736,6 @@ public class TCFMapperImport extends PepperMapperImpl{
 					p++;					
 				}
 				if(p==primaryData.length() || (p-old_p)>lookAhead){
-//					logger.error((new StringBuilder()).append(BAD_TOKENIZATION_ERROR_MESSAGE).append(" Error around token ").append(currentNodeID).toString());
-//					throw new PepperModuleDataException(TCFMapperImport.this, BAD_TOKENIZATION_ERROR_MESSAGE);
 					logger.warn("WARNING: Skipped token [".concat(tok).concat("] (ID=").concat(currentNodeID).concat("), it could not be found in the base text. This might lead to further errors in processing the document."));
 					p = old_p;
 					SToken emptyToken = SaltFactory.eINSTANCE.createSToken();//we'll need that for annotations
@@ -745,7 +744,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 					trashList.add(emptyToken);
 				}else{
 					store(currentNodeID, getSDocGraph().createSToken(currentSTDS, p, p+tok.length()));
-					p=p+tok.length();
+					p+=tok.length();
 				}				
 			}
 			else if(TAG_TC_SEGMENT.equals(localName)){

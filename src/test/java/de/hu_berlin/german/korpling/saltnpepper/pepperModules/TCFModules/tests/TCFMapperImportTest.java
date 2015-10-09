@@ -18,7 +18,6 @@
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.TCFModules.tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -28,7 +27,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -49,10 +47,10 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
-import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.samples.SampleGenerator;
 import org.corpus_tools.salt.semantics.SLemmaAnnotation;
 import org.corpus_tools.salt.semantics.SPOSAnnotation;
+import org.corpus_tools.salt.util.Difference;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EMap;
@@ -428,22 +426,25 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-				
-		
 		/* compare template salt model to imported salt model */
-		
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
-		String posQName = SaltUtil.createQName(SaltUtil.SALT_NAMESPACE, SaltUtil.SEMANTICS_POS);
-		SLayer fixLayer = fixGraph.getLayerByName(TCFMapperImport.LAYER_POS).get(0); 
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
-		assertNotNull(fixLayer);
-		assertEquals(posLayer.getNodes().size(), fixLayer.getNodes().size());
-		assertEquals(docGraph.getTokens().size(), fixGraph.getTokens().size());		
-		for(int i=0; i<docGraph.getNodes().size(); i++){
-			assertEquals(docGraph.getNodes().get(i).getAnnotation(posQName), fixGraph.getNodes().get(i).getAnnotation(posQName));
-			assertEquals(docGraph.getNodes().get(i).getClass().toString(), fixGraph.getNodes().get(i).getClass().toString());
-			assertEquals(docGraph.getText(docGraph.getNodes().get(i)), fixGraph.getText(fixGraph.getNodes().get(i)));
-		}
+//		/* compare template salt model to imported salt model */
+//		
+//		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+//		String posQName = SaltUtil.createQName(SaltUtil.SALT_NAMESPACE, SaltUtil.SEMANTICS_POS);
+//		SLayer fixLayer = fixGraph.getLayerByName(TCFMapperImport.LAYER_POS).get(0); 
+//		
+//		assertNotNull(fixLayer);
+//		assertEquals(posLayer.getNodes().size(), fixLayer.getNodes().size());
+//		assertEquals(docGraph.getTokens().size(), fixGraph.getTokens().size());		
+//		for(int i=0; i<docGraph.getNodes().size(); i++){
+//			assertEquals(docGraph.getNodes().get(i).getAnnotation(posQName), fixGraph.getNodes().get(i).getAnnotation(posQName));
+//			assertEquals(docGraph.getNodes().get(i).getClass().toString(), fixGraph.getNodes().get(i).getClass().toString());
+//			assertEquals(docGraph.getText(docGraph.getNodes().get(i)), fixGraph.getText(fixGraph.getNodes().get(i)));
+//		}
 	}
 	
 	/**
@@ -701,26 +702,29 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-				
-		
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
-
-		assertNotEquals(fixGraph.getSpans().size(), 0);
-		assertEquals(fixGraph.getSpans().size(), docGraph.getSpans().size());
-
-		SSpan fixSpan = fixGraph.getSpans().get(0);
-		SSpan docSpan = docGraph.getSpans().get(0);
-
-		List<SALT_TYPE> typeList = new ArrayList<SALT_TYPE>();
-		typeList.add(SALT_TYPE.SSPANNING_RELATION);
-
-
-		List<SToken> docSpanTokens = docGraph.getOverlappedTokens(docSpan, typeList);
-		List<SToken> fixSpanTokens = fixGraph.getOverlappedTokens(fixSpan, typeList);
-		for(int i=0; i<docSpanTokens.size(); i++){
-			assertEquals(docGraph.getText(docSpanTokens.get(i)), fixGraph.getText(fixSpanTokens.get(i)));
-		}
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());	
+		
+//		/* compare template salt model to imported salt model */
+//		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+//
+//		assertNotEquals(fixGraph.getSpans().size(), 0);
+//		assertEquals(fixGraph.getSpans().size(), docGraph.getSpans().size());
+//
+//		SSpan fixSpan = fixGraph.getSpans().get(0);
+//		SSpan docSpan = docGraph.getSpans().get(0);
+//
+//		List<SALT_TYPE> typeList = new ArrayList<SALT_TYPE>();
+//		typeList.add(SALT_TYPE.SSPANNING_RELATION);
+//
+//
+//		List<SToken> docSpanTokens = docGraph.getOverlappedTokens(docSpan, typeList);
+//		List<SToken> fixSpanTokens = fixGraph.getOverlappedTokens(fixSpan, typeList);
+//		for(int i=0; i<docSpanTokens.size(); i++){
+//			assertEquals(docGraph.getText(docSpanTokens.get(i)), fixGraph.getText(fixSpanTokens.get(i)));
+//		}
 	}
 		
 	/**
@@ -851,34 +855,37 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-				
-		
-		/* comparing fixture to template */
+		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
-		assertNotNull(fixGraph.getLayerByName(TCFMapperImport.LAYER_LEMMA).get(0));
-		Set<SNode> fixLemma = fixGraph.getLayerByName(TCFMapperImport.LAYER_LEMMA).get(0).getNodes();
-		String lemmaQName = SaltUtil.createQName(SaltUtil.SALT_NAMESPACE, SaltUtil.SEMANTICS_LEMMA);
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
-		assertFalse(fixLemma.isEmpty());
-		assertEquals(docLemma.size(), fixLemma.size());
-		SNode docNode = null;
-		SNode fixNode = null;
-		Iterator<SNode> fixLemma_it= fixLemma.iterator(); 
-		Iterator<SNode> docLemma_it= docLemma.iterator();
-		for(int i=0; i<docLemma.size(); i++){
-//			docNode = docLemma.get(i);
-//			fixNode = fixLemma.get(i);
-			docNode = docLemma_it.next();
-			fixNode = fixLemma_it.next();
-			/* both of the same class? */
-			assertEquals(docNode.getClass(), fixNode.getClass());
-			/* both overlap the same SText? */
-			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
-			/* lemma annotation exists for fixture? */
-			assertNotNull(fixNode.getAnnotation(lemmaQName));
-			/* annotations are equal? */
-			assertEquals(docNode.getAnnotation(lemmaQName), fixNode.getAnnotation(lemmaQName));
-		}
+//		/* comparing fixture to template */
+//		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+//		assertNotNull(fixGraph.getLayerByName(TCFMapperImport.LAYER_LEMMA).get(0));
+//		Set<SNode> fixLemma = fixGraph.getLayerByName(TCFMapperImport.LAYER_LEMMA).get(0).getNodes();
+//		String lemmaQName = SaltUtil.createQName(SaltUtil.SALT_NAMESPACE, SaltUtil.SEMANTICS_LEMMA);
+//		
+//		assertFalse(fixLemma.isEmpty());
+//		assertEquals(docLemma.size(), fixLemma.size());
+//		SNode docNode = null;
+//		SNode fixNode = null;
+//		Iterator<SNode> fixLemma_it= fixLemma.iterator(); 
+//		Iterator<SNode> docLemma_it= docLemma.iterator();
+//		for(int i=0; i<docLemma.size(); i++){
+////			docNode = docLemma.get(i);
+////			fixNode = fixLemma.get(i);
+//			docNode = docLemma_it.next();
+//			fixNode = fixLemma_it.next();
+//			/* both of the same class? */
+//			assertEquals(docNode.getClass(), fixNode.getClass());
+//			/* both overlap the same SText? */
+//			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
+//			/* lemma annotation exists for fixture? */
+//			assertNotNull(fixNode.getAnnotation(lemmaQName));
+//			/* annotations are equal? */
+//			assertEquals(docNode.getAnnotation(lemmaQName), fixNode.getAnnotation(lemmaQName));
+//		}
 	}
 	
 	/**
@@ -1010,7 +1017,10 @@ public class TCFMapperImportTest {
 		getFixture().mapSDocument();
 				
 		
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 //		/* comparing fixture to template */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
 //		assertNotNull(fixGraph.getLayerByName(TCFMapperImport.LAYER_LEMMA).get(0));
@@ -1502,32 +1512,33 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-				
 		
 		/* -- compare template salt model to imported salt model -- */
 		
 		SDocumentGraph docGraph = doc.getDocumentGraph();
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());	
 		
-		assertNotEquals(fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).size(), 0);	
-		
-		SLayer docSynLayer = docGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0);		
-		SLayer fixSynLayer = fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0);
-		
-//		assertEquals(docSynLayer.getAllIncludedNodes().size(), fixSynLayer.getAllIncludedNodes().size());
-		assertEquals(docSynLayer.getNodes().size(), fixSynLayer.getNodes().size());
-		
-		Set<SNode> docNodes = docGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getNodes();
-		Set<SNode> fixNodes = fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getNodes();
-		Iterator<SNode> fix_it= fixNodes.iterator(); 
-		Iterator<SNode> doc_it= docNodes.iterator();
-		for(int i=0; i<docNodes.size(); i++){
-			SNode docNode = doc_it.next();
-			SNode fixNode = fix_it.next();
-//		for(int i=0; i<docNodes.size(); i++){			
-			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
-			assertEquals(docNode.getAnnotation(TCFMapperImport.ANNO_NAME_CONSTITUENT).getValue(), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue());
-		}
+//		assertNotEquals(fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).size(), 0);	
+//		
+//		SLayer docSynLayer = docGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0);		
+//		SLayer fixSynLayer = fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0);
+//		
+////		assertEquals(docSynLayer.getAllIncludedNodes().size(), fixSynLayer.getAllIncludedNodes().size());
+//		assertEquals(docSynLayer.getNodes().size(), fixSynLayer.getNodes().size());
+//		
+//		Set<SNode> docNodes = docGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getNodes();
+//		Set<SNode> fixNodes = fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getNodes();
+//		Iterator<SNode> fix_it= fixNodes.iterator(); 
+//		Iterator<SNode> doc_it= docNodes.iterator();
+//		for(int i=0; i<docNodes.size(); i++){
+//			SNode docNode = doc_it.next();
+//			SNode fixNode = fix_it.next();
+////		for(int i=0; i<docNodes.size(); i++){			
+//			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
+//			assertEquals(docNode.getAnnotation(TCFMapperImport.ANNO_NAME_CONSTITUENT).getValue(), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue());
+//		}
 	}
 		
 	/**This method tests if a valid TCF-XML-structure containing constituent
@@ -1679,68 +1690,71 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-				
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
-		/* -- compare template salt model to imported salt model -- */
-		
-		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();		
-		assertNotEquals(fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).size(), 0);		
-				
-		Set<SNode> fixConstituents = fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getNodes();
-		assertEquals(docConstituents.size(), fixConstituents.size());		
-		
-		SNode docNode = null;
-		SNode fixNode = null;
-		List<SToken> docOTokens = null;
-		List<SToken> fixOTokens = null;
-		List<SALT_TYPE> domRelType = new ArrayList<SALT_TYPE>();
-		domRelType.add(SALT_TYPE.SDOMINANCE_RELATION);
-		if(DEBUG){}
-		Iterator<SNode> fix_it= fixConstituents.iterator(); 
-		Iterator<SNode> doc_it= docConstituents.iterator();
-		for(int i=0; i<docConstituents.size(); i++){
-			docNode = doc_it.next();
-			fixNode = fix_it.next();
-//		for(int i=0; i<docConstituents.size(); i++){			
-//			docNode = docConstituents.get(i);
-//			fixNode = fixConstituents.get(i);
-			if(DEBUG){
-				}
-			assertEquals(docNode.getIdentifier(), fixNode.getIdentifier());
-			assertEquals(docNode.getClass(), fixNode.getClass());
-			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
-			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT));
-			docOTokens = docGraph.getOverlappedTokens(docNode, domRelType);
-			fixOTokens = fixGraph.getOverlappedTokens(fixNode, domRelType);
-			assertEquals(docOTokens.size(), fixOTokens.size());
-			for(int j=0; j<docOTokens.size(); j++){
-				docNode = docOTokens.get(j);
-				fixNode = fixOTokens.get(j);
-				/* compare annotations? */
-				assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue(), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue());				
-				/* compare text? */
-				assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
-			}
-		}
-		/* compare spans: */
-		List<SSpan> docSpans = docGraph.getSpans();
-		List<SSpan> fixSpans = fixGraph.getSpans();
-		assertNotNull(fixSpans);
-		assertFalse(fixSpans.isEmpty());
-		assertEquals(docSpans.size(), fixSpans.size());
-		if(DEBUG){}
-		for(int i=0; i<docSpans.size(); i++){
-			docNode = docSpans.get(i);
-			fixNode = fixSpans.get(i);			
-			if(DEBUG){
-				}
-			assertEquals(docNode.getIdentifier(), fixNode.getIdentifier());
-			if(DEBUG){}
-			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
-			assertNotNull(fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT));
-			if(DEBUG){}			
-			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue(), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue());
-		}
+//		/* -- compare template salt model to imported salt model -- */
+//		
+//		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();		
+//		assertNotEquals(fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).size(), 0);		
+//				
+//		Set<SNode> fixConstituents = fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getNodes();
+//		assertEquals(docConstituents.size(), fixConstituents.size());		
+//		
+//		SNode docNode = null;
+//		SNode fixNode = null;
+//		List<SToken> docOTokens = null;
+//		List<SToken> fixOTokens = null;
+//		List<SALT_TYPE> domRelType = new ArrayList<SALT_TYPE>();
+//		domRelType.add(SALT_TYPE.SDOMINANCE_RELATION);
+//		if(DEBUG){}
+//		Iterator<SNode> fix_it= fixConstituents.iterator(); 
+//		Iterator<SNode> doc_it= docConstituents.iterator();
+//		for(int i=0; i<docConstituents.size(); i++){
+//			docNode = doc_it.next();
+//			fixNode = fix_it.next();
+////		for(int i=0; i<docConstituents.size(); i++){			
+////			docNode = docConstituents.get(i);
+////			fixNode = fixConstituents.get(i);
+//			if(DEBUG){
+//				}
+//			assertEquals(docNode.getIdentifier(), fixNode.getIdentifier());
+//			assertEquals(docNode.getClass(), fixNode.getClass());
+//			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
+//			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT));
+//			docOTokens = docGraph.getOverlappedTokens(docNode, domRelType);
+//			fixOTokens = fixGraph.getOverlappedTokens(fixNode, domRelType);
+//			assertEquals(docOTokens.size(), fixOTokens.size());
+//			for(int j=0; j<docOTokens.size(); j++){
+//				docNode = docOTokens.get(j);
+//				fixNode = fixOTokens.get(j);
+//				/* compare annotations? */
+//				assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue(), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue());				
+//				/* compare text? */
+//				assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
+//			}
+//		}
+//		/* compare spans: */
+//		List<SSpan> docSpans = docGraph.getSpans();
+//		List<SSpan> fixSpans = fixGraph.getSpans();
+//		assertNotNull(fixSpans);
+//		assertFalse(fixSpans.isEmpty());
+//		assertEquals(docSpans.size(), fixSpans.size());
+//		if(DEBUG){}
+//		for(int i=0; i<docSpans.size(); i++){
+//			docNode = docSpans.get(i);
+//			fixNode = fixSpans.get(i);			
+//			if(DEBUG){
+//				}
+//			assertEquals(docNode.getIdentifier(), fixNode.getIdentifier());
+//			if(DEBUG){}
+//			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
+//			assertNotNull(fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT));
+//			if(DEBUG){}			
+//			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue(), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue());
+//		}
 	}
 	
 	/**This method tests if a valid TCF-XML-structure containing constituent
@@ -1897,55 +1911,58 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-				
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());	
 		
-		/* -- compare template salt model to imported salt model -- */
-		
-		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();		
-		assertNotEquals(fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).size(), 0);		
-				
-		Set<SNode> fixConstituents = fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getNodes();
-		assertEquals(docConstituents.size(), fixConstituents.size());		
-		
-		SNode docNode = null;
-		SNode fixNode = null;
-		List<SALT_TYPE> domRelType = new ArrayList<SALT_TYPE>();
-		domRelType.add(SALT_TYPE.SDOMINANCE_RELATION);
-		if(DEBUG){}
-		Iterator<SNode> fix_it= fixConstituents.iterator(); 
-		Iterator<SNode> doc_it= docConstituents.iterator();
-		for(int i=0; i<docConstituents.size(); i++){
-			docNode = doc_it.next();
-			fixNode = fix_it.next();
-//		for(int i=0; i<docConstituents.size(); i++){			
-//			docNode = docConstituents.get(i);
-//			fixNode = fixConstituents.get(i);
-			if(DEBUG){
-				}
-			assertEquals(docNode.getIdentifier(), fixNode.getIdentifier());
-			assertEquals(docNode.getClass(), fixNode.getClass());
-			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
-			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue(), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue());			
-		}
-		/* compare spans: */
-		List<SSpan> docSpans = docGraph.getSpans();
-		List<SSpan> fixSpans = fixGraph.getSpans();
-		assertNotNull(fixSpans);
-		assertFalse(fixSpans.isEmpty());
-		assertEquals(docSpans.size(), fixSpans.size());
-		if(DEBUG){}
-		for(int i=0; i<docSpans.size(); i++){
-			docNode = docSpans.get(i);
-			fixNode = fixSpans.get(i);			
-			if(DEBUG){
-				}
-			assertEquals(docNode.getIdentifier(), fixNode.getIdentifier());
-			if(DEBUG){}
-			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
-			assertNotNull(fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT));
-			if(DEBUG){}			
-			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue(), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue());
-		}
+//		/* -- compare template salt model to imported salt model -- */
+//		
+//		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();		
+//		assertNotEquals(fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).size(), 0);		
+//				
+//		Set<SNode> fixConstituents = fixGraph.getLayerByName(TCFMapperImport.LAYER_CONSTITUENTS).get(0).getNodes();
+//		assertEquals(docConstituents.size(), fixConstituents.size());		
+//		
+//		SNode docNode = null;
+//		SNode fixNode = null;
+//		List<SALT_TYPE> domRelType = new ArrayList<SALT_TYPE>();
+//		domRelType.add(SALT_TYPE.SDOMINANCE_RELATION);
+//		if(DEBUG){}
+//		Iterator<SNode> fix_it= fixConstituents.iterator(); 
+//		Iterator<SNode> doc_it= docConstituents.iterator();
+//		for(int i=0; i<docConstituents.size(); i++){
+//			docNode = doc_it.next();
+//			fixNode = fix_it.next();
+////		for(int i=0; i<docConstituents.size(); i++){			
+////			docNode = docConstituents.get(i);
+////			fixNode = fixConstituents.get(i);
+//			if(DEBUG){
+//				}
+//			assertEquals(docNode.getIdentifier(), fixNode.getIdentifier());
+//			assertEquals(docNode.getClass(), fixNode.getClass());
+//			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
+//			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue(), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue());			
+//		}
+//		/* compare spans: */
+//		List<SSpan> docSpans = docGraph.getSpans();
+//		List<SSpan> fixSpans = fixGraph.getSpans();
+//		assertNotNull(fixSpans);
+//		assertFalse(fixSpans.isEmpty());
+//		assertEquals(docSpans.size(), fixSpans.size());
+//		if(DEBUG){}
+//		for(int i=0; i<docSpans.size(); i++){
+//			docNode = docSpans.get(i);
+//			fixNode = fixSpans.get(i);			
+//			if(DEBUG){
+//				}
+//			assertEquals(docNode.getIdentifier(), fixNode.getIdentifier());
+//			if(DEBUG){}
+//			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
+//			assertNotNull(fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT));
+//			if(DEBUG){}			
+//			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue(), fixNode.getAnnotation(TCFMapperImport.LAYER_CONSTITUENTS+"::"+TCFDictionary.ATT_CAT).getValue());
+//		}
 	}
 	
 	/**This method tests if a valid TCF-XML-structure containing morphology
@@ -2393,43 +2410,46 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		
-		
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
-		assertNotNull(fixGraph.getLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY));
-		Set<SNode> fixMorph = fixGraph.getLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY).get(0).getNodes();	
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
-		assertNotNull(fixMorph);
-		assertNotEquals(fixMorph.size(), 0);
-		assertEquals(docMorph.size(), fixMorph.size());
-		assertNotEquals(fixMorph.size(), fixGraph.getTokens().size());
-				
-		SNode docNode = null;
-		SNode fixNode = null;	
-		Iterator<SNode> fix_it= fixMorph.iterator(); 
-		Iterator<SNode> doc_it= docMorph.iterator();
-		for(int i=0; i<docMorph.size(); i++){
-			docNode = doc_it.next();
-			fixNode = fix_it.next();
-//		for(int i=0; i<docMorph.size(); i++){			
-//			docNode = docMorph.get(i);
-//			fixNode = fixMorph.get(i);
-			/*TEST*//*TEST*//* fixNode of type SSpan? */
-			assertTrue(fixNode instanceof SSpan);
-			/* both overlap the same SText? */
-			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
-			for(SAnnotation sAnno : docNode.getAnnotations()){
-				String qName = sAnno.getQName();
-				/* compare annotations */
-				if(DEBUG){
-					}
-				assertNotNull(fixNode.getAnnotation(qName));				
-				assertEquals(sAnno.getValue(), fixNode.getAnnotation(qName).getValue());
-			}
-			/*TODO Segment as annotation of the annotation? Not implemented yet! (See issue #4) */
-		}
-		
+//		/* compare template salt model to imported salt model */
+//		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+//		assertNotNull(fixGraph.getLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY));
+//		Set<SNode> fixMorph = fixGraph.getLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY).get(0).getNodes();	
+//		
+//		assertNotNull(fixMorph);
+//		assertNotEquals(fixMorph.size(), 0);
+//		assertEquals(docMorph.size(), fixMorph.size());
+//		assertNotEquals(fixMorph.size(), fixGraph.getTokens().size());
+//				
+//		SNode docNode = null;
+//		SNode fixNode = null;	
+//		Iterator<SNode> fix_it= fixMorph.iterator(); 
+//		Iterator<SNode> doc_it= docMorph.iterator();
+//		for(int i=0; i<docMorph.size(); i++){
+//			docNode = doc_it.next();
+//			fixNode = fix_it.next();
+////		for(int i=0; i<docMorph.size(); i++){			
+////			docNode = docMorph.get(i);
+////			fixNode = fixMorph.get(i);
+//			/*TEST*//*TEST*//* fixNode of type SSpan? */
+//			assertTrue(fixNode instanceof SSpan);
+//			/* both overlap the same SText? */
+//			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
+//			for(SAnnotation sAnno : docNode.getAnnotations()){
+//				String qName = sAnno.getQName();
+//				/* compare annotations */
+//				if(DEBUG){
+//					}
+//				assertNotNull(fixNode.getAnnotation(qName));				
+//				assertEquals(sAnno.getValue(), fixNode.getAnnotation(qName).getValue());
+//			}
+//			/*TODO Segment as annotation of the annotation? Not implemented yet! (See issue #4) */
+//		}
+//		
 	}
 	
 	/**This method tests if a valid TCF-XML-structure containing morphology
@@ -2878,42 +2898,45 @@ public class TCFMapperImportTest {
 				
 		getFixture().mapSDocument();
 		
-		
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
-		assertNotNull(fixGraph.getLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY));
-		Set<SNode> fixMorph = fixGraph.getLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY).get(0).getNodes();
-		
-		assertNotNull(fixMorph);
-		assertNotEquals(fixMorph.size(), 0);
-		assertEquals(docMorph.size(), fixMorph.size());
-		assertNotEquals(fixMorph.size(), fixGraph.getTokens().size());		
-				
-		SNode docNode = null;
-		SNode fixNode = null;		
-		Iterator<SNode> fix_it= fixMorph.iterator(); 
-		Iterator<SNode> doc_it= docMorph.iterator();
-		for(int i=0; i<docMorph.size(); i++){
-			docNode = doc_it.next();
-			fixNode = fix_it.next();
-//		for(int i=0; i<docMorph.size(); i++){			
-//			docNode = docMorph.get(i);
-//			fixNode = fixMorph.get(i);
-			/*TEST*//*TEST*//* both of the same type? */
-			assertEquals(docNode.getClass(), fixNode.getClass());
-			assertTrue((fixNode instanceof SToken)||(fixNode instanceof SSpan));//necessary?
-			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
-			for(SAnnotation sAnno : docNode.getAnnotations()){
-				String qName = sAnno.getQName();
-				/* compare annotations */
-				if(DEBUG){
-					}
-				assertNotNull(fixNode.getAnnotation(qName));				
-				assertEquals(sAnno.getValue(), fixNode.getAnnotation(qName).getValue());
-			}
-			/*TODO Segment*/
-		}
-		
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
+//		/* compare template salt model to imported salt model */
+//		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+//		assertNotNull(fixGraph.getLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY));
+//		Set<SNode> fixMorph = fixGraph.getLayerByName(TCFMapperImport.LAYER_TCF_MORPHOLOGY).get(0).getNodes();
+//		
+//		assertNotNull(fixMorph);
+//		assertNotEquals(fixMorph.size(), 0);
+//		assertEquals(docMorph.size(), fixMorph.size());
+//		assertNotEquals(fixMorph.size(), fixGraph.getTokens().size());		
+//				
+//		SNode docNode = null;
+//		SNode fixNode = null;		
+//		Iterator<SNode> fix_it= fixMorph.iterator(); 
+//		Iterator<SNode> doc_it= docMorph.iterator();
+//		for(int i=0; i<docMorph.size(); i++){
+//			docNode = doc_it.next();
+//			fixNode = fix_it.next();
+////		for(int i=0; i<docMorph.size(); i++){			
+////			docNode = docMorph.get(i);
+////			fixNode = fixMorph.get(i);
+//			/*TEST*//*TEST*//* both of the same type? */
+//			assertEquals(docNode.getClass(), fixNode.getClass());
+//			assertTrue((fixNode instanceof SToken)||(fixNode instanceof SSpan));//necessary?
+//			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
+//			for(SAnnotation sAnno : docNode.getAnnotations()){
+//				String qName = sAnno.getQName();
+//				/* compare annotations */
+//				if(DEBUG){
+//					}
+//				assertNotNull(fixNode.getAnnotation(qName));				
+//				assertEquals(sAnno.getValue(), fixNode.getAnnotation(qName).getValue());
+//			}
+//			/*TODO Segment*/
+//		}
+//		
 	}
 		
 	/**This method tests if a valid TCF-XML-structure containing named entity
@@ -3045,35 +3068,38 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		
-		
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
-		assertFalse(fixGraph.getLayerByName(TCFMapperImport.LAYER_NE).isEmpty());
-		SLayer fixNELayer = fixGraph.getLayerByName(TCFMapperImport.LAYER_NE).get(0);		
-		assertNotNull(fixNELayer.getMetaAnnotation(TCFDictionary.ATT_TYPE));
-		Set<SNode> fixNENodes = fixNELayer.getNodes();
-		assertFalse(fixNENodes.isEmpty());
-		assertEquals(docNENodes.size(), fixNENodes.size());
-		SAnnotation fixNEAnno = null;
-		SNode docNode = null;
-		SNode fixNode = null;
-		Iterator<SNode> fix_it= fixNENodes.iterator(); 
-		Iterator<SNode> doc_it= docNENodes.iterator();
-		for(int i=0; i<docNENodes.size(); i++){
-			docNode = doc_it.next();
-			fixNode = fix_it.next();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
+		
+//		/* compare template salt model to imported salt model */
+//		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+//		assertFalse(fixGraph.getLayerByName(TCFMapperImport.LAYER_NE).isEmpty());
+//		SLayer fixNELayer = fixGraph.getLayerByName(TCFMapperImport.LAYER_NE).get(0);		
+//		assertNotNull(fixNELayer.getMetaAnnotation(TCFDictionary.ATT_TYPE));
+//		Set<SNode> fixNENodes = fixNELayer.getNodes();
+//		assertFalse(fixNENodes.isEmpty());
+//		assertEquals(docNENodes.size(), fixNENodes.size());
+//		SAnnotation fixNEAnno = null;
+//		SNode docNode = null;
+//		SNode fixNode = null;
+//		Iterator<SNode> fix_it= fixNENodes.iterator(); 
+//		Iterator<SNode> doc_it= docNENodes.iterator();
 //		for(int i=0; i<docNENodes.size(); i++){
-//			docNode = docNENodes.get(i);
-//			fixNode = fixNENodes.get(i);
-			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
-			fixNEAnno = fixNode.getAnnotation(TCFMapperImport.LAYER_NE+"::"+TCFDictionary.ATT_CLASS);
-			assertNotNull(fixNEAnno);
-			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_NE+"::"+TCFDictionary.ATT_CLASS).getValue(), fixNEAnno.getValue());
-			if(DEBUG){}
-			assertTrue(fixNode instanceof SSpan | fixNode instanceof SToken);
-			assertEquals(docNode.getClass(), fixNode.getClass());
-		}
+//			docNode = doc_it.next();
+//			fixNode = fix_it.next();
+////		for(int i=0; i<docNENodes.size(); i++){
+////			docNode = docNENodes.get(i);
+////			fixNode = fixNENodes.get(i);
+//			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
+//			fixNEAnno = fixNode.getAnnotation(TCFMapperImport.LAYER_NE+"::"+TCFDictionary.ATT_CLASS);
+//			assertNotNull(fixNEAnno);
+//			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_NE+"::"+TCFDictionary.ATT_CLASS).getValue(), fixNEAnno.getValue());
+//			if(DEBUG){}
+//			assertTrue(fixNode instanceof SSpan | fixNode instanceof SToken);
+//			assertEquals(docNode.getClass(), fixNode.getClass());
+//		}
 	}
 	
 	/**This method tests if a valid TCF-XML-structure containing named entity
@@ -3207,34 +3233,37 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		
-		
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
-		assertFalse(fixGraph.getLayerByName(TCFMapperImport.LAYER_NE).isEmpty());
-		SLayer fixNELayer = fixGraph.getLayerByName(TCFMapperImport.LAYER_NE).get(0);
-		assertNotNull(fixNELayer.getMetaAnnotation(TCFDictionary.ATT_TYPE));
-		assertEquals(docNELayer.getMetaAnnotation(TCFDictionary.ATT_TYPE), fixNELayer.getMetaAnnotation(TCFDictionary.ATT_TYPE));
-		Set<SNode> fixNENodes = fixNELayer.getNodes();
-		assertFalse(fixNENodes.isEmpty());
-		assertEquals(docNENodes.size(), fixNENodes.size());
-		SAnnotation fixNEAnno = null;
-		SNode docNode = null;
-		SNode fixNode = null;
-		Iterator<SNode> fix_it= fixNENodes.iterator(); 
-		Iterator<SNode> doc_it= docNENodes.iterator();
-		for(int i=0; i<docNENodes.size(); i++){
-			docNode = doc_it.next();
-			fixNode = fix_it.next();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
+		
+//		/* compare template salt model to imported salt model */
+//		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+//		assertFalse(fixGraph.getLayerByName(TCFMapperImport.LAYER_NE).isEmpty());
+//		SLayer fixNELayer = fixGraph.getLayerByName(TCFMapperImport.LAYER_NE).get(0);
+//		assertNotNull(fixNELayer.getMetaAnnotation(TCFDictionary.ATT_TYPE));
+//		assertEquals(docNELayer.getMetaAnnotation(TCFDictionary.ATT_TYPE), fixNELayer.getMetaAnnotation(TCFDictionary.ATT_TYPE));
+//		Set<SNode> fixNENodes = fixNELayer.getNodes();
+//		assertFalse(fixNENodes.isEmpty());
+//		assertEquals(docNENodes.size(), fixNENodes.size());
+//		SAnnotation fixNEAnno = null;
+//		SNode docNode = null;
+//		SNode fixNode = null;
+//		Iterator<SNode> fix_it= fixNENodes.iterator(); 
+//		Iterator<SNode> doc_it= docNENodes.iterator();
 //		for(int i=0; i<docNENodes.size(); i++){
-//			docNode = docNENodes.get(i);
-//			fixNode = fixNENodes.get(i);
-			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
-			fixNEAnno = fixNode.getAnnotation(TCFMapperImport.LAYER_NE+"::"+TCFDictionary.ATT_CLASS);
-			assertNotNull(fixNEAnno);
-			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_NE+"::"+TCFDictionary.ATT_CLASS).getValue(), fixNEAnno.getValue());			
-			assertTrue(fixNode instanceof SSpan);			
-		}
+//			docNode = doc_it.next();
+//			fixNode = fix_it.next();
+////		for(int i=0; i<docNENodes.size(); i++){
+////			docNode = docNENodes.get(i);
+////			fixNode = fixNENodes.get(i);
+//			assertEquals(docGraph.getText(docNode), fixGraph.getText(fixNode));
+//			fixNEAnno = fixNode.getAnnotation(TCFMapperImport.LAYER_NE+"::"+TCFDictionary.ATT_CLASS);
+//			assertNotNull(fixNEAnno);
+//			assertEquals(docNode.getAnnotation(TCFMapperImport.LAYER_NE+"::"+TCFDictionary.ATT_CLASS).getValue(), fixNEAnno.getValue());			
+//			assertTrue(fixNode instanceof SSpan);			
+//		}
 	}
 	
 	/**This method tests if a valid TCF-XML-structure containing reference
@@ -3400,49 +3429,52 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		
-		/* compare template salt model to imported salt model */		
+		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
-		assertNotNull(fixGraph.getLayerByName(TCFMapperImport.LAYER_REFERENCES));
-		SLayer fixRefLayer = fixGraph.getLayerByName(TCFMapperImport.LAYER_REFERENCES).get(0);
-		assertFalse(fixRefLayer.getNodes().isEmpty());
-		assertFalse(fixRefLayer.getRelations().isEmpty());		
-		assertEquals(docRefLayer.getNodes().size(), fixRefLayer.getNodes().size());
-		Set<SRelation<SNode, SNode>> docReferences = docRefLayer.getRelations();
-		Set<SRelation<SNode, SNode>> fixReferences = fixRefLayer.getRelations();
-		assertEquals(docReferences.size(), fixReferences.size());
-		assertNotNull(fixRefLayer.getMetaAnnotation(TCFDictionary.ATT_TYPETAGSET));
-		assertNotNull(fixRefLayer.getMetaAnnotation(TCFDictionary.ATT_RELTAGSET));
-		assertEquals(docRefLayer.getAnnotation(TCFDictionary.ATT_TYPETAGSET), fixRefLayer.getAnnotation(TCFDictionary.ATT_TYPETAGSET));
-		assertEquals(docRefLayer.getAnnotation(TCFDictionary.ATT_RELTAGSET), fixRefLayer.getAnnotation(TCFDictionary.ATT_RELTAGSET));
-		
-		SRelation<SNode, SNode> docRef = null;
-		SRelation<SNode, SNode> fixRef = null;
-		Iterator<SRelation<SNode, SNode>> fix_it= fixReferences.iterator(); 
-		Iterator<SRelation<SNode, SNode>> doc_it= docReferences.iterator();
-		for(int i=0; i<docReferences.size(); i++){
-			docRef = doc_it.next();
-			fixRef = fix_it.next();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
+//		/* compare template salt model to imported salt model */		
+//		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+//		assertNotNull(fixGraph.getLayerByName(TCFMapperImport.LAYER_REFERENCES));
+//		SLayer fixRefLayer = fixGraph.getLayerByName(TCFMapperImport.LAYER_REFERENCES).get(0);
+//		assertFalse(fixRefLayer.getNodes().isEmpty());
+//		assertFalse(fixRefLayer.getRelations().isEmpty());		
+//		assertEquals(docRefLayer.getNodes().size(), fixRefLayer.getNodes().size());
+//		Set<SRelation<SNode, SNode>> docReferences = docRefLayer.getRelations();
+//		Set<SRelation<SNode, SNode>> fixReferences = fixRefLayer.getRelations();
+//		assertEquals(docReferences.size(), fixReferences.size());
+//		assertNotNull(fixRefLayer.getMetaAnnotation(TCFDictionary.ATT_TYPETAGSET));
+//		assertNotNull(fixRefLayer.getMetaAnnotation(TCFDictionary.ATT_RELTAGSET));
+//		assertEquals(docRefLayer.getAnnotation(TCFDictionary.ATT_TYPETAGSET), fixRefLayer.getAnnotation(TCFDictionary.ATT_TYPETAGSET));
+//		assertEquals(docRefLayer.getAnnotation(TCFDictionary.ATT_RELTAGSET), fixRefLayer.getAnnotation(TCFDictionary.ATT_RELTAGSET));
+//		
+//		SRelation<SNode, SNode> docRef = null;
+//		SRelation<SNode, SNode> fixRef = null;
+//		Iterator<SRelation<SNode, SNode>> fix_it= fixReferences.iterator(); 
+//		Iterator<SRelation<SNode, SNode>> doc_it= docReferences.iterator();
 //		for(int i=0; i<docReferences.size(); i++){
-//			docRef = docReferences.get(i);
-//			fixRef = fixReferences.get(i);
-			if(DEBUG){
-				}
-			/* compare source */
-			assertNotNull(fixRef.getSource());
-			assertEquals(docGraph.getText(docRef.getSource()), fixGraph.getText(fixRef.getSource()));
-			assertNotNull(fixRef.getSource().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
-			assertEquals(docRef.getSource().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE), fixRef.getSource().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
-			assertEquals(docRef.getSource().getClass(), fixRef.getSource().getClass());
-			/* compare relation */
-			assertNotNull(fixRef.getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL));
-			/* compare target */
-			assertNotNull(fixRef.getTarget());
-			assertEquals(docGraph.getText(docRef.getTarget()), fixGraph.getText(fixRef.getTarget()));
-			assertNotNull(fixRef.getTarget().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
-			assertEquals(docRef.getTarget().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getTarget().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());
-			assertEquals(docRef.getTarget().getClass(), fixRef.getTarget().getClass());
-		}
+//			docRef = doc_it.next();
+//			fixRef = fix_it.next();
+////		for(int i=0; i<docReferences.size(); i++){
+////			docRef = docReferences.get(i);
+////			fixRef = fixReferences.get(i);
+//			if(DEBUG){
+//				}
+//			/* compare source */
+//			assertNotNull(fixRef.getSource());
+//			assertEquals(docGraph.getText(docRef.getSource()), fixGraph.getText(fixRef.getSource()));
+//			assertNotNull(fixRef.getSource().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
+//			assertEquals(docRef.getSource().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE), fixRef.getSource().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
+//			assertEquals(docRef.getSource().getClass(), fixRef.getSource().getClass());
+//			/* compare relation */
+//			assertNotNull(fixRef.getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_REL));
+//			/* compare target */
+//			assertNotNull(fixRef.getTarget());
+//			assertEquals(docGraph.getText(docRef.getTarget()), fixGraph.getText(fixRef.getTarget()));
+//			assertNotNull(fixRef.getTarget().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE));
+//			assertEquals(docRef.getTarget().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue(), fixRef.getTarget().getAnnotation(TCFMapperImport.LAYER_REFERENCES+"::"+TCFDictionary.ATT_TYPE).getValue());
+//			assertEquals(docRef.getTarget().getClass(), fixRef.getTarget().getClass());
+//		}
 	}
 	
 	/**This method tests if a valid TCF-XML-structure containing reference
@@ -3633,7 +3665,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */		
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
@@ -3883,7 +3918,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 //		/* compare template salt model to imported salt model */		
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
 //		assertNotNull(fixGraph.getLayerByName(TCFMapperImport.LAYER_REFERENCES));
@@ -4502,7 +4540,10 @@ public class TCFMapperImportTest {
 				
 		getFixture().mapSDocument();
 		
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();		
 //		assertFalse(fixGraph.getLayerByName(TCFMapperImport.LAYER_PHONETICS).isEmpty());
@@ -4638,7 +4679,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();		
@@ -4791,7 +4835,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();		
@@ -4945,7 +4992,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();		
@@ -5106,7 +5156,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
@@ -5279,7 +5332,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
@@ -5553,7 +5609,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
@@ -5817,7 +5876,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
@@ -5956,7 +6018,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
@@ -6094,7 +6159,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
@@ -6249,7 +6317,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
@@ -6406,7 +6477,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
@@ -6557,7 +6631,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
@@ -6710,7 +6787,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
@@ -6924,7 +7004,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 				
 //		
 //		/* compare template salt model to imported salt model */
@@ -7139,7 +7222,11 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		assertTrue(docGraph.isIsomorph(docGraph));
+		
+		/* compare template salt model to imported salt model */
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		assertEquals(diffs.toString(), 0, diffs.size());
 		
 //		/* compare template salt model to imported salt model */
 //		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();

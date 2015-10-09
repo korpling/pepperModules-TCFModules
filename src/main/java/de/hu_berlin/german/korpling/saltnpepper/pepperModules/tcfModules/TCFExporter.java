@@ -17,14 +17,14 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 
+import org.corpus_tools.pepper.impl.PepperExporterImpl;
+import org.corpus_tools.pepper.modules.PepperExporter;
+import org.corpus_tools.pepper.modules.PepperExporter.EXPORT_MODE;
+import org.corpus_tools.pepper.modules.PepperMapper;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.graph.Identifier;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
-
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperExporter;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperExporterImpl;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 
 @Component(name="TCFExporterComponent", factory="PepperExporterComponentFactory")
 public class TCFExporter extends PepperExporterImpl implements PepperExporter{
@@ -40,10 +40,10 @@ public class TCFExporter extends PepperExporterImpl implements PepperExporter{
 	}
 	
 	@Override
-	public PepperMapper createPepperMapper(SElementId sElementId) {
+	public PepperMapper createPepperMapper(Identifier sElementId) {
 		TCFMapperExport mapper = new TCFMapperExport();		
-		if (sElementId.getSIdentifiableElement() instanceof SDocument) {
-			mapper.setResourceURI(getSElementId2ResourceTable().get(sElementId));
+		if (sElementId.getIdentifiableElement() instanceof SDocument) {
+			mapper.setResourceURI(getIdentifier2ResourceTable().get(sElementId));
 		}		
 		return mapper;
 	}

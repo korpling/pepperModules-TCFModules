@@ -17,18 +17,17 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
 
+import org.corpus_tools.pepper.impl.PepperImporterImpl;
+import org.corpus_tools.pepper.modules.PepperImporter;
+import org.corpus_tools.pepper.modules.PepperMapper;
+import org.corpus_tools.pepper.modules.PepperModule;
+import org.corpus_tools.pepper.modules.PepperModuleProperties;
+import org.corpus_tools.pepper.modules.exceptions.PepperModuleNotReadyException;
+import org.corpus_tools.salt.common.SCorpus;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.graph.Identifier;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
-
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperImporter;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModule;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModuleProperties;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleNotReadyException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperImporterImpl;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 
 /**
  * This is a sample {@link PepperImporter}, which can be used for creating individual Importers for the 
@@ -67,28 +66,28 @@ public class TCFImporter extends PepperImporterImpl implements PepperImporter
 	    setSupplierContact(URI.createURI("saltnpepper@lists.hu-berlin.de"));
 		setSupplierHomepage(URI.createURI("https://github.com/korpling/pepperModules-TCFModules"));
 		setDesc("This importer transforms data in TCF format produced for instance by WebLicht (see http://weblicht.sfs.uni-tuebingen.de/) or WebAnno (see https://www.ukp.tu-darmstadt.de/software/webanno/) to a Salt model. ");
-		this.addSupportedFormat("TCF", "0.4", null);
-		this.setProperties(new TCFImporterProperties());
-		this.getSDocumentEndings().add("xml");
-		this.getSDocumentEndings().add("tcf");
+		addSupportedFormat("TCF", "0.4", null);
+		setProperties(new TCFImporterProperties());
+		getDocumentEndings().add("xml");
+		getDocumentEndings().add("tcf");
 	}
 	
 	/**
 	 * <strong>OVERRIDE THIS METHOD FOR CUSTOMIZATION</strong>
 	 * 
 	 * This method creates a customized {@link PepperMapper} object and returns it. You can here do some additional initialisations. 
-	 * Thinks like setting the {@link SElementId} of the {@link SDocument} or {@link SCorpus} object and the {@link URI} resource is done
+	 * Thinks like setting the {@link Identifier} of the {@link SDocument} or {@link SCorpus} object and the {@link URI} resource is done
 	 * by the framework (or more in detail in method {@link #start()}).  
 	 * The parameter <code>sElementId</code>, if a {@link PepperMapper} object should be created in case of the object to map is either 
 	 * an {@link SDocument} object or an {@link SCorpus} object of the mapper should be initialized differently. 
 	 * <br/>
 	 * 
-	 * @param sElementId {@link SElementId} of the {@link SCorpus} or {@link SDocument} to be processed. 
-	 * @return {@link PepperMapper} object to do the mapping task for object connected to given {@link SElementId}
+	 * @param sElementId {@link Identifier} of the {@link SCorpus} or {@link SDocument} to be processed. 
+	 * @return {@link PepperMapper} object to do the mapping task for object connected to given {@link Identifier}
 	 */
-	public PepperMapper createPepperMapper(SElementId sElementId){
+	public PepperMapper createPepperMapper(Identifier sElementId){
 		TCFMapperImport mapper=new TCFMapperImport();
-		mapper.setResourceURI(getSElementId2ResourceTable().get(sElementId));
+		mapper.setResourceURI(getIdentifier2ResourceTable().get(sElementId));
 		return(mapper);
 	}
 

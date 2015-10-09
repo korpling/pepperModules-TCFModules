@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
@@ -31,6 +30,14 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.util.*;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.samples.SampleGenerator;
 import org.eclipse.emf.common.util.URI;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,15 +45,6 @@ import org.junit.Test;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFDictionary;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFExporterProperties;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFMapperExport;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SALT_SEMANTIC_NAMES;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltSemantics.SaltSemanticsPackage;
-import de.hu_berlin.german.korpling.saltnpepper.salt.samples.SampleGenerator;
 
 public class TCFMapperExportTest {
 	
@@ -159,17 +157,17 @@ public class TCFMapperExportTest {
 		xmlWriter.writeEndDocument();		
 		
 		/* creating SDocument */
-		SDocument sDocument = SaltFactory.eINSTANCE.createSDocument();
-		sDocument.setSName(SNAME_TEST_PRIMARY_TEXT);
-		sDocument.createSMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
+		SDocument sDocument = SaltFactory.createSDocument();
+		sDocument.setName(SNAME_TEST_PRIMARY_TEXT);
+		sDocument.createMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
 		SampleGenerator.createPrimaryData(sDocument, SampleGenerator.LANG_EN);		
 		
 		/* setting variables*/		
-		this.getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_PRIMARY_TEXT));
+		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_PRIMARY_TEXT));
 		
 		/* start mapper */
-		this.getFixture().setSDocument(sDocument);
-		this.getFixture().mapSDocument();
+		getFixture().setDocument(sDocument);
+		getFixture().mapSDocument();
 		
 		/* tests */
 		File fixFile = new File(getFixture().getResourceURI().toFileString());
@@ -191,18 +189,18 @@ public class TCFMapperExportTest {
 		xmlWriter.writeEndDocument();
 		
 		/* creating SDocument */
-		SDocument sDocument = SaltFactory.eINSTANCE.createSDocument();
-		sDocument.setSName(SNAME_TEST_TOKENS);
-		sDocument.createSMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
+		SDocument sDocument = SaltFactory.createSDocument();
+		sDocument.setName(SNAME_TEST_TOKENS);
+		sDocument.createMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
 		SampleGenerator.createPrimaryData(sDocument, SampleGenerator.LANG_EN);
 		SampleGenerator.createTokens(sDocument);
 		
 		/* setting variables*/		
-		this.getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_TOKENS));
+		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_TOKENS));
 		
 		/* start mapper */
-		this.getFixture().setSDocument(sDocument);
-		this.getFixture().mapSDocument();
+		getFixture().setDocument(sDocument);
+		getFixture().mapSDocument();
 		
 		/* tests */
 		File fixFile = new File(getFixture().getResourceURI().toFileString());
@@ -245,38 +243,38 @@ public class TCFMapperExportTest {
 		xmlWriter.writeEndDocument();		
 		
 		/* creating SDocument */
-		SDocument sDocument = SaltFactory.eINSTANCE.createSDocument();
-		sDocument.setSName(SNAME_TEST_TEXTSTRUCTURE);
-		sDocument.createSMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
+		SDocument sDocument = SaltFactory.createSDocument();
+		sDocument.setName(SNAME_TEST_TEXTSTRUCTURE);
+		sDocument.createMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
 		SampleGenerator.createPrimaryData(sDocument, SampleGenerator.LANG_EN);
 		SampleGenerator.createTokens(sDocument);
-		SDocumentGraph sDocGraph = sDocument.getSDocumentGraph();
+		SDocumentGraph sDocGraph = sDocument.getDocumentGraph();
 		TCFExporterProperties properties = new TCFExporterProperties();
 		String qNamePage = properties.getTextstructurePageName();
 		String valuePage = properties.getTextstructurePageValue();
 		String qNameLine = properties.getTextstructureLineName();
 		String valueLine = properties.getTextstructureLineValue();
 		
-		sDocGraph.createSSpan(sDocument.getSDocumentGraph().getSortedSTokenByText()).createSAnnotation(null, qNamePage, valuePage);
-		List<SToken> sTokens = sDocGraph.getSortedSTokenByText();
-		SSpan sSpan = sDocGraph.createSSpan(sTokens.get(0));
-		sSpan.createSAnnotation(null, qNameLine, valueLine);
+		sDocGraph.createSpan(sDocument.getDocumentGraph().getSortedTokenByText()).createAnnotation(null, qNamePage, valuePage);
+		List<SToken> sTokens = sDocGraph.getSortedTokenByText();
+		SSpan sSpan = sDocGraph.createSpan(sTokens.get(0));
+		sSpan.createAnnotation(null, qNameLine, valueLine);
 		for (int i=1; i<5; i++){
-			sDocGraph.createSRelation(sSpan, sTokens.get(i), STYPE_NAME.SSPANNING_RELATION, null);
+			sDocGraph.createSRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
-		sSpan = sDocGraph.createSSpan(sTokens.get(5));
-		sSpan.createSAnnotation(null, qNameLine, valueLine);
+		sSpan = sDocGraph.createSpan(sTokens.get(5));
+		sSpan.createAnnotation(null, qNameLine, valueLine);
 		for (int i=6; i<sTokens.size(); i++){
-			sDocGraph.createSRelation(sSpan, sTokens.get(i), STYPE_NAME.SSPANNING_RELATION, null);
+			sDocGraph.createSRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
 		
 		/* setting variables*/		
-		this.getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_TEXTSTRUCTURE));
-		this.getFixture().setProperties(properties);
+		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_TEXTSTRUCTURE));
+		getFixture().setProperties(properties);
 		
 		/* start mapper */
-		this.getFixture().setSDocument(sDocument);
-		this.getFixture().mapSDocument();
+		getFixture().setDocument(sDocument);
+		getFixture().mapSDocument();
 		
 		/* tests */
 		File fixFile = new File(getFixture().getResourceURI().toFileString());
@@ -309,31 +307,31 @@ public class TCFMapperExportTest {
 		xmlWriter.writeEndDocument();		
 		
 		/* creating SDocument */
-		SDocument sDocument = SaltFactory.eINSTANCE.createSDocument();
-		sDocument.setSName(SNAME_TEST_SENTENCES);
-		sDocument.createSMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
+		SDocument sDocument = SaltFactory.createSDocument();
+		sDocument.setName(SNAME_TEST_SENTENCES);
+		sDocument.createMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
 		SampleGenerator.createPrimaryData(sDocument, SampleGenerator.LANG_EN);
 		SampleGenerator.createTokens(sDocument);
-		SDocumentGraph sDocGraph = sDocument.getSDocumentGraph();
-		List<SToken> sTokens = sDocGraph.getSortedSTokenByText();
-		SSpan sSpan = sDocGraph.createSSpan(sTokens.get(0));
+		SDocumentGraph sDocGraph = sDocument.getDocumentGraph();
+		List<SToken> sTokens = sDocGraph.getSortedTokenByText();
+		SSpan sSpan = sDocGraph.createSpan(sTokens.get(0));
 		for (int i=1; i<5; i++){
-			sDocGraph.createSRelation(sSpan, sTokens.get(i), STYPE_NAME.SSPANNING_RELATION, null);
+			sDocGraph.createSRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
-		sSpan.createSAnnotation(null, "sentence", "sentence");
-		sSpan = sDocGraph.createSSpan(sTokens.get(5));
+		sSpan.createAnnotation(null, "sentence", "sentence");
+		sSpan = sDocGraph.createSpan(sTokens.get(5));
 		for (int i=6; i<sTokens.size(); i++){
-			sDocGraph.createSRelation(sSpan, sTokens.get(i), STYPE_NAME.SSPANNING_RELATION, null);
+			sDocGraph.createSRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
-		sSpan.createSAnnotation(null, "sentence", "sentence");
+		sSpan.createAnnotation(null, "sentence", "sentence");
 		
 		/* setting variables*/		
-		this.getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_SENTENCES));
-		this.getFixture().setProperties(new TCFExporterProperties());
+		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_SENTENCES));
+		getFixture().setProperties(new TCFExporterProperties());
 		
 		/* start mapper */
-		this.getFixture().setSDocument(sDocument);
-		this.getFixture().mapSDocument();
+		getFixture().setDocument(sDocument);
+		getFixture().mapSDocument();
 		
 		/* tests */
 		File fixFile = new File(getFixture().getResourceURI().toFileString());
@@ -425,23 +423,23 @@ public class TCFMapperExportTest {
 		xmlWriter.writeEndDocument();		
 		
 		/* creating SDocument */
-		SDocument sDocument = SaltFactory.eINSTANCE.createSDocument();
-		sDocument.setSName(SNAME_TEST_POS);
-		sDocument.createSMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
+		SDocument sDocument = SaltFactory.createSDocument();
+		sDocument.setName(SNAME_TEST_POS);
+		sDocument.createMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
 		SampleGenerator.createPrimaryData(sDocument, SampleGenerator.LANG_EN);
 		SampleGenerator.createTokens(sDocument);
 		SampleGenerator.createMorphologyAnnotations(sDocument);
-		SDocumentGraph sDocGraph = sDocument.getSDocumentGraph();
+		SDocumentGraph sDocGraph = sDocument.getDocumentGraph();
 		
 		/* setting variables*/		
-		this.getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_POS));
+		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_POS));
 		TCFExporterProperties properties = new TCFExporterProperties();
-		properties.setPropertyValue(TCFExporterProperties.PROP_POS_QNAME, SaltSemanticsPackage.eNS_PREFIX+"::"+SALT_SEMANTIC_NAMES.POS.toString());
-		this.getFixture().setProperties(properties);
+		properties.setPropertyValue(TCFExporterProperties.PROP_POS_QNAME, SaltUtil.createQName(SaltUtil.SALT_NAMESPACE, SaltUtil.SEMANTICS_POS));
+		getFixture().setProperties(properties);
 		
 		/* start mapper */
-		this.getFixture().setSDocument(sDocument);
-		this.getFixture().mapSDocument();
+		getFixture().setDocument(sDocument);
+		getFixture().mapSDocument();
 		
 		/* tests */
 		File fixFile = new File(getFixture().getResourceURI().toFileString());

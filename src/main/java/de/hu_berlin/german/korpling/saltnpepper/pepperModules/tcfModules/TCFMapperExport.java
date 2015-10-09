@@ -24,30 +24,25 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
+import org.corpus_tools.pepper.common.DOCUMENT_STATUS;
+import org.corpus_tools.pepper.impl.PepperMapperImpl;
+import org.corpus_tools.pepper.modules.exceptions.PepperModuleDataException;
+import org.corpus_tools.pepper.modules.exceptions.PepperModuleException;
+import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleDataException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 
 public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	
@@ -88,8 +83,8 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	
 	private void initMeta(){
 		meta = new HashMap<String, String>();
-//		if (getSDocument()!=null){//FIXME I think this is always false
-//			meta.put(ATT_LANG, getSDocument().getSMetaAnnotation(ATT_LANG).getValue().toString()); //FIXME --> by properties we will find out where this meta attribute is
+//		if (getDocument()!=null){//FIXME I think this is always false
+//			meta.put(ATT_LANG, getDocument().getMetaAnnotation(ATT_LANG).getValue().toString()); //FIXME --> by properties we will find out where this meta attribute is
 //		}
 		//lang can be multiple value: parallel corpora		
 	}
@@ -98,7 +93,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	@Override
 	public DOCUMENT_STATUS mapSDocument(){
 		init();
-		if (getSDocument()==null){
+		if (getDocument()==null){
 			throw new PepperModuleDataException(this, "No document delivered to be converted.");
 		}
 		ByteArrayOutputStream outStream = null;
@@ -106,8 +101,8 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		XMLStreamWriter w;
 		File file = null;
 		PrintWriter p;
-		boolean multipleFiles = getSDocument().getSDocumentGraph().getSTextualDSs().size()>1;
-		List<STextualDS> sTextualDSs = getSDocument().getSDocumentGraph().getSTextualDSs();
+		boolean multipleFiles = getDocument().getDocumentGraph().getTextualDSs().size()>1;
+		List<STextualDS> sTextualDSs = getDocument().getDocumentGraph().getTextualDSs();
 		STextualDS sTextualDS = null;
 		for (int i=0; i<sTextualDSs.size(); i++){			
 			try {
@@ -128,7 +123,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				w.writeStartElement(NS_TC, TAG_TC_TEXTCORPUS, NS_VALUE_TC);
 				w.writeAttribute(ATT_LANG, getLanguage());//TODO see also above (meta)
 				mapSTextualDS(sTextualDS);
-				mapTokenization(getSDocument().getSDocumentGraph().getSortedSTokenByText());
+				mapTokenization(getDocument().getDocumentGraph().getSortedTokenByText());
 				mapSentences();
 				mapPOSAnnotations();
 				mapLemmaAnnotations();
@@ -161,7 +156,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		XMLStreamWriter w = currentTCF;
 		try {
 			w.writeStartElement(NS_TC, TAG_TC_TEXT, NS_VALUE_TC);
-			w.writeCharacters(ds.getSText());
+			w.writeCharacters(ds.getText());
 			w.writeEndElement();
 		} catch (XMLStreamException e) {}
 		w = null;
@@ -173,12 +168,12 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 			XMLStreamWriter w = currentTCF;
 			try {
 				w.writeStartElement(NS_TC, TAG_TC_TOKENS, NS_VALUE_TC);
-				SDocumentGraph sDocGraph = getSDocument().getSDocumentGraph();
+				SDocumentGraph sDocGraph = getDocument().getDocumentGraph();
 				int i = 0;
 				String id = null;
 				String sText = null;				
 				for (SToken sTok : sTokens){
-					sText = sDocGraph.getSText(sTok);
+					sText = sDocGraph.getText(sTok);
 					if (emptyTokensAllowed || !sText.replace(" ","").replace(System.getProperty("line.separator"),"").replace("\t", "").isEmpty()){
 						i++;
 						id = "t_"+i;
@@ -199,16 +194,16 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 	private void mapSentences(){		
 		/* write */
 		XMLStreamWriter w = currentTCF;
-		SDocumentGraph sDocGraph = getSDocument().getSDocumentGraph();
+		SDocumentGraph sDocGraph = getDocument().getDocumentGraph();
 		List<SSpan> sSpans = new ArrayList<SSpan>();
-		for (SSpan sSpan : getSDocument().getSDocumentGraph().getSSpans()){
-			if (sSpan.getSAnnotation(qNameSentence)!=null && sSpan.getSAnnotation(qNameSentence).getValue().toString().equals(valueSentence)){
+		for (SSpan sSpan : getDocument().getDocumentGraph().getSpans()){
+			if (sSpan.getAnnotation(qNameSentence)!=null && sSpan.getAnnotation(qNameSentence).getValue().toString().equals(valueSentence)){
 				sSpans.add(sSpan);
 			}
 		}
-		EList<SToken> sTokens = null;
-		EList<STYPE_NAME> sTypes = new BasicEList<STYPE_NAME>();
-		sTypes.add(STYPE_NAME.SSPANNING_RELATION);
+		List<SToken> sTokens = null;
+		List<SALT_TYPE> sTypes = new ArrayList<SALT_TYPE>();
+		sTypes.add(SALT_TYPE.SSPANNING_RELATION);
 		String value = "";
 		try {
 			if (!sSpans.isEmpty()){			
@@ -216,8 +211,8 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				SSpan sSpan = null;
 				for (int j=0; j<sSpans.size(); j++){
 					sSpan = sSpans.get(j);			
-					sTokens = sDocGraph.getOverlappedSTokens(sSpan, sTypes);
-					sTokens = sDocGraph.getSortedSTokenByText(sTokens);					
+					sTokens = sDocGraph.getOverlappedTokens(sSpan, sTypes);
+					sTokens = sDocGraph.getSortedTokenByText(sTokens);					
 					w.writeStartElement(NS_TC, TAG_TC_SENTENCE, NS_VALUE_TC);
 					w.writeAttribute(ATT_ID, "s_"+(j+1));					
 					for (SToken sTok : sTokens){
@@ -237,8 +232,8 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		XMLStreamWriter w = currentTCF;
 		List<SAnnotation> sAnnos = new ArrayList<SAnnotation>();
 		SAnnotation anno = null;
-		for (SToken sTok : getSDocument().getSDocumentGraph().getSortedSTokenByText()){
-			anno = sTok.getSAnnotation(qNamePOS);
+		for (SToken sTok : getDocument().getDocumentGraph().getSortedTokenByText()){
+			anno = sTok.getAnnotation(qNamePOS);
 			if (anno!=null){
 				sAnnos.add(anno);
 			}
@@ -251,7 +246,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				for (SAnnotation sAnno : sAnnos){
 					w.writeStartElement(NS_TC, TAG_TC_TAG, NS_VALUE_TC);
 					w.writeAttribute(ATT_ID, "pt_"+k++);
-					w.writeAttribute(ATT_TOKENIDS, sNodes.get(sAnno.getSAnnotatableElement()));
+					w.writeAttribute(ATT_TOKENIDS, sNodes.get(sAnno.getContainer()));
 					w.writeCharacters(sAnno.getValue().toString());
 					w.writeEndElement();//end of tag
 				}
@@ -266,8 +261,8 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		XMLStreamWriter w = currentTCF;
 		List<SAnnotation> sAnnos = new ArrayList<SAnnotation>();
 		SAnnotation anno = null;
-		for (SToken sTok : getSDocument().getSDocumentGraph().getSortedSTokenByText()){
-			anno = sTok.getSAnnotation(qNameLemma);
+		for (SToken sTok : getDocument().getDocumentGraph().getSortedTokenByText()){
+			anno = sTok.getAnnotation(qNameLemma);
 			if (anno!=null){
 				sAnnos.add(anno);
 			}
@@ -279,7 +274,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				for (SAnnotation sAnno : sAnnos){
 					w.writeStartElement(NS_TC, TAG_TC_LEMMA, NS_VALUE_TC);
 					w.writeAttribute(ATT_ID, "le_"+k++);
-					w.writeAttribute(ATT_TOKENIDS, sNodes.get(sAnno.getSAnnotatableElement()));
+					w.writeAttribute(ATT_TOKENIDS, sNodes.get(sAnno.getContainer()));
 					w.writeCharacters(sAnno.getValue().toString());
 					w.writeEndElement();
 				}
@@ -294,13 +289,13 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 		/* collect all relevant spans */
 		List<SNode> layoutNodes = new ArrayList<SNode>(); 
 		SAnnotation anno = null;
-		for (SNode sNode : getSDocument().getSDocumentGraph().getSNodes()){
-			anno = sNode.getSAnnotation(qNameLine);
-			if (anno!=null && anno.getSValueSTEXT().equals(valueLine)){
+		for (SNode sNode : getDocument().getDocumentGraph().getNodes()){
+			anno = sNode.getAnnotation(qNameLine);
+			if (anno!=null && anno.getValue_STEXT().equals(valueLine)){
 				layoutNodes.add(sNode);				
 			}
-			anno = sNode.getSAnnotation(qNamePage);
-			if (anno!=null && anno.getSValueSTEXT().equals(valuePage)){
+			anno = sNode.getAnnotation(qNamePage);
+			if (anno!=null && anno.getValue_STEXT().equals(valuePage)){
 				layoutNodes.add(sNode);
 			}			
 		}
@@ -309,13 +304,13 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 			XMLStreamWriter w = currentTCF;
 			try {
 				w.writeStartElement(NS_TC, TAG_TC_TEXTSTRUCTURE, NS_VALUE_TC);
-				EList<STYPE_NAME> sTypes = new BasicEList<STYPE_NAME>();
-				sTypes.add(STYPE_NAME.SSPANNING_RELATION);
-				sTypes.add(STYPE_NAME.SDOMINANCE_RELATION);
+				List<SALT_TYPE> sTypes = new ArrayList<SALT_TYPE>();
+				sTypes.add(SALT_TYPE.SSPANNING_RELATION);
+				sTypes.add(SALT_TYPE.SDOMINANCE_RELATION);
 				List<SToken> sTokens = null;
 				String type = null;
 				for (SNode sNode : layoutNodes){					
-					sTokens = getSDocument().getSDocumentGraph().getSortedSTokenByText(getSDocument().getSDocumentGraph().getOverlappedSTokens(sNode, sTypes));
+					sTokens = getDocument().getDocumentGraph().getSortedTokenByText(getDocument().getDocumentGraph().getOverlappedTokens(sNode, sTypes));
 					List<SToken> realTokens = new ArrayList<SToken>();
 					for (SToken sTok : sTokens){
 						if (!emptyTokens.contains(sTok)){
@@ -326,8 +321,8 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 						w.writeStartElement(NS_TC, TAG_TC_TEXTSPAN, NS_VALUE_TC);
 						w.writeAttribute(ATT_START, sNodes.get(realTokens.get(0)));
 						w.writeAttribute(ATT_END, sNodes.get(realTokens.get(realTokens.size()-1)));
-						type = sNode.getSAnnotation(qNamePage)!=null && sNode.getSAnnotation(qNamePage).getValue().equals(valuePage)? "page" : 
-							(sNode.getSAnnotation(qNameLine)!=null && sNode.getSAnnotation(qNameLine).getValue().equals(valueLine)? "line" : "IMPOSSIBLE RIGHT NOW"/*to be continued*/); 
+						type = sNode.getAnnotation(qNamePage)!=null && sNode.getAnnotation(qNamePage).getValue().equals(valuePage)? "page" : 
+							(sNode.getAnnotation(qNameLine)!=null && sNode.getAnnotation(qNameLine).getValue().equals(valueLine)? "line" : "IMPOSSIBLE RIGHT NOW"/*to be continued*/); 
 						w.writeAttribute(ATT_TYPE, type);
 						w.writeEndElement();
 					}					

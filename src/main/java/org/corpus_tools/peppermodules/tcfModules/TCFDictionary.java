@@ -15,7 +15,7 @@
  *
  *
  */
-package de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules;
+package org.corpus_tools.peppermodules.tcfModules;
 
 public interface TCFDictionary{
 	/** constant processing instruction **/

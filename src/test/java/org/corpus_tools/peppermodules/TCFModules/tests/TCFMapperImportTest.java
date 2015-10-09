@@ -15,7 +15,7 @@
  *
  *
  */
-package de.hu_berlin.german.korpling.saltnpepper.pepperModules.TCFModules.tests;
+package org.corpus_tools.peppermodules.TCFModules.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -34,6 +34,9 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.corpus_tools.peppermodules.tcfModules.TCFDictionary;
+import org.corpus_tools.peppermodules.tcfModules.TCFImporterProperties;
+import org.corpus_tools.peppermodules.tcfModules.TCFMapperImport;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocument;
@@ -59,10 +62,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFDictionary;
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFImporterProperties;
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.tcfModules.TCFMapperImport;
 
 public class TCFMapperImportTest {
 

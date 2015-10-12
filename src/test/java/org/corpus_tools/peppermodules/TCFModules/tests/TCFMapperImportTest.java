@@ -965,7 +965,6 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-				System.out.println(docGraph.getLayers());
 		
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();

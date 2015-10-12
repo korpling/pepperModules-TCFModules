@@ -477,7 +477,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			else if (TAG_TC_WSD.equals(localName)){
 				buildLayer(LAYER_WORDSENSE);
 				String annoVal = attributes.getValue(ATT_SRC);
-				if(annoVal!=null){sLayers.get(LAYER_WORDSENSE).createAnnotation(null, ATT_SRC, annoVal);}
+				if(annoVal!=null){sLayers.get(LAYER_WORDSENSE).createMetaAnnotation(null, ATT_SRC, annoVal);}
 			}
 			else if (TAG_TC_WS.equals(localName)){
 				SNode sNode = getNode(attributes.getValue(ATT_TOKENIDS));
@@ -487,7 +487,7 @@ public class TCFMapperImport extends PepperMapperImpl{
 			}
 			else if (TAG_TC_WORDSPLITTINGS.equals(localName)){
 				SLayer splitLayer = buildLayer(LAYER_SPLITTINGS);
-				if(attributes.getValue(ATT_TYPE)!=null){splitLayer.createAnnotation(null, ATT_TYPE, attributes.getValue(ATT_TYPE));}
+				if(attributes.getValue(ATT_TYPE)!=null){splitLayer.createMetaAnnotation(null, ATT_TYPE, attributes.getValue(ATT_TYPE));}
 			}
 			else if (TAG_TC_SPLIT.equals(localName)){
 				chars.delete(0, chars.length());

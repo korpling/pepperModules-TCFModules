@@ -259,12 +259,12 @@ public class TCFMapperExportTest {
 		SSpan sSpan = sDocGraph.createSpan(sTokens.get(0));
 		sSpan.createAnnotation(null, qNameLine, valueLine);
 		for (int i=1; i<5; i++){
-			sDocGraph.createSRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
+			sDocGraph.createRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
 		sSpan = sDocGraph.createSpan(sTokens.get(5));
 		sSpan.createAnnotation(null, qNameLine, valueLine);
 		for (int i=6; i<sTokens.size(); i++){
-			sDocGraph.createSRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
+			sDocGraph.createRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
 		
 		/* setting variables*/		
@@ -315,12 +315,12 @@ public class TCFMapperExportTest {
 		List<SToken> sTokens = sDocGraph.getSortedTokenByText();
 		SSpan sSpan = sDocGraph.createSpan(sTokens.get(0));
 		for (int i=1; i<5; i++){
-			sDocGraph.createSRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
+			sDocGraph.createRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
 		sSpan.createAnnotation(null, "sentence", "sentence");
 		sSpan = sDocGraph.createSpan(sTokens.get(5));
 		for (int i=6; i<sTokens.size(); i++){
-			sDocGraph.createSRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
+			sDocGraph.createRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
 		sSpan.createAnnotation(null, "sentence", "sentence");
 		

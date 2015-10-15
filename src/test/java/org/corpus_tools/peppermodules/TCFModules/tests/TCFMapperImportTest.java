@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.exceptions.SaltException;
 import org.corpus_tools.salt.samples.SampleGenerator;
 import org.corpus_tools.salt.semantics.SLemmaAnnotation;
 import org.corpus_tools.salt.semantics.SPOSAnnotation;
@@ -5960,5 +5962,5 @@ public class TCFMapperImportTest {
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
 		Set<Difference> diffs= docGraph.findDiffs(fixGraph, (new DiffOptions()).setOption(DiffOptions.OPTION_IGNORE_ID, true));
 		assertEquals(diffs.toString(), 0, diffs.size());		
-	}
+	}	
 }

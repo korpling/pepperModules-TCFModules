@@ -5682,7 +5682,7 @@ public class TCFMapperImportTest {
 		
 		/* generating salt sample */
 		SDocument doc = SaltFactory.createSDocument();
-		doc.setId("doc");
+		doc.setId("doc0");
 		SDocumentGraph docGraph = SaltFactory.createSDocumentGraph();
 		doc.setDocumentGraph(docGraph);
 		docGraph.createTextualDS(EXAMPLE_TEXT);
@@ -5760,8 +5760,8 @@ public class TCFMapperImportTest {
 				
 		getFixture().mapSDocument();
 		/* compare template salt model to imported salt model */
-		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
-		Set<Difference> diffs= docGraph.findDiffs(fixGraph);
+		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();System.out.println(fixGraph);
+		Set<Difference> diffs= docGraph.findDiffs(fixGraph, (new DiffOptions()).setOption(DiffOptions.OPTION_IGNORE_ID, true));
 		assertEquals(diffs.toString(), 0, diffs.size());
 	}
 
@@ -5957,9 +5957,10 @@ public class TCFMapperImportTest {
 		/* start mapper */
 				
 		getFixture().mapSDocument();
-		
+				
 		/* compare template salt model to imported salt model */
 		SDocumentGraph fixGraph = getFixture().getDocument().getDocumentGraph();
+		
 		Set<Difference> diffs= docGraph.findDiffs(fixGraph, (new DiffOptions()).setOption(DiffOptions.OPTION_IGNORE_ID, true));
 		assertEquals(diffs.toString(), 0, diffs.size());		
 	}	

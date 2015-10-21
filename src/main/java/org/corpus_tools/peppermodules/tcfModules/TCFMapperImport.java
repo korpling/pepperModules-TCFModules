@@ -524,10 +524,11 @@ public class TCFMapperImport extends PepperMapperImpl{
 							j++;
 						}
 						sNode = graph.createSpan(startToken);
-						do{
+						j++;
+						while(j<allTokens.size() && !allTokens.get(j).equals(endToken)){
 							graph.addNode(sNode, allTokens.get(j), SALT_TYPE.SSPANNING_RELATION);
 							j++;
-						}while(j<allTokens.size() && !allTokens.get(j).equals(endToken));
+						}
 						graph.addNode(sNode, allTokens.get(j), SALT_TYPE.SSPANNING_RELATION);
 					}
 					/* annotate */

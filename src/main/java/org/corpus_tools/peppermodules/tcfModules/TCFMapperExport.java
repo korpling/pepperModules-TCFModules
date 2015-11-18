@@ -202,8 +202,6 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 			}
 		}
 		List<SToken> sTokens = null;
-		List<SALT_TYPE> sTypes = new ArrayList<SALT_TYPE>();
-		sTypes.add(SALT_TYPE.SSPANNING_RELATION);
 		String value = "";
 		try {
 			if (!sSpans.isEmpty()){			
@@ -211,7 +209,7 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 				SSpan sSpan = null;
 				for (int j=0; j<sSpans.size(); j++){
 					sSpan = sSpans.get(j);			
-					sTokens = sDocGraph.getOverlappedTokens(sSpan, sTypes);
+					sTokens = sDocGraph.getOverlappedTokens(sSpan, SALT_TYPE.SSPANNING_RELATION);
 					sTokens = sDocGraph.getSortedTokenByText(sTokens);					
 					w.writeStartElement(NS_TC, TAG_TC_SENTENCE, NS_VALUE_TC);
 					w.writeAttribute(ATT_ID, "s_"+(j+1));					
@@ -304,13 +302,10 @@ public class TCFMapperExport extends PepperMapperImpl implements TCFDictionary{
 			XMLStreamWriter w = currentTCF;
 			try {
 				w.writeStartElement(NS_TC, TAG_TC_TEXTSTRUCTURE, NS_VALUE_TC);
-				List<SALT_TYPE> sTypes = new ArrayList<SALT_TYPE>();
-				sTypes.add(SALT_TYPE.SSPANNING_RELATION);
-				sTypes.add(SALT_TYPE.SDOMINANCE_RELATION);
 				List<SToken> sTokens = null;
 				String type = null;
 				for (SNode sNode : layoutNodes){					
-					sTokens = getDocument().getDocumentGraph().getSortedTokenByText(getDocument().getDocumentGraph().getOverlappedTokens(sNode, sTypes));
+					sTokens = getDocument().getDocumentGraph().getSortedTokenByText(getDocument().getDocumentGraph().getOverlappedTokens(sNode, SALT_TYPE.SSPANNING_RELATION, SALT_TYPE.SDOMINANCE_RELATION));
 					List<SToken> realTokens = new ArrayList<SToken>();
 					for (SToken sTok : sTokens){
 						if (!emptyTokens.contains(sTok)){

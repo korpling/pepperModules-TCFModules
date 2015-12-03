@@ -19,7 +19,6 @@ package org.corpus_tools.peppermodules.tcfModules;
 
 import org.corpus_tools.pepper.impl.PepperExporterImpl;
 import org.corpus_tools.pepper.modules.PepperExporter;
-import org.corpus_tools.pepper.modules.PepperExporter.EXPORT_MODE;
 import org.corpus_tools.pepper.modules.PepperMapper;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.graph.Identifier;

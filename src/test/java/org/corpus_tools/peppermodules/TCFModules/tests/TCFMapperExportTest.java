@@ -46,7 +46,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TCFMapperExportTest {
-	
+
 	private TCFMapperExport fixture = null;
 	private static final String FOLDER_PEPPER_TEST = "/pepper-test/";
 	private static final String SNAME_TEST_PRIMARY_TEXT = "ExporterTestPrimaryData.tcf";
@@ -55,25 +55,25 @@ public class TCFMapperExportTest {
 	private static final String SNAME_TEST_SENTENCES = "ExporterTestSentences.tcf";
 	private static final String SNAME_TEST_POS = "ExporterTestPOS.tcf";
 	private static final String SNAME_TEST_LEMMA = "ExporterTestLemma.tcf";
-	
-	public TCFMapperExport getFixture(){
+
+	public TCFMapperExport getFixture() {
 		return fixture;
 	}
-	
-	public void setFixture(TCFMapperExport fixture){
+
+	public void setFixture(TCFMapperExport fixture) {
 		this.fixture = fixture;
 	}
-	
+
 	@Before
-	public void setUp(){		
-		setFixture(new TCFMapperExport());		
+	public void setUp() {
+		setFixture(new TCFMapperExport());
 		getFixture().setProperties(new TCFExporterProperties());
 	}
-	
-	private void writeStartAndPrimaryText(XMLStreamWriter xmlWriter) throws XMLStreamException{
+
+	private void writeStartAndPrimaryText(XMLStreamWriter xmlWriter) throws XMLStreamException {
 		xmlWriter.writeStartDocument();
 		xmlWriter.writeProcessingInstruction(TCFDictionary.TCF_PI);
-		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);				
+		xmlWriter.writeStartElement(TCFDictionary.NS_WL, TCFDictionary.TAG_WL_D_SPIN, TCFDictionary.NS_VALUE_WL);
 		xmlWriter.writeNamespace(TCFDictionary.NS_ED, TCFDictionary.NS_VALUE_ED);
 		xmlWriter.writeNamespace(TCFDictionary.NS_LX, TCFDictionary.NS_VALUE_LX);
 		xmlWriter.writeNamespace(TCFDictionary.NS_MD, TCFDictionary.NS_VALUE_MD);
@@ -88,9 +88,12 @@ public class TCFMapperExportTest {
 		xmlWriter.writeCharacters(SampleGenerator.PRIMARY_TEXT_EN);
 		xmlWriter.writeEndElement();
 	}
-	
-	/** writes tokens t_1 to t_11 (Is this example more complicated than it appears to be?) as valid tcf xml */
-	private void writeTokens(XMLStreamWriter xmlWriter) throws XMLStreamException{
+
+	/**
+	 * writes tokens t_1 to t_11 (Is this example more complicated than it
+	 * appears to be?) as valid tcf xml
+	 */
+	private void writeTokens(XMLStreamWriter xmlWriter) throws XMLStreamException {
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKENS, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t_1");
@@ -135,112 +138,111 @@ public class TCFMapperExportTest {
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TOKEN, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "t_11");
 		xmlWriter.writeCharacters("?");
-		xmlWriter.writeEndElement();//end of token
-		xmlWriter.writeEndElement();//end of tokens
+		xmlWriter.writeEndElement();// end of token
+		xmlWriter.writeEndElement();// end of tokens
 	}
-	
+
 	/*
-	 * TODO use XMLDiff von XUnit 
+	 * TODO use XMLDiff von XUnit
 	 */
-	
-	
+
 	@Test
-	public void testPrimaryText() throws XMLStreamException, IOException{
+	public void testPrimaryText() throws XMLStreamException, IOException {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		XMLOutputFactory o= XMLOutputFactory.newFactory();
-		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
-		
-		/* creating TCF */		
+		XMLOutputFactory o = XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter = o.createXMLStreamWriter(outStream);
+
+		/* creating TCF */
 		writeStartAndPrimaryText(xmlWriter);
-		xmlWriter.writeEndElement();//end of textcorpus
-		xmlWriter.writeEndDocument();		
-		
+		xmlWriter.writeEndElement();// end of textcorpus
+		xmlWriter.writeEndDocument();
+
 		/* creating SDocument */
 		SDocument sDocument = SaltFactory.createSDocument();
 		sDocument.setName(SNAME_TEST_PRIMARY_TEXT);
 		sDocument.createMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
-		SampleGenerator.createPrimaryData(sDocument, SampleGenerator.LANG_EN);		
-		
-		/* setting variables*/		
-		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_PRIMARY_TEXT));
-		
+		SampleGenerator.createPrimaryData(sDocument, SampleGenerator.LANG_EN);
+
+		/* setting variables */
+		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir") + FOLDER_PEPPER_TEST + SNAME_TEST_PRIMARY_TEXT));
+
 		/* start mapper */
 		getFixture().setDocument(sDocument);
 		getFixture().mapSDocument();
-		
+
 		/* tests */
 		File fixFile = new File(getFixture().getResourceURI().toFileString());
 		BufferedReader reader = new BufferedReader(new FileReader(fixFile));
 		assertEquals(outStream.toString(), reader.readLine());
 		reader.close();
 	}
-	
+
 	@Test
-	public void testTokenization() throws XMLStreamException, IOException{
+	public void testTokenization() throws XMLStreamException, IOException {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		XMLOutputFactory o= XMLOutputFactory.newFactory();
-		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
-		
+		XMLOutputFactory o = XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter = o.createXMLStreamWriter(outStream);
+
 		/* creating TCF */
 		writeStartAndPrimaryText(xmlWriter);
 		writeTokens(xmlWriter);
-		xmlWriter.writeEndElement();//end of textcorpus
+		xmlWriter.writeEndElement();// end of textcorpus
 		xmlWriter.writeEndDocument();
-		
+
 		/* creating SDocument */
 		SDocument sDocument = SaltFactory.createSDocument();
 		sDocument.setName(SNAME_TEST_TOKENS);
 		sDocument.createMetaAnnotation(null, TCFDictionary.ATT_LANG, "en");
 		SampleGenerator.createPrimaryData(sDocument, SampleGenerator.LANG_EN);
 		SampleGenerator.createTokens(sDocument);
-		
-		/* setting variables*/		
-		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_TOKENS));
-		
+
+		/* setting variables */
+		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir") + FOLDER_PEPPER_TEST + SNAME_TEST_TOKENS));
+
 		/* start mapper */
 		getFixture().setDocument(sDocument);
 		getFixture().mapSDocument();
-		
+
 		/* tests */
 		File fixFile = new File(getFixture().getResourceURI().toFileString());
 		BufferedReader reader = new BufferedReader(new FileReader(fixFile));
 		assertEquals(outStream.toString(), reader.readLine());
 		reader.close();
 	}
-	
+
 	@Test
-	public void testLayoutAnnotations() throws XMLStreamException, IOException{
+	public void testLayoutAnnotations() throws XMLStreamException, IOException {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		XMLOutputFactory o= XMLOutputFactory.newFactory();
-		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
-		
-		/* creating TCF */		
+		XMLOutputFactory o = XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter = o.createXMLStreamWriter(outStream);
+
+		/* creating TCF */
 		writeStartAndPrimaryText(xmlWriter);
-		writeTokens(xmlWriter);		
+		writeTokens(xmlWriter);
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSTRUCTURE, TCFDictionary.NS_VALUE_TC);
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t_1");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t_11");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "page");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t_1");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t_5");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TEXTSPAN, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_START, "t_6");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_END, "t_11");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TYPE, "line");
 		xmlWriter.writeEndElement();
-		
-		xmlWriter.writeEndElement();//end of textstructure
-		xmlWriter.writeEndElement();//end of textcorpus
-		xmlWriter.writeEndDocument();		
-		
+
+		xmlWriter.writeEndElement();// end of textstructure
+		xmlWriter.writeEndElement();// end of textcorpus
+		xmlWriter.writeEndDocument();
+
 		/* creating SDocument */
 		SDocument sDocument = SaltFactory.createSDocument();
 		sDocument.setName(SNAME_TEST_TEXTSTRUCTURE);
@@ -253,44 +255,44 @@ public class TCFMapperExportTest {
 		String valuePage = properties.getTextstructurePageValue();
 		String qNameLine = properties.getTextstructureLineName();
 		String valueLine = properties.getTextstructureLineValue();
-		
+
 		sDocGraph.createSpan(sDocument.getDocumentGraph().getSortedTokenByText()).createAnnotation(null, qNamePage, valuePage);
 		List<SToken> sTokens = sDocGraph.getSortedTokenByText();
 		SSpan sSpan = sDocGraph.createSpan(sTokens.get(0));
 		sSpan.createAnnotation(null, qNameLine, valueLine);
-		for (int i=1; i<5; i++){
+		for (int i = 1; i < 5; i++) {
 			sDocGraph.createRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
 		sSpan = sDocGraph.createSpan(sTokens.get(5));
 		sSpan.createAnnotation(null, qNameLine, valueLine);
-		for (int i=6; i<sTokens.size(); i++){
+		for (int i = 6; i < sTokens.size(); i++) {
 			sDocGraph.createRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
-		
-		/* setting variables*/		
-		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_TEXTSTRUCTURE));
+
+		/* setting variables */
+		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir") + FOLDER_PEPPER_TEST + SNAME_TEST_TEXTSTRUCTURE));
 		getFixture().setProperties(properties);
-		
+
 		/* start mapper */
 		getFixture().setDocument(sDocument);
 		getFixture().mapSDocument();
-		
+
 		/* tests */
 		File fixFile = new File(getFixture().getResourceURI().toFileString());
 		BufferedReader reader = new BufferedReader(new FileReader(fixFile));
 		assertEquals(outStream.toString(), reader.readLine());
 		reader.close();
 	}
-	
+
 	@Test
-	public void testSentences() throws XMLStreamException, IOException{
+	public void testSentences() throws XMLStreamException, IOException {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		XMLOutputFactory o= XMLOutputFactory.newFactory();
-		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
-		
-		/* creating TCF */		
+		XMLOutputFactory o = XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter = o.createXMLStreamWriter(outStream);
+
+		/* creating TCF */
 		writeStartAndPrimaryText(xmlWriter);
-		writeTokens(xmlWriter);		
+		writeTokens(xmlWriter);
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SENTENCES, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_SENTENCE, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "s_1");
@@ -300,11 +302,11 @@ public class TCFMapperExportTest {
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "s_2");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_6 t_7 t_8 t_9 t_10 t_11");
 		xmlWriter.writeEndElement();
-		
-		xmlWriter.writeEndElement();//end of senctences
-		xmlWriter.writeEndElement();//end of textcorpus
-		xmlWriter.writeEndDocument();		
-		
+
+		xmlWriter.writeEndElement();// end of senctences
+		xmlWriter.writeEndElement();// end of textcorpus
+		xmlWriter.writeEndDocument();
+
 		/* creating SDocument */
 		SDocument sDocument = SaltFactory.createSDocument();
 		sDocument.setName(SNAME_TEST_SENTENCES);
@@ -314,113 +316,113 @@ public class TCFMapperExportTest {
 		SDocumentGraph sDocGraph = sDocument.getDocumentGraph();
 		List<SToken> sTokens = sDocGraph.getSortedTokenByText();
 		SSpan sSpan = sDocGraph.createSpan(sTokens.get(0));
-		for (int i=1; i<5; i++){
+		for (int i = 1; i < 5; i++) {
 			sDocGraph.createRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
 		sSpan.createAnnotation(null, "sentence", "sentence");
 		sSpan = sDocGraph.createSpan(sTokens.get(5));
-		for (int i=6; i<sTokens.size(); i++){
+		for (int i = 6; i < sTokens.size(); i++) {
 			sDocGraph.createRelation(sSpan, sTokens.get(i), SALT_TYPE.SSPANNING_RELATION, null);
 		}
 		sSpan.createAnnotation(null, "sentence", "sentence");
-		
-		/* setting variables*/		
-		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_SENTENCES));
+
+		/* setting variables */
+		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir") + FOLDER_PEPPER_TEST + SNAME_TEST_SENTENCES));
 		getFixture().setProperties(new TCFExporterProperties());
-		
+
 		/* start mapper */
 		getFixture().setDocument(sDocument);
 		getFixture().mapSDocument();
-		
+
 		/* tests */
 		File fixFile = new File(getFixture().getResourceURI().toFileString());
 		BufferedReader reader = new BufferedReader(new FileReader(fixFile));
 		assertEquals(outStream.toString(), reader.readLine());
 		reader.close();
 	}
-	
+
 	@Test
-	public void testPOS() throws XMLStreamException, IOException{
+	public void testPOS() throws XMLStreamException, IOException {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		XMLOutputFactory o= XMLOutputFactory.newFactory();
-		XMLStreamWriter xmlWriter= o.createXMLStreamWriter(outStream);
-		
-		/* creating TCF */		
+		XMLOutputFactory o = XMLOutputFactory.newFactory();
+		XMLStreamWriter xmlWriter = o.createXMLStreamWriter(outStream);
+
+		/* creating TCF */
 		writeStartAndPrimaryText(xmlWriter);
-		writeTokens(xmlWriter);		
+		writeTokens(xmlWriter);
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_POSTAGS, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TAGSET, "stts");
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt_1");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_1");
 		xmlWriter.writeCharacters("VBZ");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt_2");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_2");
 		xmlWriter.writeCharacters("DT");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt_3");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_3");
 		xmlWriter.writeCharacters("NN");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt_4");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_4");
 		xmlWriter.writeCharacters("RBR");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt_5");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_5");
 		xmlWriter.writeCharacters("JJ");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt_6");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_6");
 		xmlWriter.writeCharacters("IN");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt_7");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_7");
 		xmlWriter.writeCharacters("PRP");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt_8");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_8");
 		xmlWriter.writeCharacters("VBZ");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt_9");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_9");
 		xmlWriter.writeCharacters("TO");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt_10");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_10");
 		xmlWriter.writeCharacters("VB");
 		xmlWriter.writeEndElement();
-		
+
 		xmlWriter.writeStartElement(TCFDictionary.NS_TC, TCFDictionary.TAG_TC_TAG, TCFDictionary.NS_VALUE_TC);
 		xmlWriter.writeAttribute(TCFDictionary.ATT_ID, "pt_11");
 		xmlWriter.writeAttribute(TCFDictionary.ATT_TOKENIDS, "t_11");
 		xmlWriter.writeCharacters(".");
 		xmlWriter.writeEndElement();
-		
-		xmlWriter.writeEndElement();//end of postags
-		xmlWriter.writeEndElement();//end of textcorpus
-		xmlWriter.writeEndDocument();		
-		
+
+		xmlWriter.writeEndElement();// end of postags
+		xmlWriter.writeEndElement();// end of textcorpus
+		xmlWriter.writeEndDocument();
+
 		/* creating SDocument */
 		SDocument sDocument = SaltFactory.createSDocument();
 		sDocument.setName(SNAME_TEST_POS);
@@ -429,17 +431,17 @@ public class TCFMapperExportTest {
 		SampleGenerator.createTokens(sDocument);
 		SampleGenerator.createMorphologyAnnotations(sDocument);
 		SDocumentGraph sDocGraph = sDocument.getDocumentGraph();
-		
-		/* setting variables*/		
-		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir")+FOLDER_PEPPER_TEST+SNAME_TEST_POS));
+
+		/* setting variables */
+		getFixture().setResourceURI(URI.createFileURI(System.getProperty("java.io.tmpdir") + FOLDER_PEPPER_TEST + SNAME_TEST_POS));
 		TCFExporterProperties properties = new TCFExporterProperties();
 		properties.setPropertyValue(TCFExporterProperties.PROP_POS_QNAME, SaltUtil.createQName(SaltUtil.SALT_NAMESPACE, SaltUtil.SEMANTICS_POS));
 		getFixture().setProperties(properties);
-		
+
 		/* start mapper */
 		getFixture().setDocument(sDocument);
 		getFixture().mapSDocument();
-		
+
 		/* tests */
 		File fixFile = new File(getFixture().getResourceURI().toFileString());
 		BufferedReader reader = new BufferedReader(new FileReader(fixFile));

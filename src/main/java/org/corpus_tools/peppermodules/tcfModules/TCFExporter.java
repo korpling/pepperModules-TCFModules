@@ -25,9 +25,9 @@ import org.corpus_tools.salt.graph.Identifier;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
 
-@Component(name="TCFExporterComponent", factory="PepperExporterComponentFactory")
-public class TCFExporter extends PepperExporterImpl implements PepperExporter{
-	public TCFExporter(){
+@Component(name = "TCFExporterComponent", factory = "PepperExporterComponentFactory")
+public class TCFExporter extends PepperExporterImpl implements PepperExporter {
+	public TCFExporter() {
 		super();
 		this.setExportMode(EXPORT_MODE.DOCUMENTS_IN_FILES);
 		this.setName("TCFExporter");
@@ -37,13 +37,13 @@ public class TCFExporter extends PepperExporterImpl implements PepperExporter{
 		this.addSupportedFormat("TCF", "0.4", null);
 		this.setProperties(new TCFExporterProperties());
 	}
-	
+
 	@Override
 	public PepperMapper createPepperMapper(Identifier sElementId) {
-		TCFMapperExport mapper = new TCFMapperExport();		
+		TCFMapperExport mapper = new TCFMapperExport();
 		if (sElementId.getIdentifiableElement() instanceof SDocument) {
 			mapper.setResourceURI(getIdentifier2ResourceTable().get(sElementId));
-		}		
+		}
 		return mapper;
 	}
 }

@@ -20,30 +20,50 @@ package org.corpus_tools.peppermodules.tcfModules;
 import org.corpus_tools.pepper.modules.PepperModuleProperties;
 import org.corpus_tools.pepper.modules.PepperModuleProperty;
 
-public class TCFExporterProperties extends PepperModuleProperties{
-	/** this property says which annotation key is used for spans over tokens that mark a line of text */
+public class TCFExporterProperties extends PepperModuleProperties {
+	/**
+	 * this property says which annotation key is used for spans over tokens
+	 * that mark a line of text
+	 */
 	public static final String PROP_TEXTSTRUCTURE_LINE_QNAME = "textstructure.line.qname";
-	/** this property says which annotation value is used for spans over tokens that mark a line of text */
+	/**
+	 * this property says which annotation value is used for spans over tokens
+	 * that mark a line of text
+	 */
 	public static final String PROP_TEXTSTRUCTURE_LINE_VALUE = "textstructure.line.value";
-	/** this property says which annotation key is used for spans over tokens that mark a page */
+	/**
+	 * this property says which annotation key is used for spans over tokens
+	 * that mark a page
+	 */
 	public static final String PROP_TEXTSTRUCTURE_PAGE_QNAME = "textstructure.page.qname";
-	/** this property says which annotation value is used for spans over tokens that mark a line */
+	/**
+	 * this property says which annotation value is used for spans over tokens
+	 * that mark a line
+	 */
 	public static final String PROP_TEXTSTRUCTURE_PAGE_VALUE = "textstructure.page.value";
 	/** this property says whether empty tokens are allowed or not */
 	public static final String PROP_EMPTY_TOKENS_ALLOWED = "allow.emptyTokens";
-	/** this property says which annotation key is used for spans over tokens that mark a sentence */
+	/**
+	 * this property says which annotation key is used for spans over tokens
+	 * that mark a sentence
+	 */
 	public static final String PROP_SENTENCE_QNAME = "sentence.qname";
-	/** this property says which annotation value is used for spans over tokens that mark a sentence */
+	/**
+	 * this property says which annotation value is used for spans over tokens
+	 * that mark a sentence
+	 */
 	public static final String PROP_SENTENCE_VALUE = "sentence.value";
 	/** this property says which annotation key is used for POS annotations */
 	public static final String PROP_POS_QNAME = "pos.qname";
-	/** this property says which annotation annotation key is used for lemma annotations */
+	/**
+	 * this property says which annotation annotation key is used for lemma
+	 * annotations
+	 */
 	public static final String PROP_LEMMA_QNAME = "lemma.qname";
 	/** property description */
 	public static final String PROP_NE_QNAME = "";
-	
-	
-	public TCFExporterProperties(){
+
+	public TCFExporterProperties() {
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_LINE_QNAME, String.class, "This property says which annotation key is used for spans over tokens that mark a line of text.", "textstructure", false));
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_LINE_VALUE, String.class, "This property says which annotation value is used for spans over tokens that mark a line of text.", "line", false));
 		addProperty(new PepperModuleProperty<String>(PROP_TEXTSTRUCTURE_PAGE_QNAME, String.class, "This property says which annotation key is used for spans over tokens that mark a page of text.", "textstructure", false));
@@ -54,45 +74,45 @@ public class TCFExporterProperties extends PepperModuleProperties{
 		addProperty(new PepperModuleProperty<String>(PROP_POS_QNAME, String.class, "This property says which annotation key is used for POS annotations.", "POS", false));
 		addProperty(new PepperModuleProperty<String>(PROP_LEMMA_QNAME, String.class, "This property says which annotation annotation key is used for lemma annotations.", "LEMMA", false));
 	}
-	
-	public String getTextstructureLineName(){		
-		return getProperty(PROP_TEXTSTRUCTURE_LINE_QNAME).getValue().toString();		
+
+	public String getTextstructureLineName() {
+		return getProperty(PROP_TEXTSTRUCTURE_LINE_QNAME).getValue().toString();
 	}
-	
-	public String getTextstructureLineValue(){		
-		return getProperty(PROP_TEXTSTRUCTURE_LINE_VALUE).getValue().toString();		
+
+	public String getTextstructureLineValue() {
+		return getProperty(PROP_TEXTSTRUCTURE_LINE_VALUE).getValue().toString();
 	}
-	
-	public String getTextstructurePageName(){		
-		return getProperty(PROP_TEXTSTRUCTURE_PAGE_QNAME).getValue().toString();		
+
+	public String getTextstructurePageName() {
+		return getProperty(PROP_TEXTSTRUCTURE_PAGE_QNAME).getValue().toString();
 	}
-	
-	public String getTextstructurePageValue(){		
-		return getProperty(PROP_TEXTSTRUCTURE_PAGE_VALUE).getValue().toString();		
+
+	public String getTextstructurePageValue() {
+		return getProperty(PROP_TEXTSTRUCTURE_PAGE_VALUE).getValue().toString();
 	}
-	
-	public Boolean isEmptyTokensAllowed(){
+
+	public Boolean isEmptyTokensAllowed() {
 		boolean retVal = false;
 		String prop = getProperty(PROP_EMPTY_TOKENS_ALLOWED).getValue().toString();
-		if((prop!=null)&&(!prop.isEmpty())){
+		if ((prop != null) && (!prop.isEmpty())) {
 			retVal = Boolean.valueOf(prop);
 		}
 		return retVal;
 	}
-	
-	public String getSentenceQName(){
+
+	public String getSentenceQName() {
 		return getProperty(PROP_SENTENCE_QNAME).getValue().toString();
 	}
-	
-	public String getSentenceValue(){
+
+	public String getSentenceValue() {
 		return getProperty(PROP_SENTENCE_VALUE).getValue().toString();
 	}
-	
-	public String getPOSQName(){
+
+	public String getPOSQName() {
 		return getProperty(PROP_POS_QNAME).getValue().toString();
 	}
-	
-	public String getLemmaQName(){
+
+	public String getLemmaQName() {
 		return getProperty(PROP_LEMMA_QNAME).getValue().toString();
 	}
 }

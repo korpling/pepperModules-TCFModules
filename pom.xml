@@ -1,8 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>pepperModules-TCFModules</artifactId>
 	<name>${project.groupId}.${project.artifactId}</name>
-	<version>1.1.6-SNAPSHOT</version>
+	<version>1.1.5-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<parent>
 		<groupId>org.corpus-tools</groupId>
@@ -27,6 +28,14 @@
 		<connection>scm:git:git://github.com/korpling/pepperModules-TCFModules.git</connection>
 		<developerConnection>scm:git:git@github.com:korpling/pepperModules-TCFModules.git</developerConnection>
 		<url>https://github.com/korpling/pepperModules-TCFModules</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
+	<developers>
+		<developer>
+			<name>Martin Klotz</name>
+			<email>saltnpepper@lists.hu-berlin.de</email>
+			<organization>Humboldt-Universität zu Berlin</organization>
+			<organizationUrl>https://www.linguistik.hu-berlin.de/en/institut-en/professuren-en/korpuslinguistik/standardseite-en?set_language=en</organizationUrl>
+		</developer>
+	</developers>
 </project>

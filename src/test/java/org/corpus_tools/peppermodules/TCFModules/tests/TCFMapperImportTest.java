@@ -395,7 +395,7 @@ public class TCFMapperImportTest {
 		SAnnotation anno = SaltFactory.createSPOSAnnotation();
 		anno.setValue("PP");
 		docGraph.getTokens().get(0).addAnnotation(anno);
-		docGraph.getTokens().get(0).addLayer(posLayer);
+		posLayer.addNode(docGraph.getTokens().get(0));
 
 		anno = SaltFactory.createSPOSAnnotation();
 		anno.setValue("VBZ");
@@ -938,26 +938,26 @@ public class TCFMapperImportTest {
 		SAnnotation sAnno = SaltFactory.createSLemmaAnnotation();
 		sAnno.setValue("I");
 		sSpan.addAnnotation(sAnno);
-		sSpan.addLayer(docLemmaLayer);
+		docLemmaLayer.addNode(sSpan);
 
 		sSpan = docGraph.createSpan(docTokens.get(1));
 		sAnno = SaltFactory.createSLemmaAnnotation();
 		sAnno.setValue("love");
 		sSpan.addAnnotation(sAnno);
-		sSpan.addLayer(docLemmaLayer);
+		docLemmaLayer.addNode(sSpan);
 
 		sSpan = docGraph.createSpan(docTokens.get(2));
 		docGraph.addNode(sSpan, docTokens.get(3), SALT_TYPE.SSPANNING_RELATION);
 		sAnno = SaltFactory.createSLemmaAnnotation();
 		sAnno.setValue("New York");
 		sSpan.addAnnotation(sAnno);
-		sSpan.addLayer(docLemmaLayer);
+		docLemmaLayer.addNode(sSpan);
 
 		sSpan = docGraph.createSpan(docTokens.get(4));
 		sAnno = SaltFactory.createSLemmaAnnotation();
 		sAnno.setValue(".");
 		sSpan.addAnnotation(sAnno);
-		sSpan.addLayer(docLemmaLayer);
+		docLemmaLayer.addNode(sSpan);
 
 		/* setting variables */
 		File tmpOut = new File(System.getProperty("java.io.tmpdir") + LOCATION_TEST_TOKENS_LEMMA);
@@ -1621,10 +1621,10 @@ public class TCFMapperImportTest {
 		docGraph.addNode(np2, newYork, SALT_TYPE.SDOMINANCE_RELATION);
 		docGraph.addNode(root, docTokens.get(4), SALT_TYPE.SDOMINANCE_RELATION);
 
-		root.addLayer(docSynLayer);
-		s.addLayer(docSynLayer);
-		np1.addLayer(docSynLayer);
-		np2.addLayer(docSynLayer);
+		docSynLayer.addNode(root);
+		docSynLayer.addNode(s);
+		docSynLayer.addNode(np1);
+		docSynLayer.addNode(np2);
 
 		docTokens.get(0).createAnnotation(TCFMapperImport.LAYER_CONSTITUENTS, TCFDictionary.ATT_CAT, "PP");
 		docTokens.get(1).createAnnotation(TCFMapperImport.LAYER_CONSTITUENTS, TCFDictionary.ATT_CAT, "VBZ");
@@ -1792,10 +1792,10 @@ public class TCFMapperImportTest {
 		docGraph.addNode(np2, sNewYork, SALT_TYPE.SDOMINANCE_RELATION);
 		docGraph.addNode(root, sStop, SALT_TYPE.SDOMINANCE_RELATION);
 
-		root.addLayer(docSynLayer);
-		s.addLayer(docSynLayer);
-		np1.addLayer(docSynLayer);
-		np2.addLayer(docSynLayer);
+		docSynLayer.addNode(root);
+		docSynLayer.addNode(s);
+		docSynLayer.addNode(np1);
+		docSynLayer.addNode(np2);
 
 		/* setting variables */
 		File tmpOut = new File(System.getProperty("java.io.tmpdir") + LOCATION_TEST_CONSTITUENT_PARSING);
@@ -6046,7 +6046,7 @@ public class TCFMapperImportTest {
 		// paragraph:
 		SSpan sSpan = docGraph.createSpan(docTokens);
 		sSpan.createAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "paragraph");
-		sSpan.addLayer(docTextLayer);
+		docTextLayer.addNode(sSpan);
 
 		// page1:
 		List<SToken> spanTokens = new ArrayList<SToken>();
@@ -6057,7 +6057,7 @@ public class TCFMapperImportTest {
 		spanTokens.add(docTokens.get(4));
 		sSpan = docGraph.createSpan(spanTokens);
 		sSpan.createAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "page");
-		sSpan.addLayer(docTextLayer);
+		docTextLayer.addNode(sSpan);
 
 		// page2:
 		spanTokens.clear();
@@ -6069,12 +6069,12 @@ public class TCFMapperImportTest {
 		spanTokens.add(docTokens.get(10));
 		sSpan = docGraph.createSpan(spanTokens);
 		sSpan.createAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "page");
-		sSpan.addLayer(docTextLayer);
+		docTextLayer.addNode(sSpan);
 
 		// line1:
 		sSpan = docGraph.createSpan(docTokens.get(0));
 		sSpan.createAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
-		sSpan.addLayer(docTextLayer);
+		docTextLayer.addNode(sSpan);
 
 		// line2:
 		spanTokens.clear();
@@ -6084,7 +6084,7 @@ public class TCFMapperImportTest {
 		spanTokens.add(docTokens.get(4));
 		sSpan = docGraph.createSpan(spanTokens);
 		sSpan.createAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
-		sSpan.addLayer(docTextLayer);
+		docTextLayer.addNode(sSpan);
 
 		// line3:
 		spanTokens.clear();
@@ -6096,7 +6096,7 @@ public class TCFMapperImportTest {
 		spanTokens.add(docTokens.get(10));
 		sSpan = docGraph.createSpan(spanTokens);
 		sSpan.createAnnotation(TCFMapperImport.LAYER_TEXTSTRUCTURE, TCFDictionary.ATT_TYPE, "line");
-		sSpan.addLayer(docTextLayer);
+		docTextLayer.addNode(sSpan);
 
 		/* setting variables */
 		File tmpOut = new File(System.getProperty("java.io.tmpdir") + LOCATION_TEST_TEXTSTRUCTURE);

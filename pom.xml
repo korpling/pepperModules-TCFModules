@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.corpus-tools</groupId>
 		<artifactId>pepper-parentModule</artifactId>
-		<version>3.0.0</version>
+		<version>3.1.0</version>
 	</parent>
 	<description>This module will allow converting from TCF to Salt and the other way around. </description>
 	<url>https://github.com/korpling/pepperModules-TCFModules</url>
@@ -21,7 +21,7 @@
 	</ciManagement>
 	<inceptionYear>2014</inceptionYear>
 	<organization>
-		<name>Humboldt-Universität zu Berlin, INRIA</name>
+		<name>Humboldt-Universit&#228;t zu Berlin, INRIA</name>
 	</organization>
 	<scm>
 		<connection>scm:git:git://github.com/korpling/pepperModules-TCFModules.git</connection>
@@ -33,7 +33,7 @@
 		<developer>
 			<name>Martin Klotz</name>
 			<email>saltnpepper@lists.hu-berlin.de</email>
-			<organization>Humboldt-Universität zu Berlin</organization>
+			<organization>Humboldt-Universit&#228;t zu Berlin</organization>
 			<organizationUrl>https://www.linguistik.hu-berlin.de/en/institut-en/professuren-en/korpuslinguistik/standardseite-en?set_language=en</organizationUrl>
 		</developer>
 	</developers>

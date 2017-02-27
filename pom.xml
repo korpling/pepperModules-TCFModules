@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>pepperModules-TCFModules</artifactId>
 	<name>${project.groupId}.${project.artifactId}</name>
-	<version>1.1.7-SNAPSHOT</version>
+	<version>1.1.7</version>
 	<packaging>bundle</packaging>
 	<parent>
 		<groupId>org.corpus-tools</groupId>
@@ -21,19 +21,19 @@
 	</ciManagement>
 	<inceptionYear>2014</inceptionYear>
 	<organization>
-		<name>Humboldt-Universit&#228;t zu Berlin, INRIA</name>
+		<name>Humboldt-Universität zu Berlin, INRIA</name>
 	</organization>
 	<scm>
 		<connection>scm:git:git://github.com/korpling/pepperModules-TCFModules.git</connection>
 		<developerConnection>scm:git:git@github.com:korpling/pepperModules-TCFModules.git</developerConnection>
 		<url>https://github.com/korpling/pepperModules-TCFModules</url>
-		<tag>HEAD</tag>
+		<tag>pepperModules-TCFModules-1.1.7</tag>
 	</scm>
 	<developers>
 		<developer>
 			<name>Martin Klotz</name>
 			<email>saltnpepper@lists.hu-berlin.de</email>
-			<organization>Humboldt-Universit&#228;t zu Berlin</organization>
+			<organization>Humboldt-Universität zu Berlin</organization>
 			<organizationUrl>https://www.linguistik.hu-berlin.de/en/institut-en/professuren-en/korpuslinguistik/standardseite-en?set_language=en</organizationUrl>
 		</developer>
 	</developers>

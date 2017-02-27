@@ -20,43 +20,12 @@ package org.corpus_tools.peppermodules.tcfModules;
 import org.corpus_tools.pepper.impl.PepperImporterImpl;
 import org.corpus_tools.pepper.modules.PepperImporter;
 import org.corpus_tools.pepper.modules.PepperMapper;
-import org.corpus_tools.pepper.modules.PepperModule;
-import org.corpus_tools.pepper.modules.PepperModuleProperties;
-import org.corpus_tools.pepper.modules.exceptions.PepperModuleNotReadyException;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.graph.Identifier;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
 
-/**
- * This is a sample {@link PepperImporter}, which can be used for creating
- * individual Importers for the Pepper Framework. Therefore you have to take a
- * look to todo's and adapt the code.
- * 
- * <ul>
- * <li>the salt model to fill, manipulate or export can be accessed via
- * {@link #getSaltProject()}</li>
- * <li>special parameters given by Pepper workflow can be accessed via
- * {@link #getSpecialParams()}</li>
- * <li>a place to store temporary datas for processing can be accessed via
- * {@link #getTemproraries()}</li>
- * <li>a place where resources of this bundle are, can be accessed via
- * {@link #getResources()}</li>
- * <li>a logService can be accessed via {@link #getLogService()}</li>
- * </ul>
- * If this is the first time, you are implementing a Pepper module, we strongly
- * recommend, to take a look into the 'Developer's Guide for Pepper modules',
- * you will find on
- * <a href="https://korpling.german.hu-berlin.de/saltnpepper/">https://korpling.
- * german.hu-berlin.de/saltnpepper/</a>.
- * 
- * @author Florian Zipser
- * @version 1.0
- *
- */
-// TODO change the name of the component, for example use the format name and
-// the ending Importer (FORMATImporterComponent)
 @Component(name = "TCFImporterComponent", factory = "PepperImporterComponentFactory")
 public class TCFImporter extends PepperImporterImpl implements PepperImporter {
 
@@ -104,25 +73,5 @@ public class TCFImporter extends PepperImporterImpl implements PepperImporter {
 		TCFMapperImport mapper = new TCFMapperImport();
 		mapper.setResourceURI(getIdentifier2ResourceTable().get(sElementId));
 		return (mapper);
-	}
-
-	// =================================================== optional
-	// ===================================================
-	/**
-	 * <strong>OVERRIDE THIS METHOD FOR CUSTOMIZATION</strong>
-	 * 
-	 * This method is called by the pepper framework after initializing this
-	 * object and directly before start processing. Initializing means setting
-	 * properties {@link PepperModuleProperties}, setting temprorary files,
-	 * resources etc. . returns false or throws an exception in case of
-	 * {@link PepperModule} instance is not ready for any reason.
-	 * 
-	 * @return false, {@link PepperModule} instance is not ready for any reason,
-	 *         true, else.
-	 */
-	@Override
-	public boolean isReadyToStart() throws PepperModuleNotReadyException {
-		// TODO make some initializations if necessary
-		return (super.isReadyToStart());
 	}
 }

@@ -29,13 +29,13 @@ import org.osgi.service.component.annotations.Component;
 public class TCFExporter extends PepperExporterImpl implements PepperExporter {
 	public TCFExporter() {
 		super();
-		this.setExportMode(EXPORT_MODE.DOCUMENTS_IN_FILES);
-		this.setName("TCFExporter");
+		setExportMode(EXPORT_MODE.DOCUMENTS_IN_FILES);
+		setName("TCFExporter");
 		setSupplierContact(URI.createURI("saltnpepper@lists.hu-berlin.de"));
 		setSupplierHomepage(URI.createURI("https://github.com/korpling/pepperModules-TCFModules"));
 		setDesc("This exporter transforms a Salt model into the TCF format produced for instance by WebLicht (see http://weblicht.sfs.uni-tuebingen.de/) or WebAnno (see https://www.ukp.tu-darmstadt.de/software/webanno/). ");
-		this.addSupportedFormat("TCF", "0.4", null);
-		this.setProperties(new TCFExporterProperties());
+		addSupportedFormat("TCF", "0.4", null);
+		setProperties(new TCFExporterProperties());
 	}
 
 	@Override
